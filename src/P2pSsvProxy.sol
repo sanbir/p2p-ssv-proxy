@@ -4,7 +4,7 @@
 pragma solidity 0.8.18;
 
 import "./constants/P2pConstants.sol";
-import "./interfaces/ssv/ISSVClusters.sol";
+import "./interfaces/ssv/ISSVNetwork.sol";
 import "./@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./access/OwnableWithOperator.sol";
 
@@ -12,13 +12,13 @@ import "./access/OwnableWithOperator.sol";
 error P2pSsvProxy__AmountOfParametersError();
 
 contract P2pSsvProxy is OwnableWithOperator {
-    ISSVClusters public immutable i_ssvNetwork;
+    ISSVNetwork public immutable i_ssvNetwork;
     IERC20 public immutable i_ssvToken;
 
     constructor() {
         i_ssvNetwork = (block.chainid == 1)
-            ? ISSVClusters(0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1)
-            : ISSVClusters(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D);
+            ? ISSVNetwork(0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1)
+            : ISSVNetwork(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D);
 
         i_ssvToken = (block.chainid == 1)
             ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
@@ -32,7 +32,7 @@ contract P2pSsvProxy is OwnableWithOperator {
         bytes[] calldata _pubkeys,
         uint64[] calldata _operatorIds,
         bytes[] calldata _sharesData,
-        ISSVClusters.Cluster[] calldata _clusters
+        ISSVNetwork.Cluster[] calldata _clusters
     ) external onlyOperatorOrOwner {
         uint256 validatorCount = _pubkeys.length;
 
@@ -57,7 +57,7 @@ contract P2pSsvProxy is OwnableWithOperator {
     function removeValidators(
         bytes[] calldata _pubkeys,
         uint64[] calldata _operatorIds,
-        ISSVClusters.Cluster[] calldata _clusters
+        ISSVNetwork.Cluster[] calldata _clusters
     ) external onlyOperatorOrOwner {
         uint256 validatorCount = _pubkeys.length;
 
@@ -78,7 +78,7 @@ contract P2pSsvProxy is OwnableWithOperator {
 
     function liquidate(
         uint64[] calldata _operatorIds,
-        ISSVClusters.Cluster[] calldata _clusters
+        ISSVNetwork.Cluster[] calldata _clusters
     ) external onlyOperatorOrOwner {
         address clusterOwner = address(this);
         uint256 validatorCount = _clusters.length;
@@ -95,7 +95,7 @@ contract P2pSsvProxy is OwnableWithOperator {
     function reactivate(
         uint256 _tokenAmount,
         uint64[] calldata _operatorIds,
-        ISSVClusters.Cluster[] calldata _clusters
+        ISSVNetwork.Cluster[] calldata _clusters
     ) external onlyOperatorOrOwner {
         uint256 tokenPerValidator = _tokenAmount / _clusters.length;
         uint256 validatorCount = _clusters.length;
@@ -112,7 +112,7 @@ contract P2pSsvProxy is OwnableWithOperator {
     function depositToSSV(
         uint256 _tokenAmount,
         uint64[] calldata _operatorIds,
-        ISSVClusters.Cluster[] calldata _clusters
+        ISSVNetwork.Cluster[] calldata _clusters
     ) external onlyOperatorOrOwner {
         address clusterOwner = address(this);
         uint256 tokenPerValidator = _tokenAmount / _clusters.length;
@@ -130,7 +130,7 @@ contract P2pSsvProxy is OwnableWithOperator {
     function withdrawFromSSV(
         uint256 _tokenAmount,
         uint64[] calldata _operatorIds,
-        ISSVClusters.Cluster[] calldata _clusters
+        ISSVNetwork.Cluster[] calldata _clusters
     ) external onlyOperatorOrOwner {
         uint256 tokenPerValidator = _tokenAmount / _clusters.length;
         uint256 validatorCount = _clusters.length;
@@ -149,5 +149,11 @@ contract P2pSsvProxy is OwnableWithOperator {
         uint256 _amount
     ) external onlyOwner {
         i_ssvToken.transfer(_to, _amount);
+    }
+
+    function setFeeRecipientAddress(
+        address feeRecipientAddress
+    ) external onlyOperatorOrOwner {
+        i_ssvNetwork.setFeeRecipientAddress(feeRecipientAddress);
     }
 }
