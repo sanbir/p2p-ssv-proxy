@@ -12,31 +12,31 @@ import "../src/P2pSsvProxy.sol";
 import "../src/interfaces/ssv/ISSVClusters.sol";
 
 contract Integration is Test {
-    // P2pSsvProxy public p2pSsvProxy;
+    P2pSsvProxy public p2pSsvProxy;
     address public constant owner = 0x000000005504F0f5CF39b1eD609B892d23028E57; // 0x5124fcC2B3F99F571AD67D075643C743F38f1C34;
     // address public constant operator = 0x388C818CA8B9251b393131C08a736A67ccB19297;
-    // address public constant p2pSsvTokenHolder = 0x000A0660FC6c21B6C8638c56f7a8BbE22DCC9000; // 0xF977814e90dA44bFA03b6295A0616a897441aceC;
+    address public constant p2pSsvTokenHolder = 0x000000005504F0f5CF39b1eD609B892d23028E57; // 0xF977814e90dA44bFA03b6295A0616a897441aceC;
     IERC20 public constant ssvToken = IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7); // IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54);
 
     function setUp() public {
         // vm.createSelectFork("mainnet", 18140648);
         vm.createSelectFork("goerli", 9882317);
 
-        // vm.startPrank(owner);
-        // p2pSsvProxy = new P2pSsvProxy();
-        // vm.stopPrank();
+         vm.startPrank(owner);
+         p2pSsvProxy = new P2pSsvProxy();
+         vm.stopPrank();
     }
 
     function test_Main_Use_Case() public {
         console.log("MainUseCase started");
 
-        // vm.startPrank(p2pSsvTokenHolder);
-        // ssvToken.transfer(address(p2pSsvProxy), 100 ether);
-        // vm.stopPrank();
+         vm.startPrank(p2pSsvTokenHolder);
+         ssvToken.transfer(address(p2pSsvProxy), 50 ether);
+         vm.stopPrank();
 
         uint256 tokenAmount = 11 ether;
 
-        uint256 balance = ssvToken.balanceOf(owner);
+        uint256 balance = ssvToken.balanceOf(address(p2pSsvProxy));
         console.log(balance);
 
         bytes[] memory pubkeys = new bytes[](1);
@@ -63,17 +63,15 @@ contract Integration is Test {
 
         vm.startPrank(owner);
 
-        ssvToken.approve(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D, tokenAmount);
+        p2pSsvProxy.registerValidators(tokenAmount, pubkeys, operatorIds, sharesData, clusters);
 
-        // p2pSsvProxy.registerValidators(tokenAmount, pubkeys, operatorIds, sharesData, clusters);
-
-        ISSVNetwork(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D).registerValidator(
-            pubkeys[0],
-                operatorIds,
-                sharesData[0],
-                tokenAmount,
-                clusters[0]
-        );
+//        ISSVNetwork(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D).registerValidator(
+//            pubkeys[0],
+//                operatorIds,
+//                sharesData[0],
+//                tokenAmount,
+//                clusters[0]
+//        );
 
         vm.stopPrank();
 
