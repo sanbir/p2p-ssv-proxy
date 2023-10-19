@@ -3,19 +3,43 @@
 
 pragma solidity 0.8.18;
 
-import "./constants/P2pConstants.sol";
-import "./interfaces/ssv/ISSVNetwork.sol";
-import "./@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./access/OwnableWithOperator.sol";
+import "../@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import "../@openzeppelin/contracts/utils/introspection/ERC165Checker.sol";
 
-/// @notice amount of parameters do no match
-error P2pSsvProxy__AmountOfParametersError();
+import "../constants/P2pConstants.sol";
+import "../interfaces/ssv/ISSVNetwork.sol";
+import "../access/OwnableWithOperator.sol";
+import "../structs/P2pStructs.sol";
+import "../interfaces/IDepositContract.sol";
+import "../interfaces/IFeeDistributor.sol";
+import "../interfaces/IFeeDistributorFactory.sol";
+
+/// @notice _referenceFeeDistributor should implement IFeeDistributor interface
+/// @param _passedAddress passed address for _referenceFeeDistributor
+error P2pSsvProxy__NotFeeDistributor(address _passedAddress);
+
+/// @notice Should be a FeeDistributorFactory contract
+/// @param _passedAddress passed address that does not support IFeeDistributorFactory interface
+error P2pSsvProxy__NotFactory(address _passedAddress);
 
 contract P2pSsvProxy is OwnableWithOperator {
     ISSVNetwork public immutable i_ssvNetwork;
     IERC20 public immutable i_ssvToken;
+    IDepositContract i_depositContract;
+    IFeeDistributorFactory public immutable i_feeDistributorFactory;
+    address public i_client;
 
-    constructor() {
+    address public s_referenceFeeDistributor;
+    uint64[] public s_operatorIds;
+
+    constructor(address _feeDistributorFactory, address _client) {
+        if (!ERC165Checker.supportsInterface(_feeDistributorFactory, type(IFeeDistributorFactory).interfaceId)) {
+            revert P2pSsvProxy__NotFactory(_feeDistributorFactory);
+        }
+
+        i_feeDistributorFactory = IFeeDistributorFactory(_feeDistributorFactory);
+
         i_ssvNetwork = (block.chainid == 1)
             ? ISSVNetwork(0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1)
             : ISSVNetwork(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D);
@@ -24,29 +48,72 @@ contract P2pSsvProxy is OwnableWithOperator {
             ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
             : IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
 
+        i_depositContract = (block.chainid == 1)
+            ? IERC20(0x00000000219ab540356cBB839Cbe05303d7705Fa)
+            : IERC20(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b);
+
+        i_client = _client;
+
         i_ssvToken.approve(address(i_ssvNetwork), type(uint256).max);
     }
 
-    function registerValidators(
-        uint256 _tokenAmount,
-        bytes[] calldata _pubkeys,
-        uint64[] calldata _operatorIds,
-        bytes[] calldata _sharesData,
-        ISSVNetwork.Cluster[] calldata _clusters
+    function setReferenceFeeDistributor(
+        address _referenceFeeDistributor
     ) external onlyOperatorOrOwner {
-        uint256 validatorCount = _pubkeys.length;
-
-        if (!(
-            _sharesData.length == validatorCount &&
-            _clusters.length == validatorCount
-        )) {
-            revert P2pSsvProxy__AmountOfParametersError();
+        if (!ERC165Checker.supportsInterface(_referenceFeeDistributor, type(IFeeDistributor).interfaceId)) {
+            revert P2pSsvProxy__NotFeeDistributor(_referenceFeeDistributor);
         }
 
-        uint256 tokenPerValidator = _tokenAmount / _pubkeys.length;
+        s_referenceFeeDistributor = _referenceFeeDistributor;
+    }
+
+    function registerValidators(
+        SsvValidator[] calldata _ssvValidators,
+        uint256 _tokenAmount,
+        bytes32 _mevRelay,
+
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) external {
+        uint256 validatorCount = _ssvValidators.length;
+        uint256 tokenPerValidator = _tokenAmount / validatorCount;
+        address referenceFeeDistributor = s_referenceFeeDistributor;
 
         for (uint256 i = 0; i < validatorCount;) {
-            i_ssvNetwork.registerValidator(_pubkeys[i], _operatorIds, _sharesData[i], tokenPerValidator, _clusters[i]);
+            // ETH deposit
+            bytes memory withdrawalCredentials = abi.encodePacked(
+                hex'010000000000000000000000',
+                    _ssvValidators[i].depositData.withdrawalCredentialsAddress
+            );
+            i_depositContract.deposit(
+                _ssvValidators[i].pubkey,
+                withdrawalCredentials,
+                _ssvValidators[i].depositData.signature,
+                _ssvValidators[i].depositData.depositDataRoot
+            );
+
+            // createFeeDistributor
+            address feeDistributorInstance = i_feeDistributorFactory.predictFeeDistributorAddress(
+                referenceFeeDistributor,
+                _clientConfig,
+                _referrerConfig
+            );
+            if (feeDistributorInstance.code.length == 0) {
+                // if feeDistributorInstance doesn't exist, deploy it
+                i_feeDistributorFactory.createFeeDistributor(
+                    referenceFeeDistributor,
+                    _clientConfig,
+                    _referrerConfig
+                );
+            }
+
+            i_ssvNetwork.registerValidator(
+                _ssvValidators[i].pubkey,
+                    _operatorIds,
+                    _sharesData[i],
+                    tokenPerValidator,
+                    _clusters[i]
+            );
 
             unchecked {
                 ++i;
