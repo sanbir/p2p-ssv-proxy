@@ -12,8 +12,10 @@ import "../interfaces/ssv/ISSVNetwork.sol";
 import "../access/OwnableWithOperator.sol";
 import "../structs/P2pStructs.sol";
 import "../interfaces/IDepositContract.sol";
-import "../interfaces/IFeeDistributor.sol";
-import "../interfaces/IFeeDistributorFactory.sol";
+import "../p2pSsvProxyFactory/IP2pSsvProxyFactory.sol";
+import "../assetRecovering/OwnableTokenRecoverer.sol";
+import "./IP2pSsvProxy.sol";
+import "../interfaces/p2p/IFeeDistributorFactory.sol";
 
 /// @notice _referenceFeeDistributor should implement IFeeDistributor interface
 /// @param _passedAddress passed address for _referenceFeeDistributor
@@ -21,24 +23,55 @@ error P2pSsvProxy__NotFeeDistributor(address _passedAddress);
 
 /// @notice Should be a FeeDistributorFactory contract
 /// @param _passedAddress passed address that does not support IFeeDistributorFactory interface
-error P2pSsvProxy__NotFactory(address _passedAddress);
+error P2pSsvProxy__NotFeeDistributorFactory(address _passedAddress);
 
-contract P2pSsvProxy is OwnableWithOperator {
+/// @notice Should be a P2pSsvProxyFactory contract
+/// @param _passedAddress passed address that does not support IP2pSsvProxyFactory interface
+error P2pSsvProxy__NotP2pSsvProxyFactory(address _passedAddress);
+
+/// @notice Throws if called by any account other than the client.
+/// @param _caller address of the caller
+/// @param _client address of the client
+error P2pSsvProxy__CallerNotClient(address _caller, address _client);
+
+/// @notice Only factory can call `initialize`.
+/// @param _msgSender sender address.
+/// @param _actualFactory the actual factory address that can call `initialize`.
+error P2pSsvProxy__NotP2pSsvProxyFactoryCalled(address _msgSender, IP2pSsvProxyFactory _actualFactory);
+
+
+contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxy {
+    IP2pSsvProxyFactory internal immutable i_p2pSsvProxyFactory;
     ISSVNetwork public immutable i_ssvNetwork;
     IERC20 public immutable i_ssvToken;
-    IDepositContract i_depositContract;
-    IFeeDistributorFactory public immutable i_feeDistributorFactory;
-    address public i_client;
 
-    address public s_referenceFeeDistributor;
-    uint64[] public s_operatorIds;
+    address public s_feeDistributor;
 
-    constructor(address _feeDistributorFactory, address _client) {
-        if (!ERC165Checker.supportsInterface(_feeDistributorFactory, type(IFeeDistributorFactory).interfaceId)) {
-            revert P2pSsvProxy__NotFactory(_feeDistributorFactory);
+    /// @notice If caller not client, revert
+    modifier onlyClient() {
+        address clientAddress = client();
+
+        if (clientAddress != msg.sender) {
+            revert P2pSsvProxy__CallerNotClient(msg.sender, clientAddress);
         }
+        _;
+    }
 
-        i_feeDistributorFactory = IFeeDistributorFactory(_feeDistributorFactory);
+    /// @notice If caller not factory, revert
+    modifier onlyP2pSsvProxyFactory() {
+        if (msg.sender != address(i_p2pSsvProxyFactory)) {
+            revert P2pSsvProxy__NotP2pSsvProxyFactoryCalled(msg.sender, i_p2pSsvProxyFactory);
+        }
+        _;
+    }
+
+    constructor(
+        address _p2pSsvProxyFactory
+    ) {
+        if (!ERC165Checker.supportsInterface(_p2pSsvProxyFactory, type(IP2pSsvProxyFactory).interfaceId)) {
+            revert P2pSsvProxy__NotP2pSsvProxyFactory(_p2pSsvProxyFactory);
+        }
+        i_p2pSsvProxyFactory = IP2pSsvProxyFactory(_p2pSsvProxyFactory);
 
         i_ssvNetwork = (block.chainid == 1)
             ? ISSVNetwork(0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1)
@@ -48,23 +81,13 @@ contract P2pSsvProxy is OwnableWithOperator {
             ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
             : IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
 
-        i_depositContract = (block.chainid == 1)
-            ? IERC20(0x00000000219ab540356cBB839Cbe05303d7705Fa)
-            : IERC20(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b);
-
-        i_client = _client;
-
         i_ssvToken.approve(address(i_ssvNetwork), type(uint256).max);
     }
 
-    function setReferenceFeeDistributor(
-        address _referenceFeeDistributor
-    ) external onlyOperatorOrOwner {
-        if (!ERC165Checker.supportsInterface(_referenceFeeDistributor, type(IFeeDistributor).interfaceId)) {
-            revert P2pSsvProxy__NotFeeDistributor(_referenceFeeDistributor);
-        }
-
-        s_referenceFeeDistributor = _referenceFeeDistributor;
+    function initialize(
+        address _client
+    ) external {
+        i_client = _client;
     }
 
     function registerValidators(
@@ -222,5 +245,11 @@ contract P2pSsvProxy is OwnableWithOperator {
         address feeRecipientAddress
     ) external onlyOperatorOrOwner {
         i_ssvNetwork.setFeeRecipientAddress(feeRecipientAddress);
+    }
+
+    /// @notice Returns the client address
+    /// @return address client address
+    function client() public view returns (address) {
+        return s_feeDistributor.client();
     }
 }
