@@ -12,6 +12,11 @@ import "../interfaces/IDepositContract.sol";
 import "../interfaces/p2p/IFeeDistributor.sol";
 import "../interfaces/p2p/IFeeDistributorFactory.sol";
 import "../p2pSsvProxy/P2pSsvProxy.sol";
+import "../structs/P2pStructs.sol";
+
+error P2pSsvProxyFactory__NotAllowedSsvOperator(address _caller);
+
+error P2pSsvProxyFactory__MaxAllowedSsvOperatorIdsExceeded();
 
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
     IDepositContract public immutable i_depositContract;
@@ -51,6 +56,64 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
 
         s_referenceFeeDistributor = _referenceFeeDistributor;
+    }
+
+    function setAllowedSsvOperators(
+        address[] calldata _allowedSsvOperators
+    ) external onlyOperatorOrOwner {
+        uint256 count = _allowedSsvOperators.length;
+        for (uint256 i = 0; i < count;) {
+            s_allowedSsvOperators[_allowedSsvOperators[i]] = true;
+
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    function removeAllowedSsvOperators(
+        address[] calldata _allowedSsvOperatorsToRemove
+    ) external onlyOperatorOrOwner {
+        uint256 count = _allowedSsvOperatorsToRemove.length;
+        for (uint256 i = 0; i < count;) {
+            delete s_allowedSsvOperators[_allowedSsvOperatorsToRemove[i]];
+            delete s_allowedSsvOperatorIds[_allowedSsvOperatorsToRemove[i]];
+
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    function addSsvOperatorIds(
+        uint64[] calldata _operatorIds
+    ) external {
+        bool isAllowed = s_allowedSsvOperators[msg.sender];
+        if (!isAllowed) {
+            revert P2pSsvProxyFactory__NotAllowedSsvOperator(msg.sender);
+        }
+
+        uint256 count = _operatorIds.length;
+        if (count + s_allowedSsvOperatorIds[msg.sender].length >= MAX_ALLOWED_SSV_OPERATOR_IDS) {
+            revert P2pSsvProxyFactory__MaxAllowedSsvOperatorIdsExceeded();
+        }
+
+        for (uint256 i = 0; i < count;) {
+            s_allowedSsvOperatorIds[msg.sender].push(_operatorIds[i]);
+
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    function clearSsvOperatorIds() external {
+        bool isAllowed = s_allowedSsvOperators[msg.sender];
+        if (!isAllowed) {
+            revert P2pSsvProxyFactory__NotAllowedSsvOperator(msg.sender);
+        }
+
+        delete s_allowedSsvOperatorIds[msg.sender];
     }
 
     function registerValidators(
@@ -101,9 +164,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 _clusters[i]
             );
 
-        unchecked {
-            ++i;
-        }
+            unchecked {
+                ++i;
+            }
         }
     }
 }
