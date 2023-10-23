@@ -25,3 +25,8 @@ struct SsvValidator {
     ISSVNetwork.Cluster cluster;
     DepositData depositData;
 }
+
+struct SsvOperator {
+    address owner;
+    uint64 id;
+}

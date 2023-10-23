@@ -92,56 +92,27 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
 
     function registerValidators(
         SsvValidator[] calldata _ssvValidators,
-        uint256 _tokenAmount,
-        bytes32 _mevRelay,
-
-        FeeRecipient calldata _clientConfig,
-        FeeRecipient calldata _referrerConfig
+        address feeDistributorInstance,
+        uint256 _tokenAmount
     ) external {
         uint256 validatorCount = _ssvValidators.length;
         uint256 tokenPerValidator = _tokenAmount / validatorCount;
-        address referenceFeeDistributor = s_referenceFeeDistributor;
 
         for (uint256 i = 0; i < validatorCount;) {
-            // ETH deposit
-            bytes memory withdrawalCredentials = abi.encodePacked(
-                hex'010000000000000000000000',
-                    _ssvValidators[i].depositData.withdrawalCredentialsAddress
-            );
-            i_depositContract.deposit(
-                _ssvValidators[i].pubkey,
-                withdrawalCredentials,
-                _ssvValidators[i].depositData.signature,
-                _ssvValidators[i].depositData.depositDataRoot
-            );
-
-            // createFeeDistributor
-            address feeDistributorInstance = i_feeDistributorFactory.predictFeeDistributorAddress(
-                referenceFeeDistributor,
-                _clientConfig,
-                _referrerConfig
-            );
-            if (feeDistributorInstance.code.length == 0) {
-                // if feeDistributorInstance doesn't exist, deploy it
-                i_feeDistributorFactory.createFeeDistributor(
-                    referenceFeeDistributor,
-                    _clientConfig,
-                    _referrerConfig
-                );
-            }
-
             i_ssvNetwork.registerValidator(
                 _ssvValidators[i].pubkey,
-                    _operatorIds,
-                    _sharesData[i],
-                    tokenPerValidator,
-                    _clusters[i]
+                _operatorIds,
+                _sharesData[i],
+                tokenPerValidator,
+                _clusters[i]
             );
 
             unchecked {
                 ++i;
             }
         }
+
+        i_ssvNetwork.setFeeRecipientAddress(feeDistributorInstance);
     }
 
     function removeValidators(

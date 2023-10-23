@@ -10,7 +10,7 @@ import "../structs/P2pStructs.sol";
 /// @dev External interface of P2pSsvProxyFactory
 interface IP2pSsvProxyFactory is IOwnable, IERC165 {
 
-    function registerValidators(
+    function depositEthAndRegisterValidators(
         SsvValidator[] calldata _ssvValidators,
         uint256 _tokenAmount,
         bytes32 _mevRelay,

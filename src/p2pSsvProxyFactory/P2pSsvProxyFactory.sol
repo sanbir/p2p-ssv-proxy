@@ -13,6 +13,7 @@ import "../interfaces/p2p/IFeeDistributor.sol";
 import "../interfaces/p2p/IFeeDistributorFactory.sol";
 import "../p2pSsvProxy/P2pSsvProxy.sol";
 import "../structs/P2pStructs.sol";
+import "../@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 error P2pSsvProxyFactory__NotAllowedSsvOperatorOwner(address _caller);
 
@@ -22,17 +23,23 @@ error P2pSsvProxyFactory__OldAndNewCountsShouldMatch(uint256 oldCount, uint256 n
 
 error P2pSsvProxyFactory__TryingToReplaceMoreThanExist(uint256 countToReplace, uint256 existingCount);
 
+error P2pSsvProxyFactory__SsvOperatorOwnerAlreadyExists(address _ssvOperatorOwner);
+
+error P2pSsvProxyFactory__SsvOperatorOwnerDoesNotExist(address _ssvOperatorOwner);
+
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
+    using EnumerableSet for EnumerableSet.AddressSet;
+
     IDepositContract public immutable i_depositContract;
     IFeeDistributorFactory public immutable i_feeDistributorFactory;
     P2pSsvProxy public immutable i_referenceP2pSsvProxy;
 
     address public s_referenceFeeDistributor;
-    mapping(address => bool) public s_allowedSsvOperatorOwners;
-    mapping(address => uint64[]) public s_allowedSsvOperatorIds;
+    EnumerableSet.AddressSet private s_allowedSsvOperatorOwners;
+    mapping(address => uint64[8]) public s_allowedSsvOperatorIds;
 
-    modifier onlyOperatorOwner() {
-        bool isAllowed = s_allowedSsvOperatorOwners[msg.sender];
+    modifier onlySsvOperatorOwner() {
+        bool isAllowed = s_allowedSsvOperatorOwners.contains(msg.sender);
         if (!isAllowed) {
             revert P2pSsvProxyFactory__NotAllowedSsvOperatorOwner(msg.sender);
         }
@@ -75,7 +82,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     ) external onlyOperatorOrOwner {
         uint256 count = _allowedSsvOperatorOwners.length;
         for (uint256 i = 0; i < count;) {
-            s_allowedSsvOperatorOwners[_allowedSsvOperatorOwners[i]] = true;
+            if (!s_allowedSsvOperatorOwners.add(_allowedSsvOperatorOwners[i])) {
+                revert P2pSsvProxyFactory__SsvOperatorOwnerAlreadyExists(_allowedSsvOperatorOwners[i]);
+            }
 
             unchecked {
                 ++i;
@@ -88,8 +97,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     ) external onlyOperatorOrOwner {
         uint256 count = _allowedSsvOperatorOwnersToRemove.length;
         for (uint256 i = 0; i < count;) {
-            delete s_allowedSsvOperatorOwners[_allowedSsvOperatorOwnersToRemove[i]];
-            delete s_allowedSsvOperatorIds[_allowedSsvOperatorOwnersToRemove[i]];
+            if (!s_allowedSsvOperatorOwners.remove(_allowedSsvOperatorOwnersToRemove[i])) {
+                revert P2pSsvProxyFactory__SsvOperatorOwnerDoesNotExist(_allowedSsvOperatorOwnersToRemove[i]);
+            }
 
             unchecked {
                 ++i;
@@ -99,7 +109,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     function addSsvOperatorIds(
         uint64[] calldata _operatorIds
-    ) external onlyOperatorOwner {
+    ) external onlySsvOperatorOwner {
         uint256 count = _operatorIds.length;
         uint64[] storage allowedForSender = s_allowedSsvOperatorIds[msg.sender];
 
@@ -116,14 +126,16 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
     }
 
-    function clearSsvOperatorIds() external onlyOperatorOwner {
+    function clearSsvOperatorIds() external onlySsvOperatorOwner {
         delete s_allowedSsvOperatorIds[msg.sender];
     }
 
     function replaceSsvOperatorIds(
         uint64[] calldata _operatorIdsToReplace,
         uint64[] calldata _newOperatorIds
-    ) external onlyOperatorOwner {
+    ) external onlySsvOperatorOwner {
+        // TODO: check that _newOperatorIds are unique within s_allowedSsvOperatorIds
+
         uint256 countToReplace = _operatorIdsToReplace.length;
         uint256 countNew = _newOperatorIds.length;
 
@@ -164,17 +176,26 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
     }
 
-    function registerValidators(
+    function depositEthAndRegisterValidators(
+        SsvOperator[] calldata _operators,
         SsvValidator[] calldata _ssvValidators,
+
         uint256 _tokenAmount,
         bytes32 _mevRelay,
 
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
-    ) external {
+    ) external payable {
+        uint256 operatorCount = _operators.length;
+        for (uint256 i = 0; i < operatorCount;) {
+            uint64[] memory allowedIds = s_allowedSsvOperatorIds[_operators[i].owner];
+
+            unchecked {
+                ++i;
+            }
+        }
+
         uint256 validatorCount = _ssvValidators.length;
-        uint256 tokenPerValidator = _tokenAmount / validatorCount;
-        address referenceFeeDistributor = s_referenceFeeDistributor;
 
         for (uint256 i = 0; i < validatorCount;) {
             // ETH deposit
@@ -189,32 +210,30 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 _ssvValidators[i].depositData.depositDataRoot
             );
 
-            // createFeeDistributor
-            address feeDistributorInstance = i_feeDistributorFactory.predictFeeDistributorAddress(
-                referenceFeeDistributor,
-                _clientConfig,
-                _referrerConfig
-            );
-            if (feeDistributorInstance.code.length == 0) {
-                // if feeDistributorInstance doesn't exist, deploy it
-                i_feeDistributorFactory.createFeeDistributor(
-                    referenceFeeDistributor,
-                    _clientConfig,
-                    _referrerConfig
-                );
-            }
-
-            i_ssvNetwork.registerValidator(
-                _ssvValidators[i].pubkey,
-                _operatorIds,
-                _sharesData[i],
-                tokenPerValidator,
-                _clusters[i]
-            );
-
             unchecked {
                 ++i;
             }
         }
+
+        // createFeeDistributor
+        address referenceFeeDistributor = s_referenceFeeDistributor;
+
+        address feeDistributorInstance = i_feeDistributorFactory.predictFeeDistributorAddress(
+            referenceFeeDistributor,
+            _clientConfig,
+            _referrerConfig
+        );
+        if (feeDistributorInstance.code.length == 0) {
+            // if feeDistributorInstance doesn't exist, deploy it
+            i_feeDistributorFactory.createFeeDistributor(
+                referenceFeeDistributor,
+                _clientConfig,
+                _referrerConfig
+            );
+        }
+
+        proxy.registerValidators(
+            _ssvValidators,
+        );
     }
 }
