@@ -11,11 +11,8 @@ import "forge-std/console2.sol";
 import "../src/P2pSsvProxy.sol";
 import "../src/interfaces/ssv/ISSVClusters.sol";
 import "../src/@ssv/Types.sol";
-import "forge-std/StdStorage.sol";
 
 contract Integration is Test {
-    using stdStorage for StdStorage;
-
     P2pSsvProxy public p2pSsvProxy;
     address public constant owner = 0x000000005504F0f5CF39b1eD609B892d23028E57; // 0x5124fcC2B3F99F571AD67D075643C743F38f1C34;
     // address public constant operator = 0x388C818CA8B9251b393131C08a736A67ccB19297;
@@ -31,12 +28,16 @@ contract Integration is Test {
          vm.stopPrank();
     }
 
-    function test_snapshot() public {
+    function getSnapshot(uint64 operatorId) private returns(bytes32 snapshot) {
         uint256 p = uint256(keccak256("ssv.network.storage.main")) + 5;
-        uint64 operatorId = 2;
         bytes32 slot1 = bytes32(uint256(keccak256(abi.encode(uint256(operatorId), p))) + 2);
-        bytes32 snapshot = vm.load(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D, slot1);
-        console.logBytes32(snapshot);
+        snapshot = vm.load(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D, slot1);
+    }
+
+    function test_snapshot() public {
+        uint64 operatorId = 2;
+        uint32 snapshotBlock = uint32(uint256(getSnapshot(operatorId)));
+        console.logUint(snapshotBlock);
     }
 
     function test_Main_Use_Case() public {
@@ -81,26 +82,31 @@ contract Integration is Test {
             balance: 0
         });
 
+        uint64 clusterIndex;
+        for (uint64 i = 0; i < 4; i++) {
+            uint256 snapshot = uint256(getSnapshot(i + 1));
+            uint32 operatorSnapshotBlock = uint32(snapshot);
+            uint64 operatorSnapshotIndex = uint64(snapshot >> 32);
 
-
-//        uint32 operatorSnapshotBlock = 0;//TODO
-//        uint256 operatorFeeExpanded = 956600000000;
-//        uint64 operatorFee = Types256.shrink(operatorFeeExpanded);
-//        uint64 blockDiffFee = (uint32(block.number) - operatorSnapshotBlock) * operatorFee;
-//        uint64 operatorSnapshotIndex = 4 * blockDiffFee;
-//        console.log(operatorSnapshotIndex);
+            uint256 operatorFeeExpanded = 956600000000;
+            uint64 operatorFee = Types256.shrink(operatorFeeExpanded);
+            uint64 blockDiffFee = (uint32(block.number) - operatorSnapshotBlock) * operatorFee;
+            operatorSnapshotIndex += blockDiffFee;
+            clusterIndex += operatorSnapshotIndex;
+        }
+        console.log(clusterIndex);
 
         clusters[1] = ISSVClusters.Cluster({
             validatorCount: 1,
             networkFeeIndex: 0,
-            index: 259695089520,
+            index: clusterIndex,
             active: true,
             balance: 11000000000000000000
         });
         clusters[2] = ISSVClusters.Cluster({
             validatorCount: 2,
             networkFeeIndex: 0,
-            index: 259695089520,
+            index: clusterIndex,
             active: true,
             balance: 22000000000000000000
         });
@@ -108,14 +114,6 @@ contract Integration is Test {
         vm.startPrank(owner);
 
         p2pSsvProxy.registerValidators(tokenAmount, pubkeys, operatorIds, sharesData, clusters);
-
-//        ISSVNetwork(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D).registerValidator(
-//            pubkeys[0],
-//                operatorIds,
-//                sharesData[0],
-//                tokenAmount,
-//                clusters[0]
-//        );
 
         vm.stopPrank();
 
