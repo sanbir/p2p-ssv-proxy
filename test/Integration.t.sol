@@ -11,8 +11,11 @@ import "forge-std/console2.sol";
 import "../src/P2pSsvProxy.sol";
 import "../src/interfaces/ssv/ISSVClusters.sol";
 import "../src/@ssv/Types.sol";
+import "forge-std/StdStorage.sol";
 
 contract Integration is Test {
+    using stdStorage for StdStorage;
+
     P2pSsvProxy public p2pSsvProxy;
     address public constant owner = 0x000000005504F0f5CF39b1eD609B892d23028E57; // 0x5124fcC2B3F99F571AD67D075643C743F38f1C34;
     // address public constant operator = 0x388C818CA8B9251b393131C08a736A67ccB19297;
@@ -26,6 +29,14 @@ contract Integration is Test {
          vm.startPrank(owner);
          p2pSsvProxy = new P2pSsvProxy();
          vm.stopPrank();
+    }
+
+    function test_snapshot() public {
+        uint256 p = uint256(keccak256("ssv.network.storage.main")) + 5;
+        uint64 operatorId = 2;
+        bytes32 slot1 = bytes32(uint256(keccak256(abi.encode(uint256(operatorId), p))) + 2);
+        bytes32 snapshot = vm.load(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D, slot1);
+        console.logBytes32(snapshot);
     }
 
     function test_Main_Use_Case() public {
@@ -69,6 +80,8 @@ contract Integration is Test {
             active: true,
             balance: 0
         });
+
+
 
 //        uint32 operatorSnapshotBlock = 0;//TODO
 //        uint256 operatorFeeExpanded = 956600000000;
