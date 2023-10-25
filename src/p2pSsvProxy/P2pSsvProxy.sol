@@ -43,6 +43,7 @@ error P2pSsvProxy__NotP2pSsvProxyFactoryCalled(address _msgSender, IP2pSsvProxyF
 
 error P2pSsvProxy__AmountOfParametersError();
 
+error P2pSsvProxy__SelectorNotAllowed(address caller, bytes4 selector);
 
 contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxy {
     IP2pSsvProxyFactory internal immutable i_p2pSsvProxyFactory;
@@ -106,7 +107,26 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
     }
 
     fallback() external {
-        // TODO new selectors
+        address caller = msg.sender;
+        bytes4 selector = msg.sig;
+
+        bool isAllowed = msg.sender == owner() ||
+            (msg.sender == operator() && i_p2pSsvProxyFactory.isOperatorSelectorAllowed(selector)) ||
+            (msg.sender == client() && i_p2pSsvProxyFactory.isClientSelectorAllowed(selector));
+
+        if (!isAllowed) {
+            revert P2pSsvProxy__SelectorNotAllowed(caller, selector);
+        }
+
+        (bool success, bytes memory data) = address(i_ssvNetwork).call(msg.data);
+        if (success) {
+            assembly {
+                return(add(data, 0x20), mload(data))
+            }
+        } else {
+            // Decode the reason from the error data returned from the call and revert with it.
+            revert(string(data));
+        }
     }
 
     function registerValidators(

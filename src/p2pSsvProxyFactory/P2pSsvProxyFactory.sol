@@ -44,14 +44,15 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     P2pSsvProxy public immutable i_referenceP2pSsvProxy;
 
     address public s_referenceFeeDistributor;
+
     EnumerableSet.AddressSet private s_allowedSsvOperatorOwners;
     mapping(address => uint64[MAX_ALLOWED_SSV_OPERATOR_IDS]) public s_allowedSsvOperatorIds;
 
-    /// @notice client address -> array of client P2pSsvProxies mapping
     mapping(address => address[]) private s_allClientP2pSsvProxies;
-
-    /// @notice array of all P2pSsvProxies for all clients
     address[] private s_allP2pSsvProxies;
+
+    mapping(bytes4 => bool) s_clientSelectors;
+    mapping(bytes4 => bool) s_operatorSelectors;
 
     modifier onlySsvOperatorOwner() {
         bool isAllowed = s_allowedSsvOperatorOwners.contains(msg.sender);
@@ -80,6 +81,28 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             : IDepositContract(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b);
 
         i_referenceP2pSsvProxy = new P2pSsvProxy(address(this));
+    }
+
+    function setAllowedSelectorsForClient(bytes4[] calldata _selectors) external onlyOwner {
+        uint256 count = _selectors.length;
+        for (uint256 i = 0; i < count;) {
+            s_clientSelectors[_selectors[i]] = true;
+
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    function setAllowedSelectorsForOperator(bytes4[] calldata _selectors) external onlyOwner {
+        uint256 count = _selectors.length;
+        for (uint256 i = 0; i < count;) {
+            s_operatorSelectors[_selectors[i]] = true;
+
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     function setReferenceFeeDistributor(
@@ -254,6 +277,14 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     function allP2pSsvProxies() external view returns (address[] memory) {
         return s_allP2pSsvProxies;
+    }
+
+    function isClientSelectorAllowed(bytes4 _selector) external view returns (bool) {
+        return s_clientSelectors[_selector];
+    }
+
+    function isOperatorSelectorAllowed(bytes4 _selector) external view returns (bool) {
+        return s_operatorSelectors[_selector];
     }
 
     function _createP2pSsvProxy(

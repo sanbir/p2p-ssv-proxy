@@ -34,6 +34,10 @@ interface IP2pSsvProxyFactory is IOwnable, IERC165 {
 
     function allP2pSsvProxies() external view returns (address[] memory);
 
+    function isClientSelectorAllowed(bytes4 _selector) external view returns (bool);
+
+    function isOperatorSelectorAllowed(bytes4 _selector) external view returns (bool);
+
     event P2pSsvProxyFactory__RegistrationCompleted(
         address indexed _proxy,
         bytes32 indexed _mevRelay
