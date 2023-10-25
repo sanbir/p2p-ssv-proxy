@@ -34,10 +34,14 @@ error P2pSsvProxy__NotP2pSsvProxyFactory(address _passedAddress);
 /// @param _client address of the client
 error P2pSsvProxy__CallerNotClient(address _caller, address _client);
 
+error P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient(address _caller);
+
 /// @notice Only factory can call `initialize`.
 /// @param _msgSender sender address.
 /// @param _actualFactory the actual factory address that can call `initialize`.
 error P2pSsvProxy__NotP2pSsvProxyFactoryCalled(address _msgSender, IP2pSsvProxyFactory _actualFactory);
+
+error P2pSsvProxy__AmountOfParametersError();
 
 
 contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxy {
@@ -53,6 +57,17 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
 
         if (clientAddress != msg.sender) {
             revert P2pSsvProxy__CallerNotClient(msg.sender, clientAddress);
+        }
+        _;
+    }
+
+    modifier onlyOperatorOrOwnerOrClient() {
+        address operator_ = operator();
+        address owner_ = owner();
+        address client_ = client();
+
+        if (operator_ != msg.sender && owner_ != msg.sender && client_ != msg.sender) {
+            revert P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient(msg.sender);
         }
         _;
     }
@@ -87,7 +102,11 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
     function initialize(
         address _feeDistributor
     ) external onlyP2pSsvProxyFactory {
-        s_feeDistributor = _feeDistributor;
+        s_feeDistributor = IFeeDistributor(_feeDistributor);
+    }
+
+    fallback() external {
+        // TODO new selectors
     }
 
     function registerValidators(
@@ -122,8 +141,8 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
         );
 
         for (uint256 i = 1; i < validatorCount;) {
-            ISSVClusters.Cluster cluster = ISSVClusters.Cluster({
-                validatorCount: _cluster.validatorCount + i,
+            ISSVClusters.Cluster memory cluster = ISSVClusters.Cluster({
+                validatorCount: uint32(_cluster.validatorCount + i),
                 networkFeeIndex: _cluster.networkFeeIndex,
                 index: clusterIndex,
                 active: true,
@@ -133,7 +152,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
             i_ssvNetwork.registerValidator(
                 _ssvValidators[i].pubkey,
                 operatorIds,
-                _sharesData[i],
+                _ssvValidators[i].sharesData,
                 0,
                 cluster
             );
@@ -143,14 +162,14 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
             }
         }
 
-        i_ssvNetwork.setFeeRecipientAddress(feeDistributorInstance);
+        i_ssvNetwork.setFeeRecipientAddress(_feeDistributorInstance);
     }
 
     function removeValidators(
         bytes[] calldata _pubkeys,
         uint64[] calldata _operatorIds,
         ISSVNetwork.Cluster[] calldata _clusters
-    ) external onlyOperatorOrOwner {
+    ) external onlyOperatorOrOwnerOrClient {
         uint256 validatorCount = _pubkeys.length;
 
         if (!(
@@ -253,5 +272,13 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
     /// @return address client address
     function client() public view returns (address) {
         return s_feeDistributor.client();
+    }
+
+    function factory() external view returns (address) {
+        return address(i_p2pSsvProxyFactory);
+    }
+
+    function owner() public view override(Ownable, OwnableBase, IOwnable) returns (address) {
+        return super.owner();
     }
 }

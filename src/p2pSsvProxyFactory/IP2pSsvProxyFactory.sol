@@ -1,40 +1,38 @@
 // SPDX-FileCopyrightText: 2023 P2P Validator <info@p2p.org>
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.10;
+pragma solidity 0.8.18;
 
 import "../@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../access/IOwnable.sol";
 import "../structs/P2pStructs.sol";
+import "../interfaces/ssv/ISSVNetwork.sol";
 
 /// @dev External interface of P2pSsvProxyFactory
 interface IP2pSsvProxyFactory is IOwnable, IERC165 {
 
     function depositEthAndRegisterValidators(
+        SsvOperator[] calldata _ssvOperators,
         SsvValidator[] calldata _ssvValidators,
+        ISSVNetwork.Cluster calldata _cluster,
         uint256 _tokenAmount,
+
+        address _withdrawalCredentialsAddress,
         bytes32 _mevRelay,
 
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
-    ) external returns (address p2pSsvProxy);
+    ) external payable returns (address p2pSsvProxy);
 
     function predictP2pSsvProxyAddress(
-        FeeRecipient calldata _clientConfig,
-        FeeRecipient calldata _referrerConfig
-    ) external view returns (address p2pSsvProxy);
+        address _feeDistributorInstance
+    ) external view returns (address);
 
-    function predictP2pSsvProxyAddress(
-        address _referenceFeeDistributor,
-        FeeRecipient calldata _clientConfig,
-        FeeRecipient calldata _referrerConfig
-    ) external view returns (address p2pSsvProxy);
-
-    function allClientFeeDistributors(
+    function allClientP2pSsvProxies(
         address _client
     ) external view returns (address[] memory);
 
-    function allFeeDistributors() external view returns (address[] memory);
+    function allP2pSsvProxies() external view returns (address[] memory);
 
     event P2pSsvProxyFactory__RegistrationCompleted(
         address indexed _proxy,

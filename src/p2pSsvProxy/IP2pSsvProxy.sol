@@ -10,7 +10,7 @@ import "../structs/P2pStructs.sol";
 interface IP2pSsvProxy is IERC165 {
 
     function initialize(
-        address _client
+        address _feeDistributor
     ) external;
 
     /// @notice Returns the factory address

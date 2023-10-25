@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2023 P2P Validator <info@p2p.org>
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.10;
+pragma solidity 0.8.18;
 
-import "../@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "../access/IOwnable.sol";
+import "../../@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "../../access/IOwnable.sol";
 import "./IFeeDistributor.sol";
-import "../structs/P2pStructs.sol";
+import "../../structs/P2pStructs.sol";
 
 /// @dev External interface of FeeDistributorFactory
 interface IFeeDistributorFactory is IOwnable, IERC165 {

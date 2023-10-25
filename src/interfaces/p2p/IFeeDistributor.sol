@@ -1,10 +1,10 @@
 // SPDX-FileCopyrightText: 2023 P2P Validator <info@p2p.org>
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.10;
+pragma solidity 0.8.18;
 
-import "../@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "../structs/P2pStructs.sol";
+import "../../structs/P2pStructs.sol";
+import "../../@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /// @dev External interface of FeeDistributor declared to support ERC165 detection.
 interface IFeeDistributor is IERC165 {

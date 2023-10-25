@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 // https://github.com/lidofinance/lido-otc-seller/blob/master/contracts/lib/AssetRecoverer.sol
-pragma solidity 0.8.10;
+pragma solidity 0.8.18;
 
 import "./OwnableTokenRecoverer.sol";
 import "./AssetRecoverer.sol";
