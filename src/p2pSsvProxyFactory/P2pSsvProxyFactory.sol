@@ -311,24 +311,27 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     function depositEthAndRegisterValidators(
-        SsvOperator[] calldata _operators,
+        SsvOperator[] calldata _ssvOperators,
         SsvValidator[] calldata _ssvValidators,
+        ISSVNetwork.Cluster calldata _cluster,
+        uint256 _tokenAmount,
 
         address _withdrawalCredentialsAddress,
-        uint256 _tokenAmount,
         bytes32 _mevRelay,
 
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable {
-        checkOperators(_operators);
+        checkOperators(_ssvOperators);
         _makeBeaconDeposits(_ssvValidators, _withdrawalCredentialsAddress);
 
         address feeDistributorInstance = _createFeeDistributor(_clientConfig, _referrerConfig);
         address proxy = _createP2pSsvProxy(feeDistributorInstance);
 
         P2pSsvProxy(proxy).registerValidators(
+            _ssvOperators,
             _ssvValidators,
+            _cluster,
             feeDistributorInstance,
             _tokenAmount
         );

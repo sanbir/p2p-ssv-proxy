@@ -91,20 +91,51 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
     }
 
     function registerValidators(
+        SsvOperator[] calldata _ssvOperators,
         SsvValidator[] calldata _ssvValidators,
-        address feeDistributorInstance,
+        ISSVNetwork.Cluster calldata _cluster,
+        address _feeDistributorInstance,
         uint256 _tokenAmount
-    ) external {
+    ) external onlyP2pSsvProxyFactory {
+        uint256 operatorCount = _ssvOperators.length;
         uint256 validatorCount = _ssvValidators.length;
-        uint256 tokenPerValidator = _tokenAmount / validatorCount;
 
-        for (uint256 i = 0; i < validatorCount;) {
+        uint64[] memory operatorIds = new uint64[](operatorCount);
+        uint64 clusterIndex;
+        for (uint256 i = 0; i < operatorCount;) {
+            operatorIds[i] = _ssvOperators[i].id;
+
+            uint256 snapshot = uint256(_ssvOperators[i].snapshot);
+            clusterIndex += uint64(snapshot >> 32) + (uint32(block.number) - uint32(snapshot)) * uint64(_ssvOperators[i].fee / 10_000_000);
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        i_ssvNetwork.registerValidator(
+            _ssvValidators[0].pubkey,
+            operatorIds,
+            _ssvValidators[0].sharesData,
+            _tokenAmount,
+            _cluster
+        );
+
+        for (uint256 i = 1; i < validatorCount;) {
+            ISSVClusters.Cluster cluster = ISSVClusters.Cluster({
+                validatorCount: _cluster.validatorCount + i,
+                networkFeeIndex: _cluster.networkFeeIndex,
+                index: clusterIndex,
+                active: true,
+                balance: _cluster.balance + _tokenAmount
+            });
+
             i_ssvNetwork.registerValidator(
                 _ssvValidators[i].pubkey,
-                _operatorIds,
+                operatorIds,
                 _sharesData[i],
-                tokenPerValidator,
-                _clusters[i]
+                0,
+                cluster
             );
 
             unchecked {
