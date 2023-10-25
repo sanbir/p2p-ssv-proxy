@@ -45,7 +45,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
     ISSVNetwork public immutable i_ssvNetwork;
     IERC20 public immutable i_ssvToken;
 
-    address public s_feeDistributor;
+    IFeeDistributor public s_feeDistributor;
 
     /// @notice If caller not client, revert
     modifier onlyClient() {
@@ -85,9 +85,9 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
     }
 
     function initialize(
-        address _client
-    ) external {
-        i_client = _client;
+        address _feeDistributor
+    ) external onlyP2pSsvProxyFactory {
+        s_feeDistributor = _feeDistributor;
     }
 
     function registerValidators(

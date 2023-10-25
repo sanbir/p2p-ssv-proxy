@@ -35,4 +35,15 @@ interface IP2pSsvProxyFactory is IOwnable, IERC165 {
     ) external view returns (address[] memory);
 
     function allFeeDistributors() external view returns (address[] memory);
+
+    event P2pSsvProxyFactory__RegistrationCompleted(
+        address indexed _proxy,
+        bytes32 indexed _mevRelay
+    );
+
+    event P2pSsvProxyFactory__P2pSsvProxyCreated(
+        address indexed _p2pSsvProxy,
+        address indexed _client,
+        address indexed _feeDistributor
+    );
 }

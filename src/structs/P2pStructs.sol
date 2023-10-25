@@ -14,7 +14,6 @@ struct FeeRecipient {
 }
 
 struct DepositData {
-    address withdrawalCredentialsAddress;
     bytes signature;
     bytes32 depositDataRoot;
 }
@@ -29,4 +28,5 @@ struct SsvValidator {
 struct SsvOperator {
     address owner;
     uint64 id;
+    bytes32 snapshot;
 }
