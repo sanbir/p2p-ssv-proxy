@@ -46,6 +46,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     IDepositContract public immutable i_depositContract;
     IFeeDistributorFactory public immutable i_feeDistributorFactory;
+    IERC20 public immutable i_ssvToken;
 
     address public s_referenceFeeDistributor;
     P2pSsvProxy public s_referenceP2pSsvProxy;
@@ -85,6 +86,10 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         i_depositContract = (block.chainid == 1)
             ? IDepositContract(0x00000000219ab540356cBB839Cbe05303d7705Fa)
             : IDepositContract(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b);
+
+        i_ssvToken = (block.chainid == 1)
+            ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
+            : IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
     }
 
     function setReferenceP2pSsvProxy(address _referenceP2pSsvProxy) external onlyOwner {
@@ -269,6 +274,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
         address feeDistributorInstance = _createFeeDistributor(_clientConfig, _referrerConfig);
         p2pSsvProxy = _createP2pSsvProxy(feeDistributorInstance);
+
+        i_ssvToken.transfer(address(p2pSsvProxy), _tokenAmount);
 
         P2pSsvProxy(p2pSsvProxy).registerValidators(
             _ssvOperators,

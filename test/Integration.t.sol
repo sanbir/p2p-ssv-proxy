@@ -11,6 +11,7 @@ import "forge-std/console2.sol";
 import "../src/interfaces/ssv/ISSVClusters.sol";
 import "../src/p2pSsvProxyFactory/P2pSsvProxyFactory.sol";
 import "../src/structs/P2pStructs.sol";
+import "../src/mocks/IChangeOperator.sol";
 
 contract Integration is Test {
     uint256 constant validatorCount = 3;
@@ -126,6 +127,7 @@ contract Integration is Test {
 
         vm.startPrank(owner);
         p2pSsvProxyFactory.setAllowedSsvOperatorOwners(allowedSsvOperatorOwners);
+        IChangeOperator(address(feeDistributorFactory)).changeOperator(address(p2pSsvProxyFactory));
         vm.stopPrank();
 
         vm.startPrank(allowedSsvOperatorOwners[0]);

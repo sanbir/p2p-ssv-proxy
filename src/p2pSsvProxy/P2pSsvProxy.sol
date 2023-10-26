@@ -107,14 +107,14 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         i_ssvToken = (block.chainid == 1)
             ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
             : IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
-
-        i_ssvToken.approve(address(i_ssvNetwork), type(uint256).max);
     }
 
     function initialize(
         address _feeDistributor
     ) external onlyP2pSsvProxyFactory {
         s_feeDistributor = IFeeDistributor(_feeDistributor);
+
+        i_ssvToken.approve(address(i_ssvNetwork), type(uint256).max);
     }
 
     fallback() external {
