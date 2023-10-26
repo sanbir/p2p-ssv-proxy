@@ -5,6 +5,7 @@ pragma solidity 0.8.18;
 
 import {Script} from "forge-std/Script.sol";
 import "../src/p2pSsvProxyFactory/P2pSsvProxyFactory.sol";
+import "../src/mocks/IChangeOperator.sol";
 
 contract Deploy is Script {
 
@@ -12,6 +13,8 @@ contract Deploy is Script {
         P2pSsvProxyFactory,
         P2pSsvProxy
     ) {
+        IERC20 ssvToken = IERC20(vm.envAddress("SSV_TOKEN"));
+
         address feeDistributorFactory = vm.envAddress("FEE_DISTRIBUTOR_FACTORY");
         address referenceFeeDistributor = vm.envAddress("REFERENCE_FEE_DISTRIBUTOR");
 
@@ -21,6 +24,27 @@ contract Deploy is Script {
         P2pSsvProxyFactory p2pSsvProxyFactory = new P2pSsvProxyFactory(feeDistributorFactory, referenceFeeDistributor);
         P2pSsvProxy referenceP2pSsvProxy = new P2pSsvProxy(address(p2pSsvProxyFactory));
         p2pSsvProxyFactory.setReferenceP2pSsvProxy(address(referenceP2pSsvProxy));
+
+        ssvToken.transfer(address(p2pSsvProxyFactory), 50 ether);
+
+        address[] memory allowedSsvOperatorOwners = new address[](1);
+        allowedSsvOperatorOwners[0] = vm.envAddress("ALLOWED_OPERATOR_OWNER");
+        p2pSsvProxyFactory.setAllowedSsvOperatorOwners(allowedSsvOperatorOwners);
+
+        IChangeOperator(address(feeDistributorFactory)).changeOperator(address(p2pSsvProxyFactory));
+
+        uint64[8] memory operatorIds = [
+            uint64(vm.envUint("OPERATOR_ID_1")),
+            uint64(vm.envUint("OPERATOR_ID_2")),
+            uint64(vm.envUint("OPERATOR_ID_3")),
+            uint64(vm.envUint("OPERATOR_ID_4")),
+
+            uint64(vm.envUint("OPERATOR_ID_5")),
+            uint64(vm.envUint("OPERATOR_ID_6")),
+            uint64(vm.envUint("OPERATOR_ID_7")),
+            uint64(vm.envUint("OPERATOR_ID_8"))
+        ];
+        p2pSsvProxyFactory.setSsvOperatorIds(operatorIds);
 
         vm.stopBroadcast();
 
