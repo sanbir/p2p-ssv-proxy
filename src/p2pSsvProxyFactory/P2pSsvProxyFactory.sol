@@ -224,7 +224,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 hex'010000000000000000000000',
                 withdrawalCredentialsAddress
             );
-            i_depositContract.deposit(
+            i_depositContract.deposit{value: 32 ether}(
                 _ssvValidators[i].pubkey,
                 withdrawalCredentials,
                 _ssvValidators[i].depositData.signature,
