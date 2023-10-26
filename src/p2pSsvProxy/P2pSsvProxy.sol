@@ -44,11 +44,11 @@ error P2pSsvProxy__AmountOfParametersError();
 error P2pSsvProxy__SelectorNotAllowed(address caller, bytes4 selector);
 
 contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
-    IP2pSsvProxyFactory internal immutable i_p2pSsvProxyFactory;
-    ISSVNetwork public immutable i_ssvNetwork;
-    IERC20 public immutable i_ssvToken;
+    IP2pSsvProxyFactory private immutable i_p2pSsvProxyFactory;
+    ISSVNetwork private immutable i_ssvNetwork;
+    IERC20 private immutable i_ssvToken;
 
-    IFeeDistributor public s_feeDistributor;
+    IFeeDistributor private s_feeDistributor;
 
     /// @notice If caller not client, revert
     modifier onlyClient() {
@@ -313,6 +313,10 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
 
     function operator() public view returns (address) {
         return i_p2pSsvProxyFactory.operator();
+    }
+
+    function feeDistributor() external view returns (address) {
+        return address(s_feeDistributor);
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {

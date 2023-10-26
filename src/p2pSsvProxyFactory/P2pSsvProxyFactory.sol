@@ -44,24 +44,24 @@ error P2pSsvProxyFactory__ZeroOperatorIds();
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    IDepositContract public immutable i_depositContract;
-    IFeeDistributorFactory public immutable i_feeDistributorFactory;
-    IERC20 public immutable i_ssvToken;
+    IDepositContract private immutable i_depositContract;
+    IFeeDistributorFactory private immutable i_feeDistributorFactory;
+    IERC20 private immutable i_ssvToken;
 
-    address public s_referenceFeeDistributor;
-    P2pSsvProxy public s_referenceP2pSsvProxy;
+    address private s_referenceFeeDistributor;
+    P2pSsvProxy private s_referenceP2pSsvProxy;
 
     EnumerableSet.AddressSet private s_allowedSsvOperatorOwners;
-    mapping(address => uint64[MAX_ALLOWED_SSV_OPERATOR_IDS]) public s_allowedSsvOperatorIds;
+    mapping(address => uint64[MAX_ALLOWED_SSV_OPERATOR_IDS]) private s_allowedSsvOperatorIds;
 
     mapping(address => address[]) private s_allClientP2pSsvProxies;
     address[] private s_allP2pSsvProxies;
 
-    mapping(bytes4 => bool) s_clientSelectors;
-    mapping(bytes4 => bool) s_operatorSelectors;
+    mapping(bytes4 => bool) private s_clientSelectors;
+    mapping(bytes4 => bool) private s_operatorSelectors;
 
     modifier onlySsvOperatorOwner() {
-        bool isAllowed = s_allowedSsvOperatorOwners.contains(msg.sender);
+        bool isAllowed = msg.sender == operator() || msg.sender == owner() || s_allowedSsvOperatorOwners.contains(msg.sender);
         if (!isAllowed) {
             revert P2pSsvProxyFactory__NotAllowedSsvOperatorOwner(msg.sender);
         }
@@ -288,24 +288,6 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         emit P2pSsvProxyFactory__RegistrationCompleted(p2pSsvProxy, _mevRelay);
     }
 
-    function allClientP2pSsvProxies(
-        address _client
-    ) external view returns (address[] memory) {
-        return s_allClientP2pSsvProxies[_client];
-    }
-
-    function allP2pSsvProxies() external view returns (address[] memory) {
-        return s_allP2pSsvProxies;
-    }
-
-    function isClientSelectorAllowed(bytes4 _selector) external view returns (bool) {
-        return s_clientSelectors[_selector];
-    }
-
-    function isOperatorSelectorAllowed(bytes4 _selector) external view returns (bool) {
-        return s_operatorSelectors[_selector];
-    }
-
     function _createP2pSsvProxy(
         address _feeDistributorInstance
     ) private returns(address p2pSsvProxyInstance) {
@@ -345,17 +327,17 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) private returns(address feeDistributorInstance) {
-        address referenceFeeDistributor = s_referenceFeeDistributor;
+        address referenceFeeDistributor_ = s_referenceFeeDistributor;
 
         feeDistributorInstance = i_feeDistributorFactory.predictFeeDistributorAddress(
-            referenceFeeDistributor,
+            referenceFeeDistributor_,
             _clientConfig,
             _referrerConfig
         );
         if (feeDistributorInstance.code.length == 0) {
             // if feeDistributorInstance doesn't exist, deploy it
             i_feeDistributorFactory.createFeeDistributor(
-                referenceFeeDistributor,
+                referenceFeeDistributor_,
                 _clientConfig,
                 _referrerConfig
             );
@@ -368,5 +350,43 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     function owner() public view override(Ownable, OwnableBase, IOwnable) returns (address) {
         return super.owner();
+    }
+
+    function feeDistributorFactory() public view returns (address) {
+        return address(i_feeDistributorFactory);
+    }
+
+    function allClientP2pSsvProxies(
+        address _client
+    ) external view returns (address[] memory) {
+        return s_allClientP2pSsvProxies[_client];
+    }
+
+    function allP2pSsvProxies() external view returns (address[] memory) {
+        return s_allP2pSsvProxies;
+    }
+
+    function isClientSelectorAllowed(bytes4 _selector) external view returns (bool) {
+        return s_clientSelectors[_selector];
+    }
+
+    function isOperatorSelectorAllowed(bytes4 _selector) external view returns (bool) {
+        return s_operatorSelectors[_selector];
+    }
+
+    function allowedSsvOperatorIds(address _ssvOperatorOwner) public view returns (uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory) {
+        return s_allowedSsvOperatorIds[_ssvOperatorOwner];
+    }
+
+    function allowedSsvOperatorOwners() public view returns (address[] memory) {
+        return s_allowedSsvOperatorOwners.values();
+    }
+
+    function referenceFeeDistributor() public view returns (address) {
+        return s_referenceFeeDistributor;
+    }
+
+    function referenceP2pSsvProxy() public view returns (address) {
+        return address(s_referenceP2pSsvProxy);
     }
 }
