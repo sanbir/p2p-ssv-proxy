@@ -44,7 +44,7 @@ contract Deploy is Script {
             uint64(vm.envUint("OPERATOR_ID_7")),
             uint64(vm.envUint("OPERATOR_ID_8"))
         ];
-        p2pSsvProxyFactory.setSsvOperatorIds(operatorIds);
+        p2pSsvProxyFactory.setSsvOperatorIds(operatorIds, allowedSsvOperatorOwners[0]);
 
         vm.stopBroadcast();
 

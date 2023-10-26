@@ -39,7 +39,6 @@ error P2pSsvProxyFactory__SsvOperatorNotAllowed(address _ssvOperatorOwner, uint6
 
 error P2pSsvProxyFactory__DuplicateIdsNotAllowed();
 
-error P2pSsvProxyFactory__ZeroOperatorIds();
 
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -61,7 +60,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     mapping(bytes4 => bool) private s_operatorSelectors;
 
     modifier onlySsvOperatorOwner() {
-        bool isAllowed = msg.sender == operator() || msg.sender == owner() || s_allowedSsvOperatorOwners.contains(msg.sender);
+        bool isAllowed = s_allowedSsvOperatorOwners.contains(msg.sender);
         if (!isAllowed) {
             revert P2pSsvProxyFactory__NotAllowedSsvOperatorOwner(msg.sender);
         }
@@ -162,14 +161,11 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
     }
 
-    function setSsvOperatorIds(
-        uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] calldata _operatorIds
-    ) external onlySsvOperatorOwner {
+    function _setSsvOperatorIds(
+        uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] calldata _operatorIds,
+        address _ssvOperatorOwner
+    ) private {
         for (uint i = 0; i < _operatorIds.length;) {
-            if (_operatorIds[i] == 0) {
-                revert P2pSsvProxyFactory__ZeroOperatorIds();
-            }
-
             for (uint j = i + 1; j < _operatorIds.length;) {
                 if (_operatorIds[i] == _operatorIds[j]) {
                     revert P2pSsvProxyFactory__DuplicateIdsNotAllowed();
@@ -183,11 +179,32 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             }
         }
 
-        s_allowedSsvOperatorIds[msg.sender] = _operatorIds;
+        s_allowedSsvOperatorIds[_ssvOperatorOwner] = _operatorIds;
+    }
+
+    function setSsvOperatorIds(
+        uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] calldata _operatorIds
+    ) external onlySsvOperatorOwner {
+        _setSsvOperatorIds(_operatorIds, msg.sender);
+    }
+
+    function setSsvOperatorIds(
+        uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] calldata _operatorIds,
+        address _ssvOperatorOwner
+    ) external onlyOperatorOrOwner {
+        _setSsvOperatorIds(_operatorIds, _ssvOperatorOwner);
+    }
+
+    function _clearSsvOperatorIds(address _ssvOperatorOwner) private {
+        delete s_allowedSsvOperatorIds[_ssvOperatorOwner];
     }
 
     function clearSsvOperatorIds() external onlySsvOperatorOwner {
-        delete s_allowedSsvOperatorIds[msg.sender];
+        _clearSsvOperatorIds(msg.sender);
+    }
+
+    function clearSsvOperatorIds(address _ssvOperatorOwner) external onlyOperatorOrOwner {
+        _clearSsvOperatorIds(_ssvOperatorOwner);
     }
 
     function checkOperators(SsvOperator[] calldata _operators) private view {
