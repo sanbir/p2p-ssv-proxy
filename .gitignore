@@ -13,3 +13,6 @@ docs/
 # Dotenv file
 .env
 /.idea/
+forge-cache
+deploy.sh
+broadcast
