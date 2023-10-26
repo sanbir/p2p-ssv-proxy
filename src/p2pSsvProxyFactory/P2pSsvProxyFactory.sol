@@ -16,7 +16,12 @@ import "../structs/P2pStructs.sol";
 import "../@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../@openzeppelin/contracts/proxy/Clones.sol";
 
+
+error P2pSsvProxyFactory__NotFeeDistributorFactory(address _passedAddress);
+
 error P2pSsvProxyFactory__NotFeeDistributor(address _passedAddress);
+
+error P2pSsvProxyFactory__NotP2pSsvProxy(address _passedAddress);
 
 error P2pSsvProxyFactory__NotAllowedSsvOperatorOwner(address _caller);
 
@@ -41,9 +46,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     IDepositContract public immutable i_depositContract;
     IFeeDistributorFactory public immutable i_feeDistributorFactory;
-    P2pSsvProxy public immutable i_referenceP2pSsvProxy;
 
     address public s_referenceFeeDistributor;
+    P2pSsvProxy public s_referenceP2pSsvProxy;
 
     EnumerableSet.AddressSet private s_allowedSsvOperatorOwners;
     mapping(address => uint64[MAX_ALLOWED_SSV_OPERATOR_IDS]) public s_allowedSsvOperatorIds;
@@ -67,20 +72,27 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         address _referenceFeeDistributor
     ) {
         if (!ERC165Checker.supportsInterface(_feeDistributorFactory, type(IFeeDistributorFactory).interfaceId)) {
-            revert P2pSsvProxy__NotFeeDistributorFactory(_feeDistributorFactory);
+            revert P2pSsvProxyFactory__NotFeeDistributorFactory(_feeDistributorFactory);
         }
         i_feeDistributorFactory = IFeeDistributorFactory(_feeDistributorFactory);
 
         if (!ERC165Checker.supportsInterface(_referenceFeeDistributor, type(IFeeDistributor).interfaceId)) {
             revert P2pSsvProxyFactory__NotFeeDistributor(_referenceFeeDistributor);
         }
+
         s_referenceFeeDistributor = _referenceFeeDistributor;
 
         i_depositContract = (block.chainid == 1)
             ? IDepositContract(0x00000000219ab540356cBB839Cbe05303d7705Fa)
             : IDepositContract(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b);
+    }
 
-        i_referenceP2pSsvProxy = new P2pSsvProxy(address(this));
+    function setReferenceP2pSsvProxy(address _referenceP2pSsvProxy) external onlyOwner {
+        if (!ERC165Checker.supportsInterface(_referenceP2pSsvProxy, type(IP2pSsvProxy).interfaceId)) {
+            revert P2pSsvProxyFactory__NotP2pSsvProxy(_referenceP2pSsvProxy);
+        }
+
+        s_referenceP2pSsvProxy = P2pSsvProxy(_referenceP2pSsvProxy);
     }
 
     function setAllowedSelectorsForClient(bytes4[] calldata _selectors) external onlyOwner {
@@ -229,7 +241,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         address _feeDistributorInstance
     ) public view returns (address) {
         return Clones.predictDeterministicAddress(
-            address(i_referenceP2pSsvProxy),
+            address(s_referenceP2pSsvProxy),
             bytes32(bytes20(_feeDistributorInstance))
         );
     }
@@ -298,7 +310,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
             // clone the reference implementation of P2pSsvProxy
             p2pSsvProxyInstance = Clones.cloneDeterministic(
-                address(i_referenceP2pSsvProxy),
+                address(s_referenceP2pSsvProxy),
                 bytes32(bytes20(_feeDistributorInstance))
             );
 
@@ -341,6 +353,10 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 _referrerConfig
             );
         }
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+        return interfaceId == type(IP2pSsvProxyFactory).interfaceId || super.supportsInterface(interfaceId);
     }
 
     function owner() public view override(Ownable, OwnableBase, IOwnable) returns (address) {

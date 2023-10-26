@@ -5,9 +5,10 @@ pragma solidity 0.8.18;
 
 import "../@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../structs/P2pStructs.sol";
+import "../access/IOwnableWithOperator.sol";
 
 /// @dev External interface of P2pSsvProxy declared to support ERC165 detection.
-interface IP2pSsvProxy is IERC165 {
+interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
 
     function initialize(
         address _feeDistributor

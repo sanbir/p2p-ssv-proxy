@@ -31,6 +31,9 @@ contract Integration is Test {
 
         vm.startPrank(owner);
         p2pSsvProxyFactory = new P2pSsvProxyFactory(address(feeDistributorFactory), address(referenceFeeDistributor));
+
+        P2pSsvProxy referenceP2pSsvProxy = new P2pSsvProxy(address(p2pSsvProxyFactory));
+        p2pSsvProxyFactory.setReferenceP2pSsvProxy(address(referenceP2pSsvProxy));
         vm.stopPrank();
     }
 

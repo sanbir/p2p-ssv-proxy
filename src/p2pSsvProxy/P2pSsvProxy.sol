@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity 0.8.18;
+import "forge-std/console.sol";
+import "forge-std/console2.sol";
 
 import "../@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../@openzeppelin/contracts/utils/introspection/ERC165.sol";
@@ -21,10 +23,6 @@ import "../interfaces/p2p/IFeeDistributorFactory.sol";
 /// @param _passedAddress passed address for _referenceFeeDistributor
 error P2pSsvProxy__NotFeeDistributor(address _passedAddress);
 
-/// @notice Should be a FeeDistributorFactory contract
-/// @param _passedAddress passed address that does not support IFeeDistributorFactory interface
-error P2pSsvProxy__NotFeeDistributorFactory(address _passedAddress);
-
 /// @notice Should be a P2pSsvProxyFactory contract
 /// @param _passedAddress passed address that does not support IP2pSsvProxyFactory interface
 error P2pSsvProxy__NotP2pSsvProxyFactory(address _passedAddress);
@@ -33,6 +31,8 @@ error P2pSsvProxy__NotP2pSsvProxyFactory(address _passedAddress);
 /// @param _caller address of the caller
 /// @param _client address of the client
 error P2pSsvProxy__CallerNotClient(address _caller, address _client);
+
+error P2pSsvProxy__CallerNeitherOperatorNorOwner(address _caller, address _operator, address _owner);
 
 error P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient(address _caller);
 
@@ -45,7 +45,7 @@ error P2pSsvProxy__AmountOfParametersError();
 
 error P2pSsvProxy__SelectorNotAllowed(address caller, bytes4 selector);
 
-contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxy {
+contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
     IP2pSsvProxyFactory internal immutable i_p2pSsvProxyFactory;
     ISSVNetwork public immutable i_ssvNetwork;
     IERC20 public immutable i_ssvToken;
@@ -59,6 +59,17 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
         if (clientAddress != msg.sender) {
             revert P2pSsvProxy__CallerNotClient(msg.sender, clientAddress);
         }
+        _;
+    }
+
+    modifier onlyOperatorOrOwner() {
+        address currentOwner = owner();
+        address currentOperator = operator();
+
+        if (currentOperator != msg.sender && currentOwner != msg.sender) {
+            revert P2pSsvProxy__CallerNeitherOperatorNorOwner(msg.sender, currentOperator, currentOwner);
+        }
+
         _;
     }
 
@@ -298,7 +309,15 @@ contract P2pSsvProxy is OwnableTokenRecoverer, OwnableWithOperator, ERC165, IP2p
         return address(i_p2pSsvProxyFactory);
     }
 
-    function owner() public view override(Ownable, OwnableBase, IOwnable) returns (address) {
-        return super.owner();
+    function owner() public view override(OwnableBase, IOwnable) returns (address) {
+        return i_p2pSsvProxyFactory.owner();
+    }
+
+    function operator() public view returns (address) {
+        return i_p2pSsvProxyFactory.operator();
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+        return interfaceId == type(IP2pSsvProxy).interfaceId || super.supportsInterface(interfaceId);
     }
 }

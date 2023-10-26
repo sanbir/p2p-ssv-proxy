@@ -4,12 +4,12 @@
 pragma solidity 0.8.18;
 
 import "../@openzeppelin/contracts/utils/introspection/IERC165.sol";
-import "../access/IOwnable.sol";
 import "../structs/P2pStructs.sol";
 import "../interfaces/ssv/ISSVNetwork.sol";
+import "../access/IOwnableWithOperator.sol";
 
 /// @dev External interface of P2pSsvProxyFactory
-interface IP2pSsvProxyFactory is IOwnable, IERC165 {
+interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
 
     function depositEthAndRegisterValidators(
         SsvOperator[] calldata _ssvOperators,
