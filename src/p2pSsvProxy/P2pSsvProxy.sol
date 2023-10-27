@@ -138,18 +138,15 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         }
     }
 
-    function registerValidators(
-        SsvOperator[] calldata _ssvOperators,
-        SsvValidator[] calldata _ssvValidators,
-        ISSVNetwork.Cluster calldata _cluster,
-        address _feeDistributorInstance,
-        uint256 _tokenAmount
-    ) external onlyP2pSsvProxyFactory {
+    function _getOperatorIdsAndClusterIndex(
+        SsvOperator[] calldata _ssvOperators
+    ) private returns(
+        uint64[] memory operatorIds,
+        uint64 clusterIndex
+    ) {
+        clusterIndex = 0;
         uint256 operatorCount = _ssvOperators.length;
-        uint256 validatorCount = _ssvValidators.length;
-
-        uint64[] memory operatorIds = new uint64[](operatorCount);
-        uint64 clusterIndex;
+        operatorIds = new uint64[](operatorCount);
         for (uint256 i = 0; i < operatorCount;) {
             operatorIds[i] = _ssvOperators[i].id;
 
@@ -160,6 +157,45 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
                 ++i;
             }
         }
+    }
+
+    function _registerValidator(
+        uint256 i,
+        uint64[] memory _operatorIds,
+        ISSVNetwork.Cluster calldata _cluster,
+        uint64 _clusterIndex,
+        bytes calldata _pubkey,
+        bytes calldata _sharesData,
+        uint256 _tokenAmount
+    ) private {
+        ISSVClusters.Cluster memory cluster = ISSVClusters.Cluster({
+            validatorCount: uint32(_cluster.validatorCount + i),
+            networkFeeIndex: _cluster.networkFeeIndex,
+            index: _clusterIndex,
+            active: true,
+            balance: _cluster.balance + _tokenAmount
+        });
+
+        i_ssvNetwork.registerValidator(
+            _pubkey,
+            _operatorIds,
+            _sharesData,
+            0,
+            cluster
+        );
+    }
+
+    function registerValidators(
+        SsvOperator[] calldata _ssvOperators,
+        SsvValidator[] calldata _ssvValidators,
+        ISSVNetwork.Cluster calldata _cluster,
+        address _feeDistributorInstance,
+        uint256 _tokenAmount
+    ) external onlyP2pSsvProxyFactory {
+        (
+            uint64[] memory operatorIds,
+            uint64 clusterIndex
+        ) = _getOperatorIdsAndClusterIndex(_ssvOperators);
 
         i_ssvNetwork.registerValidator(
             _ssvValidators[0].pubkey,
@@ -169,21 +205,16 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
             _cluster
         );
 
+        uint256 validatorCount = _ssvValidators.length;
         for (uint256 i = 1; i < validatorCount;) {
-            ISSVClusters.Cluster memory cluster = ISSVClusters.Cluster({
-                validatorCount: uint32(_cluster.validatorCount + i),
-                networkFeeIndex: _cluster.networkFeeIndex,
-                index: clusterIndex,
-                active: true,
-                balance: _cluster.balance + _tokenAmount
-            });
-
-            i_ssvNetwork.registerValidator(
-                _ssvValidators[i].pubkey,
+            _registerValidator(
+                i,
                 operatorIds,
+                _cluster,
+                clusterIndex,
+                _ssvValidators[i].pubkey,
                 _ssvValidators[i].sharesData,
-                0,
-                cluster
+                _tokenAmount
             );
 
             unchecked {

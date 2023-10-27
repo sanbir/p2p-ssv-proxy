@@ -39,6 +39,13 @@ error P2pSsvProxyFactory__SsvOperatorNotAllowed(address _ssvOperatorOwner, uint6
 
 error P2pSsvProxyFactory__DuplicateIdsNotAllowed();
 
+error P2pSsvProxyFactory__NotEnoughEtherPaidToCoverSsvFees(uint256 _needed, uint256 _paid);
+
+/// @dev We assume, SSV won't either drop 7539x or soar higher than 100 ETH.
+/// If it does, this contract won't be operational and another contract will have to be deployed.
+error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiOutOfRange();
+
+error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
 
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -59,11 +66,43 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     mapping(bytes4 => bool) private s_clientSelectors;
     mapping(bytes4 => bool) private s_operatorSelectors;
 
+    /// @notice If 1 SSV = 0.007539 ETH, it should be 0.007539 * 10^18 = 7539000000000000
+    uint256 private s_ssvPerEthExchangeRateDividedByWei;
+
     modifier onlySsvOperatorOwner() {
         bool isAllowed = s_allowedSsvOperatorOwners.contains(msg.sender);
         if (!isAllowed) {
             revert P2pSsvProxyFactory__NotAllowedSsvOperatorOwner(msg.sender);
         }
+        _;
+    }
+
+    modifier onlyAllowedOperators(SsvOperator[] calldata _operators) {
+        uint256 operatorCount = _operators.length;
+        for (uint256 i = 0; i < operatorCount;) {
+            uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory allowedIds = s_allowedSsvOperatorIds[_operators[i].owner];
+
+            bool isAllowed;
+            for (uint256 j = 0; j < MAX_ALLOWED_SSV_OPERATOR_IDS;) {
+                if (allowedIds[j] == _operators[i].id) {
+                    isAllowed = true;
+                    break;
+                }
+
+                unchecked {
+                    ++j;
+                }
+            }
+            if (!isAllowed) {
+                revert P2pSsvProxyFactory__SsvOperatorNotAllowed(_operators[i].owner, _operators[i].id);
+            }
+            isAllowed = false;
+
+            unchecked {
+                ++i;
+            }
+        }
+
         _;
     }
 
@@ -89,6 +128,14 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         i_ssvToken = (block.chainid == 1)
             ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
             : IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
+    }
+
+    function setSsvPerEthExchangeRateDividedByWei(uint256 _ssvPerEthExchangeRateDividedByWei) external onlyOwner {
+        if (_ssvPerEthExchangeRateDividedByWei < 10 ** 12 || _ssvPerEthExchangeRateDividedByWei > 10 ** 20) {
+            revert P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiOutOfRange();
+        }
+
+        s_ssvPerEthExchangeRateDividedByWei = _ssvPerEthExchangeRateDividedByWei;
     }
 
     function setReferenceP2pSsvProxy(address _referenceP2pSsvProxy) external onlyOwner {
@@ -207,34 +254,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         _clearSsvOperatorIds(_ssvOperatorOwner);
     }
 
-    function checkOperators(SsvOperator[] calldata _operators) private view {
-        uint256 operatorCount = _operators.length;
-        for (uint256 i = 0; i < operatorCount;) {
-            uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory allowedIds = s_allowedSsvOperatorIds[_operators[i].owner];
-
-            bool isAllowed;
-            for (uint256 j = 0; j < MAX_ALLOWED_SSV_OPERATOR_IDS;) {
-                if (allowedIds[j] == _operators[i].id) {
-                    isAllowed = true;
-                    break;
-                }
-
-                unchecked {
-                    ++j;
-                }
-            }
-            if (!isAllowed) {
-                revert P2pSsvProxyFactory__SsvOperatorNotAllowed(_operators[i].owner, _operators[i].id);
-            }
-            isAllowed = false;
-
-            unchecked {
-                ++i;
-            }
-        }
-    }
-
     function _makeBeaconDeposits(
+        bytes[] calldata signatures,
+        bytes32[] calldata depositDataRoots,
         SsvValidator[] calldata _ssvValidators,
         address withdrawalCredentialsAddress
     ) private {
@@ -249,8 +271,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             i_depositContract.deposit{value: 32 ether}(
                 _ssvValidators[i].pubkey,
                 withdrawalCredentials,
-                _ssvValidators[i].depositData.signature,
-                _ssvValidators[i].depositData.depositDataRoot
+                signatures[i],
+                depositDataRoots[i]
             );
 
             unchecked {
@@ -275,20 +297,60 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     function depositEthAndRegisterValidators(
+        bytes[] calldata signatures,
+        bytes32[] calldata depositDataRoots,
+        address _withdrawalCredentialsAddress,
+
         SsvOperator[] calldata _ssvOperators,
         SsvValidator[] calldata _ssvValidators,
         ISSVNetwork.Cluster calldata _cluster,
         uint256 _tokenAmount,
 
-        address _withdrawalCredentialsAddress,
         bytes32 _mevRelay,
 
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy) {
-        checkOperators(_ssvOperators);
-        _makeBeaconDeposits(_ssvValidators, _withdrawalCredentialsAddress);
+        _makeBeaconDeposits(signatures, depositDataRoots, _ssvValidators, _withdrawalCredentialsAddress);
 
+        p2pSsvProxy = _registerValidators(_ssvOperators, _ssvValidators, _cluster, _tokenAmount, _mevRelay, _clientConfig, _referrerConfig);
+    }
+
+    function registerValidators(
+        SsvOperator[] calldata _ssvOperators,
+        SsvValidator[] calldata _ssvValidators,
+        ISSVNetwork.Cluster calldata _cluster,
+        uint256 _tokenAmount,
+
+        bytes32 _mevRelay,
+
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) external payable returns (address p2pSsvProxy) {
+        uint256 exchangeRate = s_ssvPerEthExchangeRateDividedByWei;
+        if (exchangeRate == 0) {
+            revert P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
+        }
+
+        uint256 ssvTokensValueInWei = (_tokenAmount * exchangeRate) / 10**18;
+        if (msg.value != ssvTokensValueInWei) {
+            revert P2pSsvProxyFactory__NotEnoughEtherPaidToCoverSsvFees(ssvTokensValueInWei, msg.value);
+        }
+
+        p2pSsvProxy = _registerValidators(_ssvOperators, _ssvValidators, _cluster, _tokenAmount, _mevRelay, _clientConfig, _referrerConfig);
+    }
+
+    function _registerValidators(
+        SsvOperator[] calldata _ssvOperators,
+        SsvValidator[] calldata _ssvValidators,
+        ISSVNetwork.Cluster calldata _cluster,
+        uint256 _tokenAmount,
+
+        bytes32 _mevRelay,
+
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) private onlyAllowedOperators(_ssvOperators) returns (address p2pSsvProxy) {
         address feeDistributorInstance = _createFeeDistributor(_clientConfig, _referrerConfig);
         p2pSsvProxy = _createP2pSsvProxy(feeDistributorInstance);
 
@@ -369,7 +431,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         return super.owner();
     }
 
-    function feeDistributorFactory() public view returns (address) {
+    function feeDistributorFactory() external view returns (address) {
         return address(i_feeDistributorFactory);
     }
 
@@ -391,19 +453,27 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         return s_operatorSelectors[_selector];
     }
 
-    function allowedSsvOperatorIds(address _ssvOperatorOwner) public view returns (uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory) {
+    function allowedSsvOperatorIds(address _ssvOperatorOwner) external view returns (uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory) {
         return s_allowedSsvOperatorIds[_ssvOperatorOwner];
     }
 
-    function allowedSsvOperatorOwners() public view returns (address[] memory) {
+    function allowedSsvOperatorOwners() external view returns (address[] memory) {
         return s_allowedSsvOperatorOwners.values();
     }
 
-    function referenceFeeDistributor() public view returns (address) {
+    function referenceFeeDistributor() external view returns (address) {
         return s_referenceFeeDistributor;
     }
 
-    function referenceP2pSsvProxy() public view returns (address) {
+    function referenceP2pSsvProxy() external view returns (address) {
         return address(s_referenceP2pSsvProxy);
+    }
+
+    function ssvPerEthExchangeRateDividedByWei() external view returns (uint256) {
+        return s_ssvPerEthExchangeRateDividedByWei;
+    }
+
+    function neededAmountOfEtherToCoverSsvFees(uint256 _tokenAmount) external view returns (uint256) {
+        return (_tokenAmount * s_ssvPerEthExchangeRateDividedByWei) / 10**18;
     }
 }

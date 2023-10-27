@@ -11,15 +11,9 @@ struct FeeRecipient {
     address payable recipient;
 }
 
-struct DepositData {
-    bytes signature;
-    bytes32 depositDataRoot;
-}
-
 struct SsvValidator {
     bytes pubkey;
     bytes sharesData;
-    DepositData depositData;
 }
 
 struct SsvOperator {
