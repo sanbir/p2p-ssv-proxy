@@ -255,10 +255,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     function _makeBeaconDeposits(
-        bytes[] calldata signatures,
-        bytes32[] calldata depositDataRoots,
-        SsvValidator[] calldata _ssvValidators,
-        address withdrawalCredentialsAddress
+        DepositData calldata _depositData,
+        SsvValidator[] calldata _ssvValidators
     ) private {
         uint256 validatorCount = _ssvValidators.length;
 
@@ -266,13 +264,13 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             // ETH deposit
             bytes memory withdrawalCredentials = abi.encodePacked(
                 hex'010000000000000000000000',
-                withdrawalCredentialsAddress
+                _depositData.withdrawalCredentialsAddress
             );
             i_depositContract.deposit{value: 32 ether}(
                 _ssvValidators[i].pubkey,
                 withdrawalCredentials,
-                signatures[i],
-                depositDataRoots[i]
+                _depositData.signatures[i],
+                _depositData.depositDataRoots[i]
             );
 
             unchecked {
@@ -297,9 +295,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     function depositEthAndRegisterValidators(
-        bytes[] calldata signatures,
-        bytes32[] calldata depositDataRoots,
-        address _withdrawalCredentialsAddress,
+        DepositData calldata _depositData,
 
         SsvOperator[] calldata _ssvOperators,
         SsvValidator[] calldata _ssvValidators,
@@ -311,7 +307,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy) {
-        _makeBeaconDeposits(signatures, depositDataRoots, _ssvValidators, _withdrawalCredentialsAddress);
+        _makeBeaconDeposits(_depositData, _ssvValidators);
 
         p2pSsvProxy = _registerValidators(_ssvOperators, _ssvValidators, _cluster, _tokenAmount, _mevRelay, _clientConfig, _referrerConfig);
     }

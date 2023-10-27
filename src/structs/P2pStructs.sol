@@ -16,6 +16,12 @@ struct SsvValidator {
     bytes sharesData;
 }
 
+struct DepositData {
+    bytes[] signatures;
+    bytes32[] depositDataRoots;
+    address withdrawalCredentialsAddress;
+}
+
 struct SsvOperator {
     address owner;
     uint64 id;

@@ -12,9 +12,7 @@ import "../access/IOwnableWithOperator.sol";
 interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
 
     function depositEthAndRegisterValidators(
-        bytes[] calldata signatures,
-        bytes32[] calldata depositDataRoots,
-        address _withdrawalCredentialsAddress,
+        DepositData calldata _depositData,
 
         SsvOperator[] calldata _ssvOperators,
         SsvValidator[] calldata _ssvValidators,
