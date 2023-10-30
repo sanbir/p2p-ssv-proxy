@@ -113,6 +113,8 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         s_feeDistributor = IFeeDistributor(_feeDistributor);
 
         i_ssvToken.approve(address(i_ssvNetwork), type(uint256).max);
+
+        emit P2pSsvProxy__Initialized(_feeDistributor);
     }
 
     fallback() external {
@@ -129,10 +131,14 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
 
         (bool success, bytes memory data) = address(i_ssvNetwork).call(msg.data);
         if (success) {
+            emit P2pSsvProxy__SuccessfullyCalledViaFallback(caller, selector);
+
             assembly {
                 return(add(data, 0x20), mload(data))
             }
         } else {
+            emit P2pSsvProxy__CallingViaFallbackFailed(caller, selector);
+
             // Decode the reason from the error data returned from the call and revert with it.
             revert(string(data));
         }
