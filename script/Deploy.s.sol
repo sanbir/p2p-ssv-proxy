@@ -27,24 +27,19 @@ contract Deploy is Script {
 
         ssvToken.transfer(address(p2pSsvProxyFactory), 50 ether);
 
-        address[] memory allowedSsvOperatorOwners = new address[](1);
-        allowedSsvOperatorOwners[0] = vm.envAddress("ALLOWED_OPERATOR_OWNER");
+        address[] memory allowedSsvOperatorOwners = new address[](4);
+        allowedSsvOperatorOwners[0] = vm.envAddress("ALLOWED_OPERATOR_OWNER_1");
+        allowedSsvOperatorOwners[1] = vm.envAddress("ALLOWED_OPERATOR_OWNER_2");
+        allowedSsvOperatorOwners[2] = vm.envAddress("ALLOWED_OPERATOR_OWNER_3");
+        allowedSsvOperatorOwners[3] = vm.envAddress("ALLOWED_OPERATOR_OWNER_4");
         p2pSsvProxyFactory.setAllowedSsvOperatorOwners(allowedSsvOperatorOwners);
 
         IChangeOperator(address(feeDistributorFactory)).changeOperator(address(p2pSsvProxyFactory));
 
-        uint64[8] memory operatorIds = [
-            uint64(vm.envUint("OPERATOR_ID_1")),
-            uint64(vm.envUint("OPERATOR_ID_2")),
-            uint64(vm.envUint("OPERATOR_ID_3")),
-            uint64(vm.envUint("OPERATOR_ID_4")),
-
-            uint64(vm.envUint("OPERATOR_ID_5")),
-            uint64(vm.envUint("OPERATOR_ID_6")),
-            uint64(vm.envUint("OPERATOR_ID_7")),
-            uint64(vm.envUint("OPERATOR_ID_8"))
-        ];
-        p2pSsvProxyFactory.setSsvOperatorIds(operatorIds, allowedSsvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(vm.envUint("OPERATOR_ID_1")), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(vm.envUint("OPERATOR_ID_2")), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[1]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(vm.envUint("OPERATOR_ID_3")), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[2]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(vm.envUint("OPERATOR_ID_4")), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
 
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(vm.envUint("EXCHANGE_RATE"));
 

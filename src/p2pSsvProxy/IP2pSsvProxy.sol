@@ -30,9 +30,9 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
 
     /// @notice Returns the factory address
     /// @return address factory address
-    function factory() external view returns (address);
+    function getFactory() external view returns (address);
 
     /// @notice Returns the client address
     /// @return address client address
-    function client() external view returns (address);
+    function getClient() external view returns (address);
 }

@@ -30,11 +30,11 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
         address _feeDistributorInstance
     ) external view returns (address);
 
-    function allClientP2pSsvProxies(
+    function getAllClientP2pSsvProxies(
         address _client
     ) external view returns (address[] memory);
 
-    function allP2pSsvProxies() external view returns (address[] memory);
+    function getAllP2pSsvProxies() external view returns (address[] memory);
 
     function isClientSelectorAllowed(bytes4 _selector) external view returns (bool);
 

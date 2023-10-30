@@ -203,7 +203,7 @@ contract Integration is Test {
         vm.deal(owner, 1000 ether);
         vm.startPrank(owner);
 
-        uint256 neededEth = p2pSsvProxyFactory.neededAmountOfEtherToCoverSsvFees(ssvPayload.tokenAmount);
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload.tokenAmount);
 
         p2pSsvProxyFactory.registerValidators{value: neededEth}(
             ssvPayload,

@@ -52,7 +52,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
 
     /// @notice If caller not client, revert
     modifier onlyClient() {
-        address clientAddress = client();
+        address clientAddress = getClient();
 
         if (clientAddress != msg.sender) {
             revert P2pSsvProxy__CallerNotClient(msg.sender, clientAddress);
@@ -74,7 +74,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
     modifier onlyOperatorOrOwnerOrClient() {
         address operator_ = operator();
         address owner_ = owner();
-        address client_ = client();
+        address client_ = getClient();
 
         if (operator_ != msg.sender && owner_ != msg.sender && client_ != msg.sender) {
             revert P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient(msg.sender);
@@ -123,7 +123,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
 
         bool isAllowed = msg.sender == owner() ||
             (msg.sender == operator() && i_p2pSsvProxyFactory.isOperatorSelectorAllowed(selector)) ||
-            (msg.sender == client() && i_p2pSsvProxyFactory.isClientSelectorAllowed(selector));
+            (msg.sender == getClient() && i_p2pSsvProxyFactory.isClientSelectorAllowed(selector));
 
         if (!isAllowed) {
             revert P2pSsvProxy__SelectorNotAllowed(caller, selector);
@@ -333,11 +333,11 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
 
     /// @notice Returns the client address
     /// @return address client address
-    function client() public view returns (address) {
+    function getClient() public view returns (address) {
         return s_feeDistributor.client();
     }
 
-    function factory() external view returns (address) {
+    function getFactory() external view returns (address) {
         return address(i_p2pSsvProxyFactory);
     }
 
@@ -349,7 +349,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         return i_p2pSsvProxyFactory.operator();
     }
 
-    function feeDistributor() external view returns (address) {
+    function getFeeDistributor() external view returns (address) {
         return address(s_feeDistributor);
     }
 

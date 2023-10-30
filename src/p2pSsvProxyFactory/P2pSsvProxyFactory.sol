@@ -427,17 +427,17 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         return super.owner();
     }
 
-    function feeDistributorFactory() external view returns (address) {
+    function getFeeDistributorFactory() external view returns (address) {
         return address(i_feeDistributorFactory);
     }
 
-    function allClientP2pSsvProxies(
+    function getAllClientP2pSsvProxies(
         address _client
     ) external view returns (address[] memory) {
         return s_allClientP2pSsvProxies[_client];
     }
 
-    function allP2pSsvProxies() external view returns (address[] memory) {
+    function getAllP2pSsvProxies() external view returns (address[] memory) {
         return s_allP2pSsvProxies;
     }
 
@@ -449,27 +449,27 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         return s_operatorSelectors[_selector];
     }
 
-    function allowedSsvOperatorIds(address _ssvOperatorOwner) external view returns (uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory) {
+    function getAllowedSsvOperatorIds(address _ssvOperatorOwner) external view returns (uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory) {
         return s_allowedSsvOperatorIds[_ssvOperatorOwner];
     }
 
-    function allowedSsvOperatorOwners() external view returns (address[] memory) {
+    function getAllowedSsvOperatorOwners() external view returns (address[] memory) {
         return s_allowedSsvOperatorOwners.values();
     }
 
-    function referenceFeeDistributor() external view returns (address) {
+    function getReferenceFeeDistributor() external view returns (address) {
         return s_referenceFeeDistributor;
     }
 
-    function referenceP2pSsvProxy() external view returns (address) {
+    function getReferenceP2pSsvProxy() external view returns (address) {
         return address(s_referenceP2pSsvProxy);
     }
 
-    function ssvPerEthExchangeRateDividedByWei() external view returns (uint256) {
+    function getSsvPerEthExchangeRateDividedByWei() external view returns (uint256) {
         return s_ssvPerEthExchangeRateDividedByWei;
     }
 
-    function neededAmountOfEtherToCoverSsvFees(uint256 _tokenAmount) external view returns (uint256) {
+    function getNeededAmountOfEtherToCoverSsvFees(uint256 _tokenAmount) external view returns (uint256) {
         return (_tokenAmount * s_ssvPerEthExchangeRateDividedByWei) / 10**18;
     }
 }
