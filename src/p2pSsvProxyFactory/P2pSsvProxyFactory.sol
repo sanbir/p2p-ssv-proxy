@@ -297,32 +297,19 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     function depositEthAndRegisterValidators(
         DepositData calldata _depositData,
 
-        SsvOperator[] calldata _ssvOperators,
-        SsvValidator[] calldata _ssvValidators,
-        ISSVNetwork.Cluster calldata _cluster,
-        uint256 _tokenAmount,
+        SsvPayload calldata _ssvPayload,
 
         bytes32 _mevRelay,
 
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy) {
-        _makeBeaconDeposits(_depositData, _ssvValidators);
+        _makeBeaconDeposits(_depositData, _ssvPayload.ssvValidators);
 
-        p2pSsvProxy = _registerValidators(_ssvOperators, _ssvValidators, _cluster, _tokenAmount, _mevRelay, _clientConfig, _referrerConfig);
+        p2pSsvProxy = _registerValidators(_ssvPayload, _mevRelay, _clientConfig, _referrerConfig);
     }
 
-    function registerValidators(
-        SsvOperator[] calldata _ssvOperators,
-        SsvValidator[] calldata _ssvValidators,
-        ISSVNetwork.Cluster calldata _cluster,
-        uint256 _tokenAmount,
-
-        bytes32 _mevRelay,
-
-        FeeRecipient calldata _clientConfig,
-        FeeRecipient calldata _referrerConfig
-    ) external payable returns (address p2pSsvProxy) {
+    function _checkEthValue(uint256 _tokenAmount) private view {
         uint256 exchangeRate = s_ssvPerEthExchangeRateDividedByWei;
         if (exchangeRate == 0) {
             revert P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
@@ -332,32 +319,37 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         if (msg.value != ssvTokensValueInWei) {
             revert P2pSsvProxyFactory__NotEnoughEtherPaidToCoverSsvFees(ssvTokensValueInWei, msg.value);
         }
-
-        p2pSsvProxy = _registerValidators(_ssvOperators, _ssvValidators, _cluster, _tokenAmount, _mevRelay, _clientConfig, _referrerConfig);
     }
 
-    function _registerValidators(
-        SsvOperator[] calldata _ssvOperators,
-        SsvValidator[] calldata _ssvValidators,
-        ISSVNetwork.Cluster calldata _cluster,
-        uint256 _tokenAmount,
+    function registerValidators(
+        SsvPayload calldata _ssvPayload,
 
         bytes32 _mevRelay,
 
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
-    ) private onlyAllowedOperators(_ssvOperators) returns (address p2pSsvProxy) {
+    ) external payable returns (address) {
+        _checkEthValue(_ssvPayload.tokenAmount);
+
+        return _registerValidators(_ssvPayload, _mevRelay, _clientConfig, _referrerConfig);
+    }
+
+    function _registerValidators(
+        SsvPayload calldata _ssvPayload,
+
+        bytes32 _mevRelay,
+
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) private onlyAllowedOperators(_ssvPayload.ssvOperators) returns (address p2pSsvProxy) {
         address feeDistributorInstance = _createFeeDistributor(_clientConfig, _referrerConfig);
         p2pSsvProxy = _createP2pSsvProxy(feeDistributorInstance);
 
-        i_ssvToken.transfer(address(p2pSsvProxy), _tokenAmount);
+        i_ssvToken.transfer(address(p2pSsvProxy), _ssvPayload.tokenAmount);
 
         P2pSsvProxy(p2pSsvProxy).registerValidators(
-            _ssvOperators,
-            _ssvValidators,
-            _cluster,
-            feeDistributorInstance,
-            _tokenAmount
+            _ssvPayload,
+            feeDistributorInstance
         );
 
         emit P2pSsvProxyFactory__RegistrationCompleted(p2pSsvProxy, _mevRelay);

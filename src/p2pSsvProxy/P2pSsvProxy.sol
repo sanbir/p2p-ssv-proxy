@@ -140,7 +140,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
 
     function _getOperatorIdsAndClusterIndex(
         SsvOperator[] calldata _ssvOperators
-    ) private returns(
+    ) private view returns(
         uint64[] memory operatorIds,
         uint64 clusterIndex
     ) {
@@ -186,35 +186,32 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
     }
 
     function registerValidators(
-        SsvOperator[] calldata _ssvOperators,
-        SsvValidator[] calldata _ssvValidators,
-        ISSVNetwork.Cluster calldata _cluster,
-        address _feeDistributorInstance,
-        uint256 _tokenAmount
+        SsvPayload calldata _ssvPayload,
+        address _feeDistributorInstance
     ) external onlyP2pSsvProxyFactory {
         (
             uint64[] memory operatorIds,
             uint64 clusterIndex
-        ) = _getOperatorIdsAndClusterIndex(_ssvOperators);
+        ) = _getOperatorIdsAndClusterIndex(_ssvPayload.ssvOperators);
 
         i_ssvNetwork.registerValidator(
-            _ssvValidators[0].pubkey,
+            _ssvPayload.ssvValidators[0].pubkey,
             operatorIds,
-            _ssvValidators[0].sharesData,
-            _tokenAmount,
-            _cluster
+            _ssvPayload.ssvValidators[0].sharesData,
+            _ssvPayload.tokenAmount,
+            _ssvPayload.cluster
         );
 
-        uint256 validatorCount = _ssvValidators.length;
+        uint256 validatorCount = _ssvPayload.ssvValidators.length;
         for (uint256 i = 1; i < validatorCount;) {
             _registerValidator(
                 i,
                 operatorIds,
-                _cluster,
+                _ssvPayload.cluster,
                 clusterIndex,
-                _ssvValidators[i].pubkey,
-                _ssvValidators[i].sharesData,
-                _tokenAmount
+                _ssvPayload.ssvValidators[i].pubkey,
+                _ssvPayload.ssvValidators[i].sharesData,
+                _ssvPayload.tokenAmount
             );
 
             unchecked {

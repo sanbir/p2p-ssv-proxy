@@ -13,29 +13,18 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
 
     function depositEthAndRegisterValidators(
         DepositData calldata _depositData,
-
-        SsvOperator[] calldata _ssvOperators,
-        SsvValidator[] calldata _ssvValidators,
-        ISSVNetwork.Cluster calldata _cluster,
-        uint256 _tokenAmount,
-
+        SsvPayload calldata _ssvPayload,
         bytes32 _mevRelay,
-
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy);
 
     function registerValidators(
-        SsvOperator[] calldata _ssvOperators,
-        SsvValidator[] calldata _ssvValidators,
-        ISSVNetwork.Cluster calldata _cluster,
-        uint256 _tokenAmount,
-
+        SsvPayload calldata _ssvPayload,
         bytes32 _mevRelay,
-
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
-    ) external payable returns (address p2pSsvProxy);
+    ) external payable returns (address);
 
     function predictP2pSsvProxyAddress(
         address _feeDistributorInstance
