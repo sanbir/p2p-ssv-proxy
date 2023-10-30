@@ -119,13 +119,12 @@ contract Integration is Test {
         });
     }
 
-    function test_Main_Use_Case() public {
-        console.log("MainUseCase started");
+    function test_depositEthAndRegisterValidators() public {
+        console.log("test_depositEthAndRegisterValidators started");
 
         vm.startPrank(p2pSsvTokenHolder);
         ssvToken.transfer(address(p2pSsvProxyFactory), 50 ether);
         vm.stopPrank();
-        console.log(ssvToken.balanceOf(address(p2pSsvProxyFactory)));
 
         bytes32 mevRelay = bytes32(hex'4242');
 
@@ -165,6 +164,56 @@ contract Integration is Test {
 
         vm.stopPrank();
 
-        console.log("MainUseCase finsihed");
+        console.log("test_depositEthAndRegisterValidators finsihed");
+    }
+
+    function test_registerValidators() public {
+        console.log("test_registerValidators started");
+
+        vm.startPrank(p2pSsvTokenHolder);
+        ssvToken.transfer(address(p2pSsvProxyFactory), 50 ether);
+        vm.stopPrank();
+
+        bytes32 mevRelay = bytes32(hex'4242');
+
+        FeeRecipient memory clientConfig = FeeRecipient({
+            recipient: clientAddress,
+            basisPoints: 0
+        });
+        FeeRecipient memory referrerConfig = FeeRecipient({
+            recipient: payable(address(0)),
+            basisPoints: 0
+        });
+
+        SsvPayload memory ssvPayload = getSsvPayload();
+        address[] memory allowedSsvOperatorOwners = new address[](1);
+        allowedSsvOperatorOwners[0] = ssvPayload.ssvOperators[0].owner;
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setAllowedSsvOperatorOwners(allowedSsvOperatorOwners);
+        IChangeOperator(address(feeDistributorFactory)).changeOperator(address(p2pSsvProxyFactory));
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        vm.stopPrank();
+
+        vm.startPrank(allowedSsvOperatorOwners[0]);
+        uint64[8] memory operatorIds = [uint64(1),2,3,4,5,6,7,8];
+        p2pSsvProxyFactory.setSsvOperatorIds(operatorIds);
+        vm.stopPrank();
+
+        vm.deal(owner, 1000 ether);
+        vm.startPrank(owner);
+
+        uint256 neededEth = p2pSsvProxyFactory.neededAmountOfEtherToCoverSsvFees(ssvPayload.tokenAmount);
+
+        p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload,
+            mevRelay,
+            clientConfig,
+            referrerConfig
+        );
+
+        vm.stopPrank();
+
+        console.log("test_registerValidators finsihed");
     }
 }
