@@ -21,7 +21,6 @@ struct SsvValidator {
 struct DepositData {
     bytes[] signatures;
     bytes32[] depositDataRoots;
-    address withdrawalCredentialsAddress;
 }
 
 struct SsvOperator {

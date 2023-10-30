@@ -110,12 +110,9 @@ contract Integration is Test {
         depositDataRoots[1] = bytes32(hex'fbd27eef624027cb47d3a83a10f18752832e538f38f100b9050ef0216ce6a9e9');
         depositDataRoots[2] = bytes32(hex'1bfb75d79d628863886bd0374908d33e2aecb2410567b81a82f253ba5c5470db');
 
-        address withdrawalCredentialsAddress = owner;
-
         return DepositData({
             signatures: signatures,
-            depositDataRoots: depositDataRoots,
-            withdrawalCredentialsAddress: withdrawalCredentialsAddress
+            depositDataRoots: depositDataRoots
         });
     }
 
@@ -156,6 +153,7 @@ contract Integration is Test {
 
         p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 96 ether}(
             getDepositData(),
+            owner,
             ssvPayload,
             mevRelay,
             clientConfig,

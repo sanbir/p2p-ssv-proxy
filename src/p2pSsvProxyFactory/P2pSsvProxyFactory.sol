@@ -264,6 +264,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     function _makeBeaconDeposits(
         DepositData calldata _depositData,
+        address _withdrawalCredentialsAddress,
         SsvValidator[] calldata _ssvValidators
     ) private {
         uint256 validatorCount = _ssvValidators.length;
@@ -272,7 +273,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             // ETH deposit
             bytes memory withdrawalCredentials = abi.encodePacked(
                 hex'010000000000000000000000',
-                _depositData.withdrawalCredentialsAddress
+                _withdrawalCredentialsAddress
             );
             i_depositContract.deposit{value: 32 ether}(
                 _ssvValidators[i].pubkey,
@@ -304,6 +305,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     function depositEthAndRegisterValidators(
         DepositData calldata _depositData,
+        address _withdrawalCredentialsAddress,
 
         SsvPayload calldata _ssvPayload,
 
@@ -312,7 +314,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy) {
-        _makeBeaconDeposits(_depositData, _ssvPayload.ssvValidators);
+        _makeBeaconDeposits(_depositData, _withdrawalCredentialsAddress, _ssvPayload.ssvValidators);
 
         p2pSsvProxy = _registerValidators(_ssvPayload, _mevRelay, _clientConfig, _referrerConfig);
     }
