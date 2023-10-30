@@ -46,6 +46,8 @@ contract Deploy is Script {
         ];
         p2pSsvProxyFactory.setSsvOperatorIds(operatorIds, allowedSsvOperatorOwners[0]);
 
+        p2pSsvProxyFactory.changeOperator(vm.envAddress("FACTORY_OPERATOR"));
+
         vm.stopBroadcast();
 
         return (

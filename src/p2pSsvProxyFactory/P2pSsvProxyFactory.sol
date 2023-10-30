@@ -69,6 +69,14 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     /// @notice If 1 SSV = 0.007539 ETH, it should be 0.007539 * 10^18 = 7539000000000000
     uint256 private s_ssvPerEthExchangeRateDividedByWei;
 
+    modifier onlyAllowedSsvOperatorOwner(address _ssvOperatorOwner) {
+        bool isAllowed = s_allowedSsvOperatorOwners.contains(_ssvOperatorOwner);
+        if (!isAllowed) {
+            revert P2pSsvProxyFactory__NotAllowedSsvOperatorOwner(_ssvOperatorOwner);
+        }
+        _;
+    }
+
     modifier onlySsvOperatorOwner() {
         bool isAllowed = s_allowedSsvOperatorOwners.contains(msg.sender);
         if (!isAllowed) {
@@ -214,7 +222,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     ) private {
         for (uint i = 0; i < _operatorIds.length;) {
             for (uint j = i + 1; j < _operatorIds.length;) {
-                if (_operatorIds[i] == _operatorIds[j]) {
+                if (_operatorIds[i] == _operatorIds[j] && _operatorIds[i] != 0) {
                     revert P2pSsvProxyFactory__DuplicateIdsNotAllowed();
                 }
                 unchecked {
@@ -238,7 +246,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     function setSsvOperatorIds(
         uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] calldata _operatorIds,
         address _ssvOperatorOwner
-    ) external onlyOperatorOrOwner {
+    ) external onlyOperatorOrOwner onlyAllowedSsvOperatorOwner(_ssvOperatorOwner) {
         _setSsvOperatorIds(_operatorIds, _ssvOperatorOwner);
     }
 
