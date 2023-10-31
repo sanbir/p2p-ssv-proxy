@@ -194,7 +194,7 @@ contract Integration is Test {
         vm.stopPrank();
 
         vm.startPrank(allowedSsvOperatorOwners[0]);
-        uint64[8] memory operatorIds = [uint64(1),2,3,4,5,6,7,8];
+        uint64[8] memory operatorIds = [uint64(1),2,3,4,0,0,0,0];
         p2pSsvProxyFactory.setSsvOperatorIds(operatorIds);
         vm.stopPrank();
 

@@ -14,6 +14,7 @@ import "../p2pSsvProxy/P2pSsvProxy.sol";
 import "../structs/P2pStructs.sol";
 import "../@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "../@openzeppelin/contracts/proxy/Clones.sol";
+import "../interfaces/ssv/ISSVViews.sol";
 
 
 error P2pSsvProxyFactory__NotFeeDistributorFactory(address _passedAddress);
@@ -46,12 +47,15 @@ error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiOutOfRange();
 
 error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
 
+error P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(uint64 _operatorId, address _passedOwner, address _actualOwner);
+
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
     using EnumerableSet for EnumerableSet.AddressSet;
 
     IDepositContract private immutable i_depositContract;
     IFeeDistributorFactory private immutable i_feeDistributorFactory;
     IERC20 private immutable i_ssvToken;
+    ISSVViews private immutable i_ssvViews;
 
     address private s_referenceFeeDistributor;
     P2pSsvProxy private s_referenceP2pSsvProxy;
@@ -136,6 +140,10 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         i_ssvToken = (block.chainid == 1)
             ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
             : IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
+
+        i_ssvViews = (block.chainid == 1)
+            ? ISSVViews(0xafE830B6Ee262ba11cce5F32fDCd760FFE6a66e4)
+            : ISSVViews(0xAE2C84c48272F5a1746150ef333D5E5B51F68763);
     }
 
     function setSsvPerEthExchangeRateDividedByWei(uint256 _ssvPerEthExchangeRateDividedByWei) external onlyOwner {
@@ -232,14 +240,24 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         address _ssvOperatorOwner
     ) private {
         for (uint i = 0; i < _operatorIds.length;) {
+            uint64 id = _operatorIds[i];
+
             for (uint j = i + 1; j < _operatorIds.length;) {
-                if (_operatorIds[i] == _operatorIds[j] && _operatorIds[i] != 0) {
+                if (id == _operatorIds[j] && id != 0) {
                     revert P2pSsvProxyFactory__DuplicateIdsNotAllowed();
                 }
                 unchecked {
                     ++j;
                 }
             }
+
+            if (id != 0) {
+                (address actualOwner,,,,,) = i_ssvViews.getOperatorById(id);
+                if (actualOwner != _ssvOperatorOwner) {
+                    revert P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(id, _ssvOperatorOwner, actualOwner);
+                }
+            }
+
             unchecked {
                 ++i;
             }
