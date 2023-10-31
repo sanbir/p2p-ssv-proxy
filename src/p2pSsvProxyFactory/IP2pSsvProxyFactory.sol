@@ -5,6 +5,7 @@ pragma solidity 0.8.18;
 
 import "../@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../structs/P2pStructs.sol";
+import "../constants/P2pConstants.sol";
 import "../interfaces/ssv/ISSVNetwork.sol";
 import "../access/IOwnableWithOperator.sol";
 
@@ -53,5 +54,42 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
         address indexed _p2pSsvProxy,
         address indexed _client,
         address indexed _feeDistributor
+    );
+
+    event P2pSsvProxyFactory__ReferenceFeeDistributorSet(
+        address indexed _referenceFeeDistributor
+    );
+
+    event P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiSet(
+        uint256 _ssvPerEthExchangeRateDividedByWei
+    );
+
+    event P2pSsvProxyFactory__ReferenceP2pSsvProxySet(
+        address indexed _referenceP2pSsvProxy
+    );
+
+    event P2pSsvProxyFactory__AllowedSelectorsForClientSet(
+        bytes4[] _selectors
+    );
+
+    event P2pSsvProxyFactory__AllowedSelectorsForOperatorSet(
+        bytes4[] _selectors
+    );
+
+    event P2pSsvProxyFactory__AllowedSsvOperatorOwnersSet(
+        address[] _allowedSsvOperatorOwners
+    );
+
+    event P2pSsvProxyFactory__AllowedSsvOperatorOwnersRemoved(
+        address[] _allowedSsvOperatorOwners
+    );
+
+    event P2pSsvProxyFactory__SsvOperatorIdsSet(
+        address indexed _ssvOperatorOwner,
+        uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] _operatorIds
+    );
+
+    event P2pSsvProxyFactory__SsvOperatorIdsCleared(
+        address indexed _ssvOperatorOwner
     );
 }

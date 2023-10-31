@@ -7,7 +7,6 @@ import "./IP2pSsvProxyFactory.sol";
 import "../assetRecovering/OwnableAssetRecoverer.sol";
 import "../access/OwnableWithOperator.sol";
 import "../@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import "../structs/P2pStructs.sol";
 import "../interfaces/IDepositContract.sol";
 import "../interfaces/p2p/IFeeDistributor.sol";
 import "../interfaces/p2p/IFeeDistributorFactory.sol";
@@ -128,6 +127,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
 
         s_referenceFeeDistributor = _referenceFeeDistributor;
+        emit P2pSsvProxyFactory__ReferenceFeeDistributorSet(_referenceFeeDistributor);
 
         i_depositContract = (block.chainid == 1)
             ? IDepositContract(0x00000000219ab540356cBB839Cbe05303d7705Fa)
@@ -144,6 +144,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
 
         s_ssvPerEthExchangeRateDividedByWei = _ssvPerEthExchangeRateDividedByWei;
+        emit P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiSet(_ssvPerEthExchangeRateDividedByWei);
     }
 
     function setReferenceP2pSsvProxy(address _referenceP2pSsvProxy) external onlyOwner {
@@ -152,6 +153,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
 
         s_referenceP2pSsvProxy = P2pSsvProxy(_referenceP2pSsvProxy);
+        emit P2pSsvProxyFactory__ReferenceP2pSsvProxySet(_referenceP2pSsvProxy);
     }
 
     function setAllowedSelectorsForClient(bytes4[] calldata _selectors) external onlyOwner {
@@ -163,6 +165,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 ++i;
             }
         }
+
+        emit P2pSsvProxyFactory__AllowedSelectorsForClientSet(_selectors);
     }
 
     function setAllowedSelectorsForOperator(bytes4[] calldata _selectors) external onlyOwner {
@@ -174,6 +178,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 ++i;
             }
         }
+
+        emit P2pSsvProxyFactory__AllowedSelectorsForOperatorSet(_selectors);
     }
 
     function setReferenceFeeDistributor(
@@ -184,6 +190,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
 
         s_referenceFeeDistributor = _referenceFeeDistributor;
+        emit P2pSsvProxyFactory__ReferenceFeeDistributorSet(_referenceFeeDistributor);
     }
 
     function setAllowedSsvOperatorOwners(
@@ -199,6 +206,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 ++i;
             }
         }
+
+        emit P2pSsvProxyFactory__AllowedSsvOperatorOwnersSet(_allowedSsvOperatorOwners);
     }
 
     function removeAllowedSsvOperatorOwners(
@@ -214,6 +223,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 ++i;
             }
         }
+
+        emit P2pSsvProxyFactory__AllowedSsvOperatorOwnersRemoved(_allowedSsvOperatorOwnersToRemove);
     }
 
     function _setSsvOperatorIds(
@@ -235,6 +246,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
 
         s_allowedSsvOperatorIds[_ssvOperatorOwner] = _operatorIds;
+        emit P2pSsvProxyFactory__SsvOperatorIdsSet(_ssvOperatorOwner, _operatorIds);
     }
 
     function setSsvOperatorIds(
@@ -252,6 +264,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     function _clearSsvOperatorIds(address _ssvOperatorOwner) private {
         delete s_allowedSsvOperatorIds[_ssvOperatorOwner];
+        emit P2pSsvProxyFactory__SsvOperatorIdsCleared(_ssvOperatorOwner);
     }
 
     function clearSsvOperatorIds() external onlySsvOperatorOwner {
