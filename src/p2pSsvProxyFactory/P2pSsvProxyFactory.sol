@@ -49,6 +49,10 @@ error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
 
 error P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(uint64 _operatorId, address _passedOwner, address _actualOwner);
 
+error P2pSsvProxyFactory__CannotSetZeroSelectors();
+
+error P2pSsvProxyFactory__CannotSetZeroAllowedSsvOperatorOwners();
+
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
     using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -166,6 +170,11 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     function setAllowedSelectorsForClient(bytes4[] calldata _selectors) external onlyOwner {
         uint256 count = _selectors.length;
+
+        if (count == 0) {
+            revert P2pSsvProxyFactory__CannotSetZeroSelectors();
+        }
+
         for (uint256 i = 0; i < count;) {
             s_clientSelectors[_selectors[i]] = true;
 
@@ -179,6 +188,11 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     function setAllowedSelectorsForOperator(bytes4[] calldata _selectors) external onlyOwner {
         uint256 count = _selectors.length;
+
+        if (count == 0) {
+            revert P2pSsvProxyFactory__CannotSetZeroSelectors();
+        }
+
         for (uint256 i = 0; i < count;) {
             s_operatorSelectors[_selectors[i]] = true;
 
@@ -205,7 +219,13 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         address[] calldata _allowedSsvOperatorOwners
     ) external onlyOperatorOrOwner {
         uint256 count = _allowedSsvOperatorOwners.length;
+
+        if (count == 0) {
+            revert P2pSsvProxyFactory__CannotSetZeroAllowedSsvOperatorOwners();
+        }
+
         for (uint256 i = 0; i < count;) {
+            // address _allowedSsvOperatorOwners[i]
             if (!s_allowedSsvOperatorOwners.add(_allowedSsvOperatorOwners[i])) {
                 revert P2pSsvProxyFactory__SsvOperatorOwnerAlreadyExists(_allowedSsvOperatorOwners[i]);
             }
