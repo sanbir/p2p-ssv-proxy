@@ -165,6 +165,20 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         }
     }
 
+    function _getBalance(
+        ISSVNetwork.Cluster memory _cluster,
+        uint64 _newIndex,
+        uint64 _currentNetworkFeeIndex,
+        uint256 _tokenAmount
+    ) private pure returns(uint256 balance) {
+        uint256 balanceBefore = _cluster.balance + _tokenAmount;
+
+        uint64 networkFee = uint64(_currentNetworkFeeIndex - _cluster.networkFeeIndex) * _cluster.validatorCount;
+        uint64 usage = (_newIndex - _cluster.index) * _cluster.validatorCount + networkFee;
+        uint256 expandedUsage = usage * 10_000_000;
+        balance = expandedUsage > balanceBefore? 0 : balanceBefore - expandedUsage;
+    }
+
     function _registerValidator(
         uint256 i,
         uint64[] memory _operatorIds,
@@ -172,14 +186,16 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         uint64 _clusterIndex,
         bytes calldata _pubkey,
         bytes calldata _sharesData,
-        uint256 _tokenAmount
+        uint256 _tokenAmount,
+        uint64 _currentNetworkFeeIndex,
+        uint256 _balance
     ) private {
         ISSVClusters.Cluster memory cluster = ISSVClusters.Cluster({
             validatorCount: uint32(_cluster.validatorCount + i),
-            networkFeeIndex: _cluster.networkFeeIndex,
+            networkFeeIndex: _currentNetworkFeeIndex,
             index: _clusterIndex,
             active: true,
-            balance: _cluster.balance + _tokenAmount
+            balance: _balance
         });
 
         i_ssvNetwork.registerValidator(
@@ -200,6 +216,10 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
             uint64 clusterIndex
         ) = _getOperatorIdsAndClusterIndex(_ssvPayload.ssvOperators);
 
+        uint64 currentNetworkFeeIndex = uint64(uint256(_ssvPayload.ssvSlot0) >> 192) + uint64(block.number - uint32(uint256(_ssvPayload.ssvSlot0))) * uint64(uint256(_ssvPayload.ssvSlot0) >> 128);
+
+        uint256 balance = _getBalance(_ssvPayload.cluster, clusterIndex, currentNetworkFeeIndex, _ssvPayload.tokenAmount);
+
         i_ssvNetwork.registerValidator(
             _ssvPayload.ssvValidators[0].pubkey,
             operatorIds,
@@ -208,8 +228,8 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
             _ssvPayload.cluster
         );
 
-        uint256 validatorCount = _ssvPayload.ssvValidators.length;
-        for (uint256 i = 1; i < validatorCount;) {
+        // uint256 validatorCount = _ssvPayload.ssvValidators.length;
+        for (uint256 i = 1; i < _ssvPayload.ssvValidators.length;) {
             _registerValidator(
                 i,
                 operatorIds,
@@ -217,7 +237,9 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
                 clusterIndex,
                 _ssvPayload.ssvValidators[i].pubkey,
                 _ssvPayload.ssvValidators[i].sharesData,
-                _ssvPayload.tokenAmount
+                _ssvPayload.tokenAmount,
+                currentNetworkFeeIndex,
+                balance
             );
 
             unchecked {

@@ -35,4 +35,5 @@ struct SsvPayload {
     SsvValidator[] ssvValidators;
     ISSVClusters.Cluster cluster;
     uint256 tokenAmount;
+    bytes32 ssvSlot0;
 }

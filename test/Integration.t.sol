@@ -46,7 +46,7 @@ contract Integration is Test {
         console.logUint(snapshotBlock);
     }
 
-    function getSsvPayload() private view returns(SsvPayload memory) {
+    function getSsvPayload1() private view returns(SsvPayload memory) {
         SsvOperator[] memory ssvOperators = new SsvOperator[](4);
 
         ssvOperators[0].owner = 0xef08EE5E9403E6DE7938ea6ec8ef1CFe596102EB;
@@ -97,11 +97,12 @@ contract Integration is Test {
             ssvOperators:ssvOperators,
             ssvValidators:ssvValidators,
             cluster:cluster,
-            tokenAmount:105102853212500000000
+            tokenAmount:105102853212500000000,
+            ssvSlot0: 0x00000000000000000000000000000000000001f400980a6500000a5d00000000
         });
     }
 
-    function getDepositData() private pure returns(DepositData memory) {
+    function getDepositData1() private pure returns(DepositData memory) {
         bytes[] memory signatures = new bytes[](5);
         signatures[0] = bytes(hex'b30e5adc7e414df9895082fc262142f4f238e768f76937a79c34dfae4417a44c9271d81118a97d933d033c7fa52f91f00cf52c016dd493eccfc694ab708e9c33b289da7c4c4d2d1357b89340bbaf7256b50cf69e6c8a18db37dc24eafe5b7c26');
         signatures[1] = bytes(hex'a4407a0a3675c31807d029b71916120880f3500c5373c2c0ab604bd7fcd1c4548aebf3f7ac3a1d8d3935dc68b088c2a1195456f2e52244cfa07657aa53e28a77d54b5399a5dfca1246b2292d1bdcbfb523e5423304fc88ca587d3f986e660f2b');
@@ -115,6 +116,69 @@ contract Integration is Test {
         depositDataRoots[2] = bytes32(hex'89d95e435cb1535044ff888a3bcbf49ba4a950667def6dff3032e6a9e0655efd');
         depositDataRoots[3] = bytes32(hex'2db2efe5d6e8bdf6e95cc61c21b5b0295fa77ee0589dacbf830e7f68cfe9db8f');
         depositDataRoots[4] = bytes32(hex'2b86e89e1cdace0d21853457ac6b958a348c0ac6e94b2ae5d8c85873e8ec684d');
+
+        return DepositData({
+            signatures: signatures,
+            depositDataRoots: depositDataRoots
+        });
+    }
+
+    function getSsvPayload2() private view returns(SsvPayload memory) {
+        SsvOperator[] memory ssvOperators = new SsvOperator[](4);
+
+        ssvOperators[0].owner = 0xef08EE5E9403E6DE7938ea6ec8ef1CFe596102EB;
+        ssvOperators[0].id = 30;
+        ssvOperators[0].snapshot = bytes32(hex'0000000000000000000000000000041dc362a828000000064e370e400097f342');
+        ssvOperators[0].fee = 382640000000;
+
+        ssvOperators[1].owner = 0x84860e46dc75b0F3dA64e3Efc287319b67b4FF00;
+        ssvOperators[1].id = 35;
+        ssvOperators[1].snapshot = bytes32(hex'0000000000000000000000000000132a733f8c8a0000003e59a4b2d80097faa7');
+        ssvOperators[1].fee = 3826430000000;
+
+        ssvOperators[2].owner = 0xc799bE8De03F20B2D3b101E6F6516D614e6fFe06;
+        ssvOperators[2].id = 123;
+        ssvOperators[2].snapshot = bytes32(hex'0000000000000000000000000000000ce013ff500000000024614b490097f342');
+        ssvOperators[2].fee = 19130000000;
+
+        ssvOperators[3].owner = 0x6676FFebC95C0B3C85025d57b9543E11C571dB4a;
+        ssvOperators[3].id = 147;
+        ssvOperators[3].snapshot = bytes32(hex'000000000000000000000000000005b55d086a6d0000001af9e40c8b0097f342');
+        ssvOperators[3].fee = 3826430000000;
+
+        SsvValidator[] memory ssvValidators = new SsvValidator[](2);
+        ssvValidators[0].pubkey = bytes(hex'92269be7b88c417f46aafd18943783990df0952c9858bd3147815e31f48d1be5f559387b696231f98fcc5ca2b3ff354e');
+        ssvValidators[0].sharesData = bytes(hex'99b88e1eca1cf575cb1a677bfdc4876f6c5bedd1118c2ed8357aeb2e2ee2fdbb0eb216ad2540fdd6ee913e2c381b307b196320ac8414ef0b0d555fe6661579d59a4287090db18e0db509c23a1919f396b0ccb04f82c72bc88ce17c6fac6bc309a5b072ed1e69cdb407956c197df15594f2e9855931f11871239b4d25e44f518fddc9afd1d869454615a0fa2a81c9243c8ce92f451cb47b0b31040afe31af27de31015b10128f6ff3ca9ebce5ac75c6986fb0190bbbbbf92f0183bcdbb9ccd8f4aedc30faea71209afa8c7b383bf62489e036b819a652bcc494c620e463f1d5f796f794e7a96bd165c5738babe950dc1f9755581f9c50650949717f16a6b92228067eabfdc5b2ea77d77c8e3a26cfaa917bd54700f86b4566c266e9b8a0230836323a71f5f55999450d707bccc09a3a9a45a85f8cccaafcf55e3eb84df3f0b8d6af78f49031fdbca7adafc929ad097f0546e33a9b5ee7df80d65cb60e2c45342967a6f869565029ac2e5b83e8b9607e4193ad801a95ee14fac0791aab62d422e66afa52bb0f7ac829fd774ad45e07cb4415b9b5a4d67ed5588533a659d0da23903b9f215eeb1cf0febca0d0f7809dd94a9047bc19b150bf4602a38131565800557c8de10153ee1cb2cb38e72c834017abf90601b8c17a04b012f0713e929aa5ae8c35661f667c9508b89085801fe34bb7ee3d76b7d43cdfba20222dd3ea0bc55354bf34e8ae21b6c813955429ab65be266375e427d377f5306a9713a2a90b12bb23a310f3a1bb6d9d448921142e62fae30ec974a1c7d873e902c7afe335c7eaf7aa4de4bf958af617f230f220f8b2630fcfb1d32300e92a0691d3abbb2edf3e3bdd633de6d09c748c6506a64c93a18b2f9f30cba96261d88c1ba2673e85530fea53fd5962d7cd9c655477adc417c052ec88429ff241c63af8c4ae54c90a0b16363f3f314ecbde0adc3a72f358f76ec5f7dd801c4b9de0d6fdaced1da5f9421eb8ae964c7f0f1587fb01bfe863f05e04dd1b809c604850b8fb7e910bbd05a8e9dc87fc1358fb3a22f9d8ec416f80c6f3f5b8de75dc036b4e1303ce0598f15c6822dff40ae99f376b21593a32a5cc74694a26a90cffef496a4e38e86156e892f8369f7ad55e8b89d341d94933a9b0ca74a47bf34462f752c1f72dfdf91764c38cb5004afc51d9fe8169ec75af3cdd560b526e724d966b3e48a6e1803ac31dda18f7fc86921e21d4554963fc4a9894e283f16d6277f2c9a5b9ee33a3e7ab307c6187f06db3a594bd9830ec7506ca9f9cbb04a6a6449553a8d8dc6dcafd0bfbabace53a5fc8774167885a2aadc3b5e03e26a3be0940daed402184587bce40addd9873fbf097531357949376b3ea56c7497108e5f44b6f8d3242414283f0123a97689ff8d0bf864385a8f090f1a8bb1d3a5e822cc2bf1215dbe023d4c20de39f15799a985e2d040ced0767fb05d1887a7fc773a723e7f7564e4efa3062e761adee463a77a0a40ea691758e8f722ac1261ee3dc8ae4cc775305ab94d0f0c4c1d846c18cbf5e481618fc569a984b395f7b1307c8cf11468504cc1c5e3aeb075a7111dfa69c5dde491ea9edffb01adc78a9e15e8403722aaf19e0a2902826fc8ab5b13117163b7d45f40eb8707b882b096d2a567031d0eb36d67cd0d2201f7fcbb73f73258463e39e9e088756f66ff4d6d95819cd9915cf56bb39724c0f684d52d69ff6e63f3a6b46434e35db605afb91ba18d6022ebc3494e356cc7eaf0fda465e3cf76a60d8b5596f1e40a11123b011a3bc2643e6a2f1798e958351756fc652bbabb817ce6d146d4783efea51206241e6377e1d4e46a96ff9ec87614cf0e1e09ea1cc4e');
+
+        ssvValidators[1].pubkey = bytes(hex'a413b93c25f77d27c5edab2b131d06bc90215c3eb2761309fdac35b0c76e12dccf45788a7ca0228b591cafb8626ab01a');
+        ssvValidators[1].sharesData = bytes(hex'80207acdc7e6be7cd4e6479c3d8ad8439222da050260914a537cba09e8a26c33a6e757be3d3c8e75ca4905622f06ca631121516894135f065ae11b97fe901a5e2337a7309efdd62c320e3d3b25b4c8f6ad2812a7af56839f8d22c6e1fca86459ae20b38d7ccb90d2442bd760ca3867b0fdbed05c9a197045bbfae01d2325b42958db1a8d6a0903ebba114a594aa154b59523875c79ace4d0d360c69f5ab3020a24f549a7aa7b8c9fcd6e849b03976ee493b9e74a76aec5bf0c5dec86a91f42cfae2453819ec6b5e0887c7073ff45479a284593379d0a3e05d4f03b0014032a2a9fdb5d4670424138c7189fe4425daf718afd44d587a0fdfd3700dbdc0777e095b0bb5ef354f7dd3f6049a5bfe60156628378446c95c25282d6fe11fea1f072f1a6e50bd9698267998993a249633862a74cd2388c505120dbdc9b173ec3feaffc8009ca437ae1635dd58a3d683e110f24bdf6a5fe8ef4c74e2dc515a57b5ed5c420c80d0598019c273fa6d54a82802a477b2774aa6e3be20a7ada47898a426b1d5ad76508f734f3577911e8785203a310d9b41900c8406297a58c5a3a6627843a8e2f7b8770376a8c16f226668e98032445fdc11589cf7d97b09521f6459ea470305e464157084458bc84c9aa5624c9fd68d730a0aeb765b05b2496adcdaefea50460e73d788515a00d883cbd42cab486cc5ed4e6a43d032fc33a11041da6fd0ef0a1e11dec6a17381caf2c3b4f1f7414e0dd8d2c259c4f1c2aec04f6f40f7291334ac9b89d9304a7daef9ceea5964e99ffb0c4f87a92774470f410bc11780e9b25c1a1614d7ee982a5aa690a49fc86ec92b9875812c68969264ebca7e5c4d51211665fb862500521fcad571467a04387664ea610918f1f74dbe6d0034d48036e6faa0678ea64e17121a83b1a27a2f97482bacc7f7a1f44365f08009947cca2e1ee18606d824d1df859988e3a718fb5e00370d924123de285ecca75bbf31b543c3ebd5a55cfbb3fb49528d25322c7fc9becd61d07291bdab488a7b8c660e22ea44e829a6043caeb50261f06c249182b0aacca28c61e73f34fdd2888a748e1951bbdf55557f9b1f5ab036c5f3de4eb816b750981f3783e581e8a9a15c915cbd6302d44c140121f6ab61bbd186f5cd4fbdf0dc7f80f44ea192de2902fbfa12fe0aef51d80874c1b7fc623f1fbb6b3c278df74c7262570da36d5cf4ba7e81b374344c201b49ddabb53692b7e5e9bc77e0dc37907e641f449fa9c42c6e914ffd1eea36ff0c77cdcc98ba84714d66c5358d1709af13551ec184d32c9a2edde8a8d459f898b494430d74de1be67330359c4399e46c5f5fe5082881396c81fb65f13a1adf31a934d70911581302798481e9b4a25e0cdaa19cc20910e78f4b36cf9e2b75cef8cfb8481583926f940d32c38f8c900ce3ca3577e3f9261a06efca76f53a12be3b255071f9ceafd06b30ef5044b7c81f0484e352a2661ae9f7780c9d5c55589697b037e5ea7da1d84a34fa2996f9a56b9f96bc1410b450b22c49558b5c39c38ac3b0210cfa1ef32c9184462fd6e1da87646cb56c66e6978a0e9574624c43b27909cd4fdb3d30f57b05cd55e766d46755596931d2b371d5dbbfc107a1534a270d0f01d5b2e291efb323f1d09930eecba5a83241d6c4dc6643fc27bbd950c6d95d42fd2c6c22105f9abf8f7239119b8a5b574d19e12ee217dbc3f29a022a3267df20f24095d51e3101df412225905ffd2af164d9e92b0ced825bae3393876c4b39c5d020964790a8617464fbc0f30d6e1d6267ac7d9a1d44e3573d41ac10a61c9c4cbdb052a71f0be93d4e6a5b9da6526a9ac960740432648e76fbe0b1e9e9a4f');
+
+        // 5,0,410621607757,true,105102853212500000000
+        ISSVClusters.Cluster memory cluster = ISSVClusters.Cluster({
+            validatorCount: 5,
+            networkFeeIndex: 0,
+            index: 410620802294, // 410621607757,
+            active: true,
+            balance: 105102853212500000000
+        });
+
+        return SsvPayload({
+            ssvOperators:ssvOperators,
+            ssvValidators:ssvValidators,
+            cluster:cluster,
+            tokenAmount:42041141285000000000,
+            ssvSlot0: 0x00000000000000000000000000000000000001f400980a6500000a5d00000000
+        });
+    }
+
+    function getDepositData2() private pure returns(DepositData memory) {
+        bytes[] memory signatures = new bytes[](2);
+        signatures[0] = bytes(hex'8c00eea680eadac2f426cd3809ab3177ab4b25c3f97dd80fc4ba0c055ff8d60e73381de456cf8b8184d9af2a15bb318a144cd0b0c261f462b58e61bea15e1fb9ff67058950ac0eb2e430feca3915c2c49d36b83beb3f7ca23141b5ebd5cf12f0');
+        signatures[1] = bytes(hex'8a28e64df753ed8e4785db087e4c6b7476ab4d11d711674b2d6398fb82dde8417e7b5db8ccf4383e891da8bdc167982f17dc7712a3b27c6b57d90b08af884486d743ffd904575561a29960f6ee47cda70a606b461b8dc475d191bcbab2af8662');
+
+        bytes32[] memory depositDataRoots = new bytes32[](2);
+        depositDataRoots[0] = bytes32(hex'20187410c9727808d2eafe0bea417c04c65917236ed424f21c8daa1f2b494f98');
+        depositDataRoots[1] = bytes32(hex'8c75013ba6f48bd1c635c25d8e6e1f3ca04a8f30ae77d91dc53f49df518de687');
 
         return DepositData({
             signatures: signatures,
@@ -136,15 +200,28 @@ contract Integration is Test {
             basisPoints: 0
         });
 
-        SsvPayload memory ssvPayload = getSsvPayload();
-
         vm.deal(owner, 1000 ether);
         vm.startPrank(owner);
 
         p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 160 ether}(
-            getDepositData(),
+            getDepositData1(),
             address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
-            ssvPayload,
+            getSsvPayload1(),
+            mevRelay,
+            clientConfig,
+            referrerConfig
+        );
+
+        vm.stopPrank();
+
+        vm.roll(9962945);
+
+        vm.startPrank(owner);
+
+        p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 64 ether}(
+            getDepositData2(),
+            address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
+            getSsvPayload2(),
             mevRelay,
             clientConfig,
             referrerConfig
