@@ -12,11 +12,9 @@ import "../src/interfaces/ssv/ISSVClusters.sol";
 import "../src/p2pSsvProxyFactory/P2pSsvProxyFactory.sol";
 import "../src/structs/P2pStructs.sol";
 import "../src/mocks/IChangeOperator.sol";
-import "../script/Deploy.s.sol";
 
-contract Integration is Test {
+contract GoerliIntegration is Test {
     address public constant owner = 0x000000005504F0f5CF39b1eD609B892d23028E57;
-    address public constant p2pSsvTokenHolder = 0x929C3Ed3D1788C4862E6b865E0E02500DB8Fd760;
     IERC20 public constant ssvToken = IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
     P2pSsvProxyFactory public p2pSsvProxyFactory;
     address payable public constant client = payable(address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f));
@@ -24,26 +22,40 @@ contract Integration is Test {
     function setUp() public {
         vm.createSelectFork("goerli", 9958209);
 
-        deal(address(ssvToken), owner, 50000 ether);
+        address feeDistributorFactory = address(0xe17cA83F84295aA66EC1d199bc569B0dbCddFb05);
+        address referenceFeeDistributor = address(0x98C275395677cAbc5EC21f4D669eB66a3A25fdA4);
 
-        Deploy deploy = new Deploy();
-        (p2pSsvProxyFactory,) = deploy.run();
+        vm.startPrank(owner);
 
-        vm.allowCheatcodes(address(p2pSsvProxyFactory));
+        p2pSsvProxyFactory = new P2pSsvProxyFactory(feeDistributorFactory, referenceFeeDistributor);
+        P2pSsvProxy referenceP2pSsvProxy = new P2pSsvProxy(address(p2pSsvProxyFactory));
+        p2pSsvProxyFactory.setReferenceP2pSsvProxy(address(referenceP2pSsvProxy));
 
-        deal(address(ssvToken), address(p2pSsvProxyFactory), 50000 ether, true);
+        address[] memory allowedSsvOperatorOwners = new address[](4);
+        allowedSsvOperatorOwners[0] = address(0xef08EE5E9403E6DE7938ea6ec8ef1CFe596102EB);
+        allowedSsvOperatorOwners[1] = address(0x6676FFebC95C0B3C85025d57b9543E11C571dB4a);
+        allowedSsvOperatorOwners[2] = address(0x84860e46dc75b0F3dA64e3Efc287319b67b4FF00);
+        allowedSsvOperatorOwners[3] = address(0xc799bE8De03F20B2D3b101E6F6516D614e6fFe06);
+        p2pSsvProxyFactory.setAllowedSsvOperatorOwners(allowedSsvOperatorOwners);
+
+        IChangeOperator(address(feeDistributorFactory)).changeOperator(address(p2pSsvProxyFactory));
+
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(30), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(147), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[1]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(35), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[2]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(123), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
+
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+
+        vm.stopPrank();
+
+        deal(address(ssvToken), address(p2pSsvProxyFactory), 50000 ether);
     }
 
     function getSnapshot(uint64 operatorId) private view returns(bytes32 snapshot) {
         uint256 p = uint256(keccak256("ssv.network.storage.main")) + 5;
         bytes32 slot1 = bytes32(uint256(keccak256(abi.encode(uint256(operatorId), p))) + 2);
         snapshot = vm.load(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D, slot1);
-    }
-
-    function test_snapshot() public view {
-        uint64 operatorId = 2;
-        uint32 snapshotBlock = uint32(uint256(getSnapshot(operatorId)));
-        console.logUint(snapshotBlock);
     }
 
     function getSsvPayload1() private view returns(SsvPayload memory) {
@@ -102,7 +114,7 @@ contract Integration is Test {
         });
     }
 
-    function getDepositData1() private pure returns(DepositData memory) {
+    function getDepositData1() private view returns(DepositData memory) {
         bytes[] memory signatures = new bytes[](5);
         signatures[0] = bytes(hex'b30e5adc7e414df9895082fc262142f4f238e768f76937a79c34dfae4417a44c9271d81118a97d933d033c7fa52f91f00cf52c016dd493eccfc694ab708e9c33b289da7c4c4d2d1357b89340bbaf7256b50cf69e6c8a18db37dc24eafe5b7c26');
         signatures[1] = bytes(hex'a4407a0a3675c31807d029b71916120880f3500c5373c2c0ab604bd7fcd1c4548aebf3f7ac3a1d8d3935dc68b088c2a1195456f2e52244cfa07657aa53e28a77d54b5399a5dfca1246b2292d1bdcbfb523e5423304fc88ca587d3f986e660f2b');
@@ -186,8 +198,8 @@ contract Integration is Test {
         });
     }
 
-    function test_depositEthAndRegisterValidators1() public {
-        console.log("test_depositEthAndRegisterValidators started");
+    function test_depositEthAndRegisterValidators_Goerli() public {
+        console.log("test_depositEthAndRegisterValidators_Goerli started");
 
         bytes32 mevRelay = bytes32(hex'616c6c0000000000000000000000000000000000000000000000000000000000');
 
@@ -229,12 +241,6 @@ contract Integration is Test {
 
         vm.stopPrank();
 
-        console.log("test_depositEthAndRegisterValidators finsihed");
-    }
-
-    function test_registerValidators() public {
-        console.log("test_registerValidators started");
-
-        console.log("test_registerValidators finsihed");
+        console.log("test_depositEthAndRegisterValidators_Goerli finsihed");
     }
 }

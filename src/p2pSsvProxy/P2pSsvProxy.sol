@@ -228,7 +228,6 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
             _ssvPayload.cluster
         );
 
-        // uint256 validatorCount = _ssvPayload.ssvValidators.length;
         for (uint256 i = 1; i < _ssvPayload.ssvValidators.length;) {
             _registerValidator(
                 i,
