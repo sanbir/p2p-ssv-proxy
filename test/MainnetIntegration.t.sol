@@ -14,7 +14,7 @@ import "../src/structs/P2pStructs.sol";
 import "../src/mocks/IChangeOperator.sol";
 import "../src/mocks/IMockSsvNetwork.sol";
 
-contract MainnetiIntegration is Test {
+contract MainnetIntegration is Test {
     address public constant ssvOwner = 0xb35096b074fdb9bBac63E3AdaE0Bbde512B2E6b6;
     address public constant ssvNetworkAddress = 0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1;
     address public constant owner = 0x588ede4403DF0082C5ab245b35F0f79EB2d8033a;
@@ -66,7 +66,7 @@ contract MainnetiIntegration is Test {
         ssvOperators[1].owner = 0x54a452FD717Eb92DE7C6ff58e586490BB9aD9fb4;
         ssvOperators[1].id = 30;
         ssvOperators[1].snapshot = getSnapshot(30);
-        ssvOperators[1].fee = 573960000000;
+        ssvOperators[1].fee = 4591710000000;
 
         ssvOperators[3].owner = 0x7D895cB3000dfea6B7e18A24BF8A63c3648762Ac;
         ssvOperators[3].id = 47;
@@ -143,7 +143,7 @@ contract MainnetiIntegration is Test {
         ssvOperators[1].owner = 0x54a452FD717Eb92DE7C6ff58e586490BB9aD9fb4;
         ssvOperators[1].id = 30;
         ssvOperators[1].snapshot = getSnapshot(30);
-        ssvOperators[1].fee = 573960000000;
+        ssvOperators[1].fee = 4591710000000;
 
         ssvOperators[3].owner = 0x7D895cB3000dfea6B7e18A24BF8A63c3648762Ac;
         ssvOperators[3].id = 47;
@@ -170,8 +170,8 @@ contract MainnetiIntegration is Test {
         // 5,0,410621607757,true,105102853212500000000
         ISSVClusters.Cluster memory cluster = ISSVClusters.Cluster({
             validatorCount: 5,
-            networkFeeIndex: 0,
-            index: 410620802294,
+            networkFeeIndex: 36345986398,
+            index: 192532799673,
             active: true,
             balance: 105102853212500000000
         });
