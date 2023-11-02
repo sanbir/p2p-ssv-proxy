@@ -116,7 +116,7 @@ contract MainnetIntegration is Test {
         });
     }
 
-    function getDepositData1() private view returns(DepositData memory) {
+    function getDepositData1() private pure returns(DepositData memory) {
         bytes[] memory signatures = new bytes[](5);
         signatures[0] = bytes(hex'b30e5adc7e414df9895082fc262142f4f238e768f76937a79c34dfae4417a44c9271d81118a97d933d033c7fa52f91f00cf52c016dd493eccfc694ab708e9c33b289da7c4c4d2d1357b89340bbaf7256b50cf69e6c8a18db37dc24eafe5b7c26');
         signatures[1] = bytes(hex'a4407a0a3675c31807d029b71916120880f3500c5373c2c0ab604bd7fcd1c4548aebf3f7ac3a1d8d3935dc68b088c2a1195456f2e52244cfa07657aa53e28a77d54b5399a5dfca1246b2292d1bdcbfb523e5423304fc88ca587d3f986e660f2b');
@@ -255,5 +255,48 @@ contract MainnetIntegration is Test {
         vm.stopPrank();
 
         console.log("test_depositEthAndRegisterValidators_Mainnet finsihed");
+    }
+
+    function test_registerValidators() public {
+        console.log("test_registerValidators started");
+
+        bytes32 mevRelay = bytes32(hex'616c6c0000000000000000000000000000000000000000000000000000000000');
+
+        FeeRecipient memory clientConfig = FeeRecipient({
+            recipient: client,
+            basisPoints: 9500
+        });
+        FeeRecipient memory referrerConfig = FeeRecipient({
+            recipient: payable(address(0)),
+            basisPoints: 0
+        });
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        vm.stopPrank();
+
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        address proxyAddress = predictProxyAddress(clientConfig, referrerConfig);
+
+        vm.startPrank(ssvOwner);
+        IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
+        vm.stopPrank();
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+
+        p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload1,
+            mevRelay,
+            clientConfig,
+            referrerConfig
+        );
+
+        vm.stopPrank();
+
+        console.log("test_registerValidators finsihed");
     }
 }

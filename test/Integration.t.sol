@@ -46,7 +46,7 @@ contract Integration is Test {
         console.logUint(snapshotBlock);
     }
 
-    function getSsvPayload1() private view returns(SsvPayload memory) {
+    function getSsvPayload1() private pure returns(SsvPayload memory) {
         SsvOperator[] memory ssvOperators = new SsvOperator[](4);
 
         ssvOperators[0].owner = 0xef08EE5E9403E6DE7938ea6ec8ef1CFe596102EB;
@@ -123,7 +123,7 @@ contract Integration is Test {
         });
     }
 
-    function getSsvPayload2() private view returns(SsvPayload memory) {
+    function getSsvPayload2() private pure returns(SsvPayload memory) {
         SsvOperator[] memory ssvOperators = new SsvOperator[](4);
 
         ssvOperators[0].owner = 0xef08EE5E9403E6DE7938ea6ec8ef1CFe596102EB;
@@ -234,6 +234,37 @@ contract Integration is Test {
 
     function test_registerValidators() public {
         console.log("test_registerValidators started");
+
+        bytes32 mevRelay = bytes32(hex'616c6c0000000000000000000000000000000000000000000000000000000000');
+
+        FeeRecipient memory clientConfig = FeeRecipient({
+            recipient: client,
+            basisPoints: 9500
+        });
+        FeeRecipient memory referrerConfig = FeeRecipient({
+            recipient: payable(address(0)),
+            basisPoints: 0
+        });
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        vm.stopPrank();
+
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        vm.deal(owner, 1000 ether);
+        vm.startPrank(owner);
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+
+        p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload1,
+            mevRelay,
+            clientConfig,
+            referrerConfig
+        );
+
+        vm.stopPrank();
 
         console.log("test_registerValidators finsihed");
     }

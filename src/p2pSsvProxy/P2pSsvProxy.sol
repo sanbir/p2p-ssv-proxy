@@ -186,7 +186,6 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         uint64 _clusterIndex,
         bytes calldata _pubkey,
         bytes calldata _sharesData,
-        uint256 _tokenAmount,
         uint64 _currentNetworkFeeIndex,
         uint256 _balance
     ) private {
@@ -236,7 +235,6 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
                 clusterIndex,
                 _ssvPayload.ssvValidators[i].pubkey,
                 _ssvPayload.ssvValidators[i].sharesData,
-                _ssvPayload.tokenAmount,
                 currentNetworkFeeIndex,
                 balance
             );

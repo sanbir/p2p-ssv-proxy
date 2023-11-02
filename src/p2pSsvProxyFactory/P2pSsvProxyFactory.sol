@@ -225,9 +225,10 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
 
         for (uint256 i = 0; i < count;) {
-            // address _allowedSsvOperatorOwners[i]
-            if (!s_allowedSsvOperatorOwners.add(_allowedSsvOperatorOwners[i])) {
-                revert P2pSsvProxyFactory__SsvOperatorOwnerAlreadyExists(_allowedSsvOperatorOwners[i]);
+            address allowedSsvOperatorOwner = _allowedSsvOperatorOwners[i];
+
+            if (!s_allowedSsvOperatorOwners.add(allowedSsvOperatorOwner)) {
+                revert P2pSsvProxyFactory__SsvOperatorOwnerAlreadyExists(allowedSsvOperatorOwner);
             }
 
             unchecked {
