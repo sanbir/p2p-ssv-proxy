@@ -18,6 +18,7 @@ contract MainnetIntegration is Test {
     address public constant ssvOwner = 0xb35096b074fdb9bBac63E3AdaE0Bbde512B2E6b6;
     address public constant ssvNetworkAddress = 0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1;
     address public constant owner = 0x588ede4403DF0082C5ab245b35F0f79EB2d8033a;
+    address public constant operator = 0x11491A091A64E7e8E4837fe728e380BDd42b8834;
     IERC20 public constant ssvToken = IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54);
     P2pSsvProxyFactory public p2pSsvProxyFactory;
     address payable public constant client = payable(address(0xDd1CD16F95e44Ef7E55CC33Ee6C1aF9AB7CEC7fC));
@@ -303,8 +304,8 @@ contract MainnetIntegration is Test {
         console.log("test_registerValidators finsihed");
     }
 
-    function test_NewSelectors() public {
-        console.log("test_NewSelectors started");
+    function test_NewClientSelectors() public {
+        console.log("test_NewClientSelectors started");
 
         registerValidators();
 
@@ -331,6 +332,41 @@ contract MainnetIntegration is Test {
         assertTrue(success2);
         assertEq(data2, bytes(''));
 
-        console.log("test_NewSelectors finished");
+        console.log("test_NewClientSelectors finished");
+    }
+
+    function test_NewOperatorSelectors() public {
+        console.log("test_NewOperatorSelectors started");
+
+        registerValidators();
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.changeOperator(operator);
+        vm.stopPrank();
+
+        bytes memory callData = abi.encodeCall(ISSVClusters.withdraw, (operatorIds, 42, clusterAfter1stRegistation));
+
+        vm.startPrank(operator);
+        (bool success1, bytes memory data1) = proxyAddress.call(callData);
+        vm.stopPrank();
+
+        assertFalse(success1);
+        assertEq(data1, abi.encodeWithSelector(P2pSsvProxy__SelectorNotAllowed.selector, operator, ISSVClusters.withdraw.selector));
+
+        bytes4[] memory selectors = new bytes4[](1);
+        selectors[0] = ISSVClusters.withdraw.selector;
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setAllowedSelectorsForOperator(selectors);
+        vm.stopPrank();
+
+        vm.startPrank(operator);
+        (bool success2, bytes memory data2) = proxyAddress.call(callData);
+        vm.stopPrank();
+
+        assertTrue(success2);
+        assertEq(data2, bytes(''));
+
+        console.log("test_NewOperatorSelectors finished");
     }
 }
