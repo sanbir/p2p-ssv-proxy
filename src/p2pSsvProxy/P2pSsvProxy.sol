@@ -30,8 +30,14 @@ error P2pSsvProxy__NotP2pSsvProxyFactory(address _passedAddress);
 /// @param _client address of the client
 error P2pSsvProxy__CallerNotClient(address _caller, address _client);
 
+/// @notice The caller was neither operator nor owner
+/// @param _caller address of the caller
+/// @param _operator address of the operator
+/// @param _owner address of the owner
 error P2pSsvProxy__CallerNeitherOperatorNorOwner(address _caller, address _operator, address _owner);
 
+/// @notice The caller was neither operator nor owner nor client
+/// @param _caller address of the caller
 error P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient(address _caller);
 
 /// @notice Only factory can call `initialize`.
@@ -39,10 +45,19 @@ error P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient(address _caller);
 /// @param _actualFactory the actual factory address that can call `initialize`.
 error P2pSsvProxy__NotP2pSsvProxyFactoryCalled(address _msgSender, IP2pSsvProxyFactory _actualFactory);
 
+/// @notice _pubkeys and _operatorIds arrays should have the same lengths
 error P2pSsvProxy__AmountOfParametersError();
 
-error P2pSsvProxy__SelectorNotAllowed(address caller, bytes4 selector);
+/// @notice Selector is not allowed for the caller.
+/// @param _caller caller address
+/// @param _selector function selector to be called on SSVNetwork
+error P2pSsvProxy__SelectorNotAllowed(address _caller, bytes4 _selector);
 
+/// @notice Proxy for SSVNetwork calls.
+/// @dev Each instance of P2pSsvProxy corresponds to 1 FeeDistributor instance.
+/// Thus, client to P2pSsvProxy instances is a 1-to-many relation.
+/// SSV tokens are managed by P2P.
+/// Clients cover the costs of SSV tokens by EL rewards via FeeDistributor instance.
 contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
     IP2pSsvProxyFactory private immutable i_p2pSsvProxyFactory;
     ISSVNetwork private immutable i_ssvNetwork;
