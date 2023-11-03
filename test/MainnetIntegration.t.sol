@@ -369,4 +369,54 @@ contract MainnetIntegration is Test {
 
         console.log("test_NewOperatorSelectors finished");
     }
+
+    function test_NewOwnerSelectors() public {
+        console.log("test_NewOwnerSelectors started");
+
+        registerValidators();
+
+        bytes memory callData = abi.encodeCall(ISSVClusters.withdraw, (operatorIds, 42, clusterAfter1stRegistation));
+
+        vm.startPrank(owner);
+        (bool success1, bytes memory data1) = proxyAddress.call(callData);
+        vm.stopPrank();
+
+        assertTrue(success1);
+        assertEq(data1, bytes(''));
+
+        console.log("test_NewOwnerSelectors finished");
+    }
+
+    function test_WithdrawSsvTokens() public {
+        console.log("test_WithdrawSsvTokens started");
+
+        registerValidators();
+
+        ISSVClusters.Cluster[] memory clusters = new ISSVClusters.Cluster[](1);
+        clusters[0] = clusterAfter1stRegistation;
+
+        uint256 proxyBalanceBefore = ssvToken.balanceOf(proxyAddress);
+
+        uint256 tokenAmount = 42;
+
+        vm.startPrank(owner);
+        P2pSsvProxy(proxyAddress).withdrawFromSSV(tokenAmount, operatorIds, clusters);
+        vm.stopPrank();
+
+        uint256 proxyBalanceAfter = ssvToken.balanceOf(proxyAddress);
+
+        assertEq(proxyBalanceAfter - proxyBalanceBefore, tokenAmount);
+
+        uint256 ownerBalanceBefore = ssvToken.balanceOf(owner);
+
+        vm.startPrank(owner);
+        P2pSsvProxy(proxyAddress).withdrawSSVTokens(owner, tokenAmount);
+        vm.stopPrank();
+
+        uint256 ownerBalanceAfter = ssvToken.balanceOf(owner);
+
+        assertEq(ownerBalanceAfter - ownerBalanceBefore, tokenAmount);
+
+        console.log("test_WithdrawSsvTokens finished");
+    }
 }
