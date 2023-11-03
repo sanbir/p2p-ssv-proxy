@@ -306,10 +306,10 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         uint256 _tokenAmount,
         uint64[] calldata _operatorIds,
         ISSVNetwork.Cluster[] calldata _clusters
-    ) external onlyOperatorOrOwner {
+    ) external {
         address clusterOwner = address(this);
-        uint256 tokenPerValidator = _tokenAmount / _clusters.length;
         uint256 validatorCount = _clusters.length;
+        uint256 tokenPerValidator = _tokenAmount / validatorCount;
 
         for (uint256 i = 0; i < validatorCount;) {
             i_ssvNetwork.deposit(clusterOwner, _operatorIds, tokenPerValidator, _clusters[i]);

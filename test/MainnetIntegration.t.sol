@@ -23,6 +23,11 @@ contract MainnetIntegration is Test {
     address payable public constant client = payable(address(0xDd1CD16F95e44Ef7E55CC33Ee6C1aF9AB7CEC7fC));
     IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0x86a9f3e908b4658A1327952Eb1eC297a4212E1bb);
     address public constant referenceFeeDistributor = 0x7109DeEb07aa9Eed1e2613F88b2f3E1e6C05163f;
+    ISSVClusters.Cluster public clusterAfter1stRegistation;
+
+    FeeRecipient public clientConfig;
+    FeeRecipient public referrerConfig;
+    address public proxyAddress;
 
     function setUp() public {
         vm.createSelectFork("mainnet", 18476533);
@@ -52,6 +57,25 @@ contract MainnetIntegration is Test {
         vm.stopPrank();
 
         deal(address(ssvToken), address(p2pSsvProxyFactory), 50000 ether);
+
+        clientConfig = FeeRecipient({
+            recipient: client,
+            basisPoints: 9500
+        });
+        referrerConfig = FeeRecipient({
+            recipient: payable(address(0)),
+            basisPoints: 0
+        });
+
+        proxyAddress = predictProxyAddress(clientConfig, referrerConfig);
+
+        clusterAfter1stRegistation = ISSVClusters.Cluster({
+            validatorCount: 5,
+            networkFeeIndex: 36345986398,
+            index: 192532799673,
+            active: true,
+            balance: 105102853212500000000
+        });
     }
 
     function getSnapshot(uint64 operatorId) private view returns(bytes32 snapshot) {
@@ -167,19 +191,10 @@ contract MainnetIntegration is Test {
         ssvValidators[1].pubkey = bytes(hex'a413b93c25f77d27c5edab2b131d06bc90215c3eb2761309fdac35b0c76e12dccf45788a7ca0228b591cafb8626ab01a');
         ssvValidators[1].sharesData = bytes(hex'80207acdc7e6be7cd4e6479c3d8ad8439222da050260914a537cba09e8a26c33a6e757be3d3c8e75ca4905622f06ca631121516894135f065ae11b97fe901a5e2337a7309efdd62c320e3d3b25b4c8f6ad2812a7af56839f8d22c6e1fca86459ae20b38d7ccb90d2442bd760ca3867b0fdbed05c9a197045bbfae01d2325b42958db1a8d6a0903ebba114a594aa154b59523875c79ace4d0d360c69f5ab3020a24f549a7aa7b8c9fcd6e849b03976ee493b9e74a76aec5bf0c5dec86a91f42cfae2453819ec6b5e0887c7073ff45479a284593379d0a3e05d4f03b0014032a2a9fdb5d4670424138c7189fe4425daf718afd44d587a0fdfd3700dbdc0777e095b0bb5ef354f7dd3f6049a5bfe60156628378446c95c25282d6fe11fea1f072f1a6e50bd9698267998993a249633862a74cd2388c505120dbdc9b173ec3feaffc8009ca437ae1635dd58a3d683e110f24bdf6a5fe8ef4c74e2dc515a57b5ed5c420c80d0598019c273fa6d54a82802a477b2774aa6e3be20a7ada47898a426b1d5ad76508f734f3577911e8785203a310d9b41900c8406297a58c5a3a6627843a8e2f7b8770376a8c16f226668e98032445fdc11589cf7d97b09521f6459ea470305e464157084458bc84c9aa5624c9fd68d730a0aeb765b05b2496adcdaefea50460e73d788515a00d883cbd42cab486cc5ed4e6a43d032fc33a11041da6fd0ef0a1e11dec6a17381caf2c3b4f1f7414e0dd8d2c259c4f1c2aec04f6f40f7291334ac9b89d9304a7daef9ceea5964e99ffb0c4f87a92774470f410bc11780e9b25c1a1614d7ee982a5aa690a49fc86ec92b9875812c68969264ebca7e5c4d51211665fb862500521fcad571467a04387664ea610918f1f74dbe6d0034d48036e6faa0678ea64e17121a83b1a27a2f97482bacc7f7a1f44365f08009947cca2e1ee18606d824d1df859988e3a718fb5e00370d924123de285ecca75bbf31b543c3ebd5a55cfbb3fb49528d25322c7fc9becd61d07291bdab488a7b8c660e22ea44e829a6043caeb50261f06c249182b0aacca28c61e73f34fdd2888a748e1951bbdf55557f9b1f5ab036c5f3de4eb816b750981f3783e581e8a9a15c915cbd6302d44c140121f6ab61bbd186f5cd4fbdf0dc7f80f44ea192de2902fbfa12fe0aef51d80874c1b7fc623f1fbb6b3c278df74c7262570da36d5cf4ba7e81b374344c201b49ddabb53692b7e5e9bc77e0dc37907e641f449fa9c42c6e914ffd1eea36ff0c77cdcc98ba84714d66c5358d1709af13551ec184d32c9a2edde8a8d459f898b494430d74de1be67330359c4399e46c5f5fe5082881396c81fb65f13a1adf31a934d70911581302798481e9b4a25e0cdaa19cc20910e78f4b36cf9e2b75cef8cfb8481583926f940d32c38f8c900ce3ca3577e3f9261a06efca76f53a12be3b255071f9ceafd06b30ef5044b7c81f0484e352a2661ae9f7780c9d5c55589697b037e5ea7da1d84a34fa2996f9a56b9f96bc1410b450b22c49558b5c39c38ac3b0210cfa1ef32c9184462fd6e1da87646cb56c66e6978a0e9574624c43b27909cd4fdb3d30f57b05cd55e766d46755596931d2b371d5dbbfc107a1534a270d0f01d5b2e291efb323f1d09930eecba5a83241d6c4dc6643fc27bbd950c6d95d42fd2c6c22105f9abf8f7239119b8a5b574d19e12ee217dbc3f29a022a3267df20f24095d51e3101df412225905ffd2af164d9e92b0ced825bae3393876c4b39c5d020964790a8617464fbc0f30d6e1d6267ac7d9a1d44e3573d41ac10a61c9c4cbdb052a71f0be93d4e6a5b9da6526a9ac960740432648e76fbe0b1e9e9a4f');
 
-        // 5,0,410621607757,true,105102853212500000000
-        ISSVClusters.Cluster memory cluster = ISSVClusters.Cluster({
-            validatorCount: 5,
-            networkFeeIndex: 36345986398,
-            index: 192532799673,
-            active: true,
-            balance: 105102853212500000000
-        });
-
         return SsvPayload({
             ssvOperators:ssvOperators,
             ssvValidators:ssvValidators,
-            cluster:cluster,
+            cluster:clusterAfter1stRegistation,
             tokenAmount:42041141285000000000,
             ssvSlot0: 0x00000007d0a8451c00000000000076a5000001f40119da10000002b00118885b
         });
@@ -200,8 +215,8 @@ contract MainnetIntegration is Test {
         });
     }
 
-    function predictProxyAddress(FeeRecipient memory clientConfig, FeeRecipient memory referrerConfig) private view returns(address) {
-        address feeDistributor = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, clientConfig, referrerConfig);
+    function predictProxyAddress(FeeRecipient memory _clientConfig, FeeRecipient memory _referrerConfig) private view returns(address) {
+        address feeDistributor = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, _clientConfig, _referrerConfig);
         return p2pSsvProxyFactory.predictP2pSsvProxyAddress(feeDistributor);
     }
 
@@ -209,15 +224,6 @@ contract MainnetIntegration is Test {
         console.log("test_depositEthAndRegisterValidators_Mainnet started");
 
         bytes32 mevRelay = bytes32(hex'616c6c0000000000000000000000000000000000000000000000000000000000');
-
-        FeeRecipient memory clientConfig = FeeRecipient({
-            recipient: client,
-            basisPoints: 9500
-        });
-        FeeRecipient memory referrerConfig = FeeRecipient({
-            recipient: payable(address(0)),
-            basisPoints: 0
-        });
 
         address proxyAddress = predictProxyAddress(clientConfig, referrerConfig);
 
@@ -257,27 +263,14 @@ contract MainnetIntegration is Test {
         console.log("test_depositEthAndRegisterValidators_Mainnet finsihed");
     }
 
-    function test_registerValidators() public {
-        console.log("test_registerValidators started");
-
+    function registerValidators() private {
         bytes32 mevRelay = bytes32(hex'616c6c0000000000000000000000000000000000000000000000000000000000');
-
-        FeeRecipient memory clientConfig = FeeRecipient({
-            recipient: client,
-            basisPoints: 9500
-        });
-        FeeRecipient memory referrerConfig = FeeRecipient({
-            recipient: payable(address(0)),
-            basisPoints: 0
-        });
 
         vm.startPrank(owner);
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
         vm.stopPrank();
 
         SsvPayload memory ssvPayload1 = getSsvPayload1();
-
-        address proxyAddress = predictProxyAddress(clientConfig, referrerConfig);
 
         vm.startPrank(ssvOwner);
         IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
@@ -296,7 +289,50 @@ contract MainnetIntegration is Test {
         );
 
         vm.stopPrank();
+    }
+
+    function test_registerValidators() public {
+        console.log("test_registerValidators started");
+
+        registerValidators();
 
         console.log("test_registerValidators finsihed");
+    }
+
+    function test_NewSelectors() public {
+        console.log("test_NewSelectors started");
+
+        registerValidators();
+
+        uint64[] memory operatorIds = new uint64[](4);
+        operatorIds[0] = 20;
+        operatorIds[1] = 30;
+        operatorIds[2] = 35;
+        operatorIds[3] = 47;
+
+        bytes memory callData = abi.encodeCall(ISSVClusters.withdraw, (operatorIds, 42, clusterAfter1stRegistation));
+
+        vm.startPrank(client);
+        (bool success1, bytes memory data1) = proxyAddress.call(callData);
+        vm.stopPrank();
+
+        assertFalse(success1);
+        assertEq(data1, abi.encodeWithSelector(P2pSsvProxy__SelectorNotAllowed.selector, client, ISSVClusters.withdraw.selector));
+
+        bytes4[] memory selectors = new bytes4[](1);
+        selectors[0] = ISSVClusters.withdraw.selector;
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setAllowedSelectorsForClient(selectors);
+        vm.stopPrank();
+
+        vm.startPrank(client);
+        (bool success2, bytes memory data2) = proxyAddress.call(callData);
+        vm.stopPrank();
+
+        assertTrue(success2);
+        assertEq(data2, bytes(''));
+
+        console.log("test_NewSelectors finished");
     }
 }

@@ -53,6 +53,8 @@ error P2pSsvProxyFactory__CannotSetZeroSelectors();
 
 error P2pSsvProxyFactory__CannotSetZeroAllowedSsvOperatorOwners();
 
+error P2pSsvProxyFactory__CannotRemoveZeroAllowedSsvOperatorOwners();
+
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
     using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -243,9 +245,16 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         address[] calldata _allowedSsvOperatorOwnersToRemove
     ) external onlyOperatorOrOwner {
         uint256 count = _allowedSsvOperatorOwnersToRemove.length;
+
+        if (count == 0) {
+            revert P2pSsvProxyFactory__CannotRemoveZeroAllowedSsvOperatorOwners();
+        }
+
         for (uint256 i = 0; i < count;) {
-            if (!s_allowedSsvOperatorOwners.remove(_allowedSsvOperatorOwnersToRemove[i])) {
-                revert P2pSsvProxyFactory__SsvOperatorOwnerDoesNotExist(_allowedSsvOperatorOwnersToRemove[i]);
+            address allowedSsvOperatorOwnersToRemove = _allowedSsvOperatorOwnersToRemove[i];
+
+            if (!s_allowedSsvOperatorOwners.remove(allowedSsvOperatorOwnersToRemove)) {
+                revert P2pSsvProxyFactory__SsvOperatorOwnerDoesNotExist(allowedSsvOperatorOwnersToRemove);
             }
 
             unchecked {
