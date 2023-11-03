@@ -29,6 +29,9 @@ contract MainnetIntegration is Test {
     FeeRecipient public referrerConfig;
     address public proxyAddress;
 
+    uint64[] public operatorIds;
+    bytes32 public constant mevRelay = 0x616c6c0000000000000000000000000000000000000000000000000000000000;
+
     function setUp() public {
         vm.createSelectFork("mainnet", 18476533);
 
@@ -38,19 +41,26 @@ contract MainnetIntegration is Test {
         P2pSsvProxy referenceP2pSsvProxy = new P2pSsvProxy(address(p2pSsvProxyFactory));
         p2pSsvProxyFactory.setReferenceP2pSsvProxy(address(referenceP2pSsvProxy));
 
+        operatorIds = new uint64[](4);
+        operatorIds[0] = 20;
+        operatorIds[1] = 30;
+        operatorIds[2] = 35;
+        operatorIds[3] = 47;
+
         address[] memory allowedSsvOperatorOwners = new address[](4);
-        allowedSsvOperatorOwners[1] = address(0x54a452FD717Eb92DE7C6ff58e586490BB9aD9fb4);
-        allowedSsvOperatorOwners[3] = address(0x7D895cB3000dfea6B7e18A24BF8A63c3648762Ac);
-        allowedSsvOperatorOwners[2] = address(0x24F34a87a28088cf58808D03C7f6017C6aD2150e);
         allowedSsvOperatorOwners[0] = address(0x7291de6E40D7d2A65cB7a8Db735e5E8E32971519);
+        allowedSsvOperatorOwners[1] = address(0x54a452FD717Eb92DE7C6ff58e586490BB9aD9fb4);
+        allowedSsvOperatorOwners[2] = address(0x24F34a87a28088cf58808D03C7f6017C6aD2150e);
+        allowedSsvOperatorOwners[3] = address(0x7D895cB3000dfea6B7e18A24BF8A63c3648762Ac);
+
         p2pSsvProxyFactory.setAllowedSsvOperatorOwners(allowedSsvOperatorOwners);
 
         IChangeOperator(address(feeDistributorFactory)).changeOperator(address(p2pSsvProxyFactory));
 
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(30), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[1]);
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(47), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(35), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[2]);
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(20), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[0], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[1], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[1]);
+        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[2], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[2]);
+        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[3], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
 
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
 
@@ -67,7 +77,7 @@ contract MainnetIntegration is Test {
             basisPoints: 0
         });
 
-        proxyAddress = predictProxyAddress(clientConfig, referrerConfig);
+        proxyAddress = predictProxyAddress();
 
         clusterAfter1stRegistation = ISSVClusters.Cluster({
             validatorCount: 5,
@@ -81,31 +91,31 @@ contract MainnetIntegration is Test {
     function getSnapshot(uint64 operatorId) private view returns(bytes32 snapshot) {
         uint256 p = uint256(keccak256("ssv.network.storage.main")) + 5;
         bytes32 slot1 = bytes32(uint256(keccak256(abi.encode(uint256(operatorId), p))) + 2);
-        snapshot = vm.load(0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1, slot1);
+        snapshot = vm.load(ssvNetworkAddress, slot1);
     }
 
     function getSsvPayload1() private view returns(SsvPayload memory) {
         SsvOperator[] memory ssvOperators = new SsvOperator[](4);
+
+        ssvOperators[0].owner = 0x7291de6E40D7d2A65cB7a8Db735e5E8E32971519;
+        ssvOperators[0].id = 20;
+        ssvOperators[0].snapshot = getSnapshot(20);
+        ssvOperators[0].fee = 573960000000;
 
         ssvOperators[1].owner = 0x54a452FD717Eb92DE7C6ff58e586490BB9aD9fb4;
         ssvOperators[1].id = 30;
         ssvOperators[1].snapshot = getSnapshot(30);
         ssvOperators[1].fee = 4591710000000;
 
-        ssvOperators[3].owner = 0x7D895cB3000dfea6B7e18A24BF8A63c3648762Ac;
-        ssvOperators[3].id = 47;
-        ssvOperators[3].snapshot = getSnapshot(47);
-        ssvOperators[3].fee = 573960000000;
-
         ssvOperators[2].owner = 0x24F34a87a28088cf58808D03C7f6017C6aD2150e;
         ssvOperators[2].id = 35;
         ssvOperators[2].snapshot = getSnapshot(35);
         ssvOperators[2].fee = 573960000000;
 
-        ssvOperators[0].owner = 0x7291de6E40D7d2A65cB7a8Db735e5E8E32971519;
-        ssvOperators[0].id = 20;
-        ssvOperators[0].snapshot = getSnapshot(20);
-        ssvOperators[0].fee = 573960000000;
+        ssvOperators[3].owner = 0x7D895cB3000dfea6B7e18A24BF8A63c3648762Ac;
+        ssvOperators[3].id = 47;
+        ssvOperators[3].snapshot = getSnapshot(47);
+        ssvOperators[3].fee = 573960000000;
 
         SsvValidator[] memory ssvValidators = new SsvValidator[](5);
         ssvValidators[0].pubkey = bytes(hex'8ae430787d3cb55093dba32d4f5e7736c48d494121dc6ed5520182490b977af7ddc0ecc586296fc315f9553dd07c5486');
@@ -215,17 +225,13 @@ contract MainnetIntegration is Test {
         });
     }
 
-    function predictProxyAddress(FeeRecipient memory _clientConfig, FeeRecipient memory _referrerConfig) private view returns(address) {
-        address feeDistributor = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, _clientConfig, _referrerConfig);
+    function predictProxyAddress() private view returns(address) {
+        address feeDistributor = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, clientConfig, referrerConfig);
         return p2pSsvProxyFactory.predictP2pSsvProxyAddress(feeDistributor);
     }
 
     function test_depositEthAndRegisterValidators_Mainnet() public {
         console.log("test_depositEthAndRegisterValidators_Mainnet started");
-
-        bytes32 mevRelay = bytes32(hex'616c6c0000000000000000000000000000000000000000000000000000000000');
-
-        address proxyAddress = predictProxyAddress(clientConfig, referrerConfig);
 
         vm.startPrank(ssvOwner);
         IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
@@ -264,8 +270,6 @@ contract MainnetIntegration is Test {
     }
 
     function registerValidators() private {
-        bytes32 mevRelay = bytes32(hex'616c6c0000000000000000000000000000000000000000000000000000000000');
-
         vm.startPrank(owner);
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
         vm.stopPrank();
@@ -303,12 +307,6 @@ contract MainnetIntegration is Test {
         console.log("test_NewSelectors started");
 
         registerValidators();
-
-        uint64[] memory operatorIds = new uint64[](4);
-        operatorIds[0] = 20;
-        operatorIds[1] = 30;
-        operatorIds[2] = 35;
-        operatorIds[3] = 47;
 
         bytes memory callData = abi.encodeCall(ISSVClusters.withdraw, (operatorIds, 42, clusterAfter1stRegistation));
 
