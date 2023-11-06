@@ -201,8 +201,6 @@ contract GoerliIntegration is Test {
     function test_depositEthAndRegisterValidators_Goerli() public {
         console.log("test_depositEthAndRegisterValidators_Goerli started");
 
-        bytes32 mevRelay = bytes32(hex'616c6c0000000000000000000000000000000000000000000000000000000000');
-
         FeeRecipient memory clientConfig = FeeRecipient({
             recipient: client,
             basisPoints: 9500
@@ -219,7 +217,6 @@ contract GoerliIntegration is Test {
             getDepositData1(),
             address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
             getSsvPayload1(),
-            mevRelay,
             clientConfig,
             referrerConfig
         );
@@ -234,7 +231,6 @@ contract GoerliIntegration is Test {
             getDepositData2(),
             address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
             getSsvPayload2(),
-            mevRelay,
             clientConfig,
             referrerConfig
         );
@@ -246,8 +242,6 @@ contract GoerliIntegration is Test {
 
     function test_registerValidators() public {
         console.log("test_registerValidators started");
-
-        bytes32 mevRelay = bytes32(hex'616c6c0000000000000000000000000000000000000000000000000000000000');
 
         FeeRecipient memory clientConfig = FeeRecipient({
             recipient: client,
@@ -271,7 +265,6 @@ contract GoerliIntegration is Test {
 
         p2pSsvProxyFactory.registerValidators{value: neededEth}(
             ssvPayload1,
-            mevRelay,
             clientConfig,
             referrerConfig
         );

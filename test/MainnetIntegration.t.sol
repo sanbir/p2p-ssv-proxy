@@ -31,7 +31,6 @@ contract MainnetIntegration is Test {
     address public proxyAddress;
 
     uint64[] public operatorIds;
-    bytes32 public constant mevRelay = 0x616c6c0000000000000000000000000000000000000000000000000000000000;
 
     function setUp() public {
         vm.createSelectFork("mainnet", 18476533);
@@ -245,7 +244,6 @@ contract MainnetIntegration is Test {
             getDepositData1(),
             address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
             getSsvPayload1(),
-            mevRelay,
             clientConfig,
             referrerConfig
         );
@@ -260,7 +258,6 @@ contract MainnetIntegration is Test {
             getDepositData2(),
             address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
             getSsvPayload2(),
-            mevRelay,
             clientConfig,
             referrerConfig
         );
@@ -288,7 +285,6 @@ contract MainnetIntegration is Test {
 
         p2pSsvProxyFactory.registerValidators{value: neededEth}(
             ssvPayload1,
-            mevRelay,
             clientConfig,
             referrerConfig
         );

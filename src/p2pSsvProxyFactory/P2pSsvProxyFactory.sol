@@ -370,14 +370,12 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
         SsvPayload calldata _ssvPayload,
 
-        bytes32 _mevRelay,
-
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy) {
         _makeBeaconDeposits(_depositData, _withdrawalCredentialsAddress, _ssvPayload.ssvValidators);
 
-        p2pSsvProxy = _registerValidators(_ssvPayload, _mevRelay, _clientConfig, _referrerConfig);
+        p2pSsvProxy = _registerValidators(_ssvPayload, _clientConfig, _referrerConfig);
     }
 
     function _checkEthValue(uint256 _tokenAmount) private view {
@@ -394,22 +392,16 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     function registerValidators(
         SsvPayload calldata _ssvPayload,
-
-        bytes32 _mevRelay,
-
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address) {
         _checkEthValue(_ssvPayload.tokenAmount);
 
-        return _registerValidators(_ssvPayload, _mevRelay, _clientConfig, _referrerConfig);
+        return _registerValidators(_ssvPayload, _clientConfig, _referrerConfig);
     }
 
     function _registerValidators(
         SsvPayload calldata _ssvPayload,
-
-        bytes32 _mevRelay,
-
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) private onlyAllowedOperators(_ssvPayload.ssvOperators) returns (address p2pSsvProxy) {
@@ -423,7 +415,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             feeDistributorInstance
         );
 
-        emit P2pSsvProxyFactory__RegistrationCompleted(p2pSsvProxy, _mevRelay);
+        emit P2pSsvProxyFactory__RegistrationCompleted(p2pSsvProxy);
     }
 
     function _createP2pSsvProxy(

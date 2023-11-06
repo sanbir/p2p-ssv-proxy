@@ -18,15 +18,12 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
 
         SsvPayload calldata _ssvPayload,
 
-        bytes32 _mevRelay,
-
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy);
 
     function registerValidators(
         SsvPayload calldata _ssvPayload,
-        bytes32 _mevRelay,
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address);
@@ -46,8 +43,7 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
     function isOperatorSelectorAllowed(bytes4 _selector) external view returns (bool);
 
     event P2pSsvProxyFactory__RegistrationCompleted(
-        address indexed _proxy,
-        bytes32 indexed _mevRelay
+        address indexed _proxy
     );
 
     event P2pSsvProxyFactory__P2pSsvProxyCreated(
