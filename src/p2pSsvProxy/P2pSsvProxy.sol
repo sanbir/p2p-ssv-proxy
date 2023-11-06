@@ -53,19 +53,26 @@ error P2pSsvProxy__AmountOfParametersError();
 /// @param _selector function selector to be called on SSVNetwork
 error P2pSsvProxy__SelectorNotAllowed(address _caller, bytes4 _selector);
 
-/// @notice Proxy for SSVNetwork calls.
+/// @title Proxy for SSVNetwork calls.
 /// @dev Each instance of P2pSsvProxy corresponds to 1 FeeDistributor instance.
 /// Thus, client to P2pSsvProxy instances is a 1-to-many relation.
 /// SSV tokens are managed by P2P.
 /// Clients cover the costs of SSV tokens by EL rewards via FeeDistributor instance.
 contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
+
+    /// @notice P2pSsvProxyFactory address
     IP2pSsvProxyFactory private immutable i_p2pSsvProxyFactory;
+
+    /// @notice SSVNetwork address
     ISSVNetwork private immutable i_ssvNetwork;
+
+    /// @notice SSV token (ERC-20) address
     IERC20 private immutable i_ssvToken;
 
+    /// @notice FeeDistributor instance address
     IFeeDistributor private s_feeDistributor;
 
-    /// @notice If caller not client, revert
+    /// @notice If caller is not client, revert
     modifier onlyClient() {
         address clientAddress = getClient();
 
@@ -75,6 +82,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         _;
     }
 
+    /// @notice If caller is neither operator nor owner, revert
     modifier onlyOperatorOrOwner() {
         address currentOwner = owner();
         address currentOperator = operator();
@@ -86,6 +94,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         _;
     }
 
+    /// @notice If caller is neither operator nor owner nor client, revert
     modifier onlyOperatorOrOwnerOrClient() {
         address operator_ = operator();
         address owner_ = owner();
@@ -97,7 +106,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         _;
     }
 
-    /// @notice If caller not factory, revert
+    /// @notice If caller is not factory, revert
     modifier onlyP2pSsvProxyFactory() {
         if (msg.sender != address(i_p2pSsvProxyFactory)) {
             revert P2pSsvProxy__NotP2pSsvProxyFactoryCalled(msg.sender, i_p2pSsvProxyFactory);
@@ -105,6 +114,8 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         _;
     }
 
+    /// @dev Set values that are constant, common for all clients, known at the initial deploy time.
+    /// @param _p2pSsvProxyFactory address of P2pSsvProxyFactory
     constructor(
         address _p2pSsvProxyFactory
     ) {
@@ -122,6 +133,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
             : IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
     }
 
+    /// @inheritdoc IP2pSsvProxy
     function initialize(
         address _feeDistributor
     ) external onlyP2pSsvProxyFactory {
@@ -132,6 +144,8 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         emit P2pSsvProxy__Initialized(_feeDistributor);
     }
 
+    /// @dev Access any SSVNetwork function as cluster owner (this P2pSsvProxy instance)
+    /// Each selector access is managed by P2pSsvProxyFactory roles (owner, operator, client)
     fallback() external {
         address caller = msg.sender;
         bytes4 selector = msg.sig;
@@ -159,6 +173,8 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
         }
     }
 
+    /// @notice
+    /// @param _ssvOperators
     function _getOperatorIdsAndClusterIndex(
         SsvOperator[] calldata _ssvOperators
     ) private view returns(
