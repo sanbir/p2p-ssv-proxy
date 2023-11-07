@@ -37,6 +37,8 @@ error P2pSsvProxyFactory__SsvOperatorOwnerDoesNotExist(address _ssvOperatorOwner
 
 error P2pSsvProxyFactory__SsvOperatorNotAllowed(address _ssvOperatorOwner, uint64 _ssvOperatorId);
 
+error P2pSsvProxyFactory__DuplicateOperatorOwnersNotAllowed(address _ssvOperatorOwner);
+
 error P2pSsvProxyFactory__DuplicateIdsNotAllowed();
 
 error P2pSsvProxyFactory__NotEnoughEtherPaidToCoverSsvFees(uint256 _needed, uint256 _paid);
@@ -97,7 +99,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     modifier onlyAllowedOperators(SsvOperator[] calldata _operators) {
         uint256 operatorCount = _operators.length;
         for (uint256 i = 0; i < operatorCount;) {
-            uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory allowedIds = s_allowedSsvOperatorIds[_operators[i].owner];
+            address currentOperatorOwner = _operators[i].owner;
+
+            uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory allowedIds = s_allowedSsvOperatorIds[currentOperatorOwner];
 
             bool isAllowed;
             for (uint256 j = 0; j < MAX_ALLOWED_SSV_OPERATOR_IDS;) {
@@ -106,18 +110,21 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                     break;
                 }
 
-                unchecked {
-                    ++j;
-                }
+                unchecked {++j;}
             }
             if (!isAllowed) {
-                revert P2pSsvProxyFactory__SsvOperatorNotAllowed(_operators[i].owner, _operators[i].id);
+                revert P2pSsvProxyFactory__SsvOperatorNotAllowed(currentOperatorOwner, _operators[i].id);
             }
-            isAllowed = false;
 
-            unchecked {
-                ++i;
+            for (uint256 k = 0; k < operatorCount;) {
+                if (i != k && currentOperatorOwner == _operators[k].owner) {
+                    revert P2pSsvProxyFactory__DuplicateOperatorOwnersNotAllowed(currentOperatorOwner);
+                }
+
+                unchecked {++k;}
             }
+
+            unchecked {++i;}
         }
 
         _;
