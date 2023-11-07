@@ -94,6 +94,11 @@ contract MainnetIntegration is Test {
         snapshot = vm.load(ssvNetworkAddress, slot1);
     }
 
+    function getSsvSlot0() private view returns(bytes32 ssvSlot0) {
+        bytes32 slot = bytes32(uint256(keccak256("ssv.network.storage.protocol")) - 1);
+        ssvSlot0 = vm.load(ssvNetworkAddress, slot);
+    }
+
     function getSsvPayload1() private view returns(SsvPayload memory) {
         SsvOperator[] memory ssvOperators = new SsvOperator[](4);
 
@@ -146,7 +151,7 @@ contract MainnetIntegration is Test {
             ssvValidators:ssvValidators,
             cluster:cluster,
             tokenAmount:105102853212500000000,
-            ssvSlot0: 0x00000007d0a8451c00000000000076a5000001f40119da10000002b00118885b
+            ssvSlot0: getSsvSlot0()
         });
     }
 
@@ -206,7 +211,7 @@ contract MainnetIntegration is Test {
             ssvValidators:ssvValidators,
             cluster:clusterAfter1stRegistation,
             tokenAmount:42041141285000000000,
-            ssvSlot0: 0x00000007d0a8451c00000000000076a5000001f40119da10000002b00118885b
+            ssvSlot0: getSsvSlot0()
         });
     }
 
