@@ -49,13 +49,23 @@ error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiOutOfRange();
 
 error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
 
-error P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(uint64 _operatorId, address _passedOwner, address _actualOwner);
+error P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(
+    uint64 _operatorId,
+    address _passedOwner,
+    address _actualOwner
+);
 
 error P2pSsvProxyFactory__CannotSetZeroSelectors();
 
 error P2pSsvProxyFactory__CannotSetZeroAllowedSsvOperatorOwners();
 
 error P2pSsvProxyFactory__CannotRemoveZeroAllowedSsvOperatorOwners();
+
+error P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength(
+    uint256 _ssvValidatorsLength,
+    uint256 _signaturesLength,
+    uint256 _depositDataRootsLength
+);
 
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -336,6 +346,14 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         SsvValidator[] calldata _ssvValidators
     ) private {
         uint256 validatorCount = _ssvValidators.length;
+
+        if (_depositData.signatures.length != validatorCount || _depositData.depositDataRoots.length != validatorCount) {
+            revert P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength(
+                validatorCount,
+                _depositData.signatures.length,
+                _depositData.depositDataRoots.length
+            );
+        }
 
         for (uint256 i = 0; i < validatorCount;) {
             // ETH deposit

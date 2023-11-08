@@ -13,7 +13,7 @@ import "../access/OwnableWithOperator.sol";
 import "../structs/P2pStructs.sol";
 import "../interfaces/IDepositContract.sol";
 import "../p2pSsvProxyFactory/IP2pSsvProxyFactory.sol";
-import "../assetRecovering/OwnableTokenRecoverer.sol";
+import "../assetRecovering/OwnableAssetRecoverer.sol";
 import "./IP2pSsvProxy.sol";
 import "../interfaces/p2p/IFeeDistributorFactory.sol";
 
@@ -58,7 +58,7 @@ error P2pSsvProxy__SelectorNotAllowed(address _caller, bytes4 _selector);
 /// Thus, client to P2pSsvProxy instances is a 1-to-many relation.
 /// SSV tokens are managed by P2P.
 /// Clients cover the costs of SSV tokens by EL rewards via FeeDistributor instance.
-contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
+contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
 
     /// @notice P2pSsvProxyFactory address
     IP2pSsvProxyFactory private immutable i_p2pSsvProxyFactory;
@@ -190,9 +190,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
             uint256 snapshot = uint256(_ssvOperators[i].snapshot);
             clusterIndex += uint64(snapshot >> 32) + (uint32(block.number) - uint32(snapshot)) * uint64(_ssvOperators[i].fee / 10_000_000);
 
-            unchecked {
-                ++i;
-            }
+            unchecked {++i;}
         }
     }
 
@@ -246,7 +244,8 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
             uint64 clusterIndex
         ) = _getOperatorIdsAndClusterIndex(_ssvPayload.ssvOperators);
 
-        uint64 currentNetworkFeeIndex = uint64(uint256(_ssvPayload.ssvSlot0) >> 192) + uint64(block.number - uint32(uint256(_ssvPayload.ssvSlot0))) * uint64(uint256(_ssvPayload.ssvSlot0) >> 128);
+        uint256 ssvSlot0 = uint256(_ssvPayload.ssvSlot0);
+        uint64 currentNetworkFeeIndex = uint64(ssvSlot0 >> 192) + uint64(block.number - uint32(ssvSlot0)) * uint64(ssvSlot0 >> 128);
 
         uint256 balance = _getBalance(_ssvPayload.cluster, clusterIndex, currentNetworkFeeIndex, _ssvPayload.tokenAmount);
 
