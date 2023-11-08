@@ -1,0 +1,723 @@
+<?xml version="1.0" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1120pt" height="1999pt" viewBox="0.00 0.00 1119.92 1999.00">
+<g id="graph0" class="graph" transform="translate(91.9009618910087,1888.0966214201335) scale(0.8893725604143151)" data-name="G">
+
+<polygon fill="#2e3e56" stroke="none" points="-4,4 -4,-1995 1115.92,-1995 1115.92,4 -4,4" style=""/>
+<g id="clust1" class="cluster" data-name="clusterP2pSsvProxy">
+
+<path fill="#445773" stroke="#445773" d="M20,-689C20,-689 822.53,-689 822.53,-689 828.53,-689 834.53,-695 834.53,-701 834.53,-701 834.53,-1834 834.53,-1834 834.53,-1840 828.53,-1846 822.53,-1846 822.53,-1846 20,-1846 20,-1846 14,-1846 8,-1840 8,-1834 8,-1834 8,-701 8,-701 8,-695 14,-689 20,-689" style=""/>
+<text text-anchor="middle" x="421.27" y="-1829.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">P2pSsvProxy</text>
+</g>
+<g id="clust2" class="cluster" data-name="clusterERC165Checker">
+
+<path fill="#3b4b63" stroke="#e8726d" stroke-dasharray="5,2" d="M512.92,-604C512.92,-604 661.06,-604 661.06,-604 667.06,-604 673.06,-610 673.06,-616 673.06,-616 673.06,-669 673.06,-669 673.06,-675 667.06,-681 661.06,-681 661.06,-681 512.92,-681 512.92,-681 506.92,-681 500.92,-675 500.92,-669 500.92,-669 500.92,-616 500.92,-616 500.92,-610 506.92,-604 512.92,-604" style=""/>
+<text text-anchor="middle" x="586.99" y="-664.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">ERC165Checker</text>
+</g>
+<g id="clust3" class="cluster" data-name="clusterIERC20">
+
+<path fill="#3b4b63" stroke="#e8726d" stroke-dasharray="5,2" d="M548.85,-465C548.85,-465 625.13,-465 625.13,-465 631.13,-465 637.13,-471 637.13,-477 637.13,-477 637.13,-584 637.13,-584 637.13,-590 631.13,-596 625.13,-596 625.13,-596 548.85,-596 548.85,-596 542.85,-596 536.85,-590 536.85,-584 536.85,-584 536.85,-477 536.85,-477 536.85,-471 542.85,-465 548.85,-465" style=""/>
+<text text-anchor="middle" x="586.99" y="-579.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">IERC20</text>
+</g>
+<g id="clust4" class="cluster" data-name="clusterIP2pSsvProxyFactory">
+
+<path fill="#3b4b63" stroke="#e8726d" stroke-dasharray="5,2" d="M866.53,-939C866.53,-939 1091.92,-939 1091.92,-939 1097.92,-939 1103.92,-945 1103.92,-951 1103.92,-951 1103.92,-1166 1103.92,-1166 1103.92,-1172 1097.92,-1178 1091.92,-1178 1091.92,-1178 866.53,-1178 866.53,-1178 860.53,-1178 854.53,-1172 854.53,-1166 854.53,-1166 854.53,-951 854.53,-951 854.53,-945 860.53,-939 866.53,-939" style=""/>
+<text text-anchor="middle" x="979.23" y="-1161.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">IP2pSsvProxyFactory</text>
+</g>
+<g id="clust5" class="cluster" data-name="clusterISSVClusters">
+
+<path fill="#3b4b63" stroke="#e8726d" stroke-dasharray="5,2" d="M944.29,-1303C944.29,-1303 1014.16,-1303 1014.16,-1303 1020.16,-1303 1026.16,-1309 1026.16,-1315 1026.16,-1315 1026.16,-1368 1026.16,-1368 1026.16,-1374 1020.16,-1380 1014.16,-1380 1014.16,-1380 944.29,-1380 944.29,-1380 938.29,-1380 932.29,-1374 932.29,-1368 932.29,-1368 932.29,-1315 932.29,-1315 932.29,-1309 938.29,-1303 944.29,-1303" style=""/>
+<text text-anchor="middle" x="979.23" y="-1363.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">ISSVClusters</text>
+</g>
+<g id="clust6" class="cluster" data-name="clusterISSVNetwork">
+
+<path fill="#3b4b63" stroke="#e8726d" stroke-dasharray="5,2" d="M878.86,-45C878.86,-45 1079.59,-45 1079.59,-45 1085.59,-45 1091.59,-51 1091.59,-57 1091.59,-57 1091.59,-434 1091.59,-434 1091.59,-440 1085.59,-446 1079.59,-446 1079.59,-446 878.86,-446 878.86,-446 872.86,-446 866.86,-440 866.86,-434 866.86,-434 866.86,-57 866.86,-57 866.86,-51 872.86,-45 878.86,-45" style=""/>
+<text text-anchor="middle" x="979.23" y="-429.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">ISSVNetwork</text>
+</g>
+<g id="clust7" class="cluster" data-name="clusterIFeeDistributor">
+
+<path fill="#3b4b63" stroke="#e8726d" stroke-dasharray="5,2" d="M940.74,-1218C940.74,-1218 1018.71,-1218 1018.71,-1218 1024.71,-1218 1030.71,-1224 1030.71,-1230 1030.71,-1230 1030.71,-1283 1030.71,-1283 1030.71,-1289 1024.71,-1295 1018.71,-1295 1018.71,-1295 940.74,-1295 940.74,-1295 934.74,-1295 928.74,-1289 928.74,-1283 928.74,-1283 928.74,-1230 928.74,-1230 928.74,-1224 934.74,-1218 940.74,-1218" style=""/>
+<text text-anchor="middle" x="979.73" y="-1278.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">IFeeDistributor</text>
+</g>
+<g id="clust8" class="cluster" data-name="clusterIP2pSsvProxy">
+
+<path fill="#3b4b63" stroke="#e8726d" stroke-dasharray="5,2" d="M512.92,-8C512.92,-8 661.06,-8 661.06,-8 667.06,-8 673.06,-14 673.06,-20 673.06,-20 673.06,-73 673.06,-73 673.06,-79 667.06,-85 661.06,-85 661.06,-85 512.92,-85 512.92,-85 506.92,-85 500.92,-79 500.92,-73 500.92,-73 500.92,-20 500.92,-20 500.92,-14 506.92,-8 512.92,-8" style=""/>
+<text text-anchor="middle" x="586.99" y="-68.4" font-family="Times,serif" font-size="14.00" fill="#f0f0f0" style="">IP2pSsvProxy</text>
+</g>
+<g id="clust9" class="cluster" data-name="cluster_01">
+
+<polygon fill="#2e3e56" stroke="black" points="90.73,-1854 90.73,-1983 621.99,-1983 621.99,-1854 90.73,-1854" style=""/>
+<text text-anchor="middle" x="356.36" y="-1966.4" font-family="Times,serif" font-size="14.00" style="">Legend</text>
+</g>
+<!-- P2pSsvProxy.onlyClient -->
+<g id="node1" class="node" pointer-events="visible" data-name="P2pSsvProxy.onlyClient">
+
+<polygon fill="#edad56" stroke="#1bc6a6" stroke-width="3" points="219.88,-1746.54 219.88,-1761.46 186.99,-1772 140.47,-1772 107.57,-1761.46 107.57,-1746.54 140.47,-1736 186.99,-1736 219.88,-1746.54" style=""/>
+<polygon fill="none" stroke="#1bc6a6" stroke-width="3" points="223.88,-1743.63 223.88,-1764.37 187.61,-1776 139.84,-1776 103.57,-1764.37 103.57,-1743.63 139.84,-1732 187.61,-1732 223.88,-1743.63" style=""/>
+<text text-anchor="middle" x="163.73" y="-1749.8" font-family="Times,serif" font-size="14.00" style="">onlyClient</text>
+</g>
+<!-- P2pSsvProxy.getClient -->
+<g id="node19" class="node" pointer-events="visible" data-name="P2pSsvProxy.getClient">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1741" rx="46.38" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1736.8" font-family="Times,serif" font-size="14.00" style="">getClient</text>
+</g>
+<!-- P2pSsvProxy.onlyClient&#45;&gt;P2pSsvProxy.getClient -->
+<g id="edge1" class="edge" data-name="P2pSsvProxy.onlyClient-&gt;P2pSsvProxy.getClient">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M225.08,-1752.14C305.47,-1749.66 446.78,-1745.3 526.65,-1742.83" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="526.49,-1746.34 536.37,-1742.53 526.27,-1739.34 526.49,-1746.34" style=""/>
+</g>
+<!-- P2pSsvProxy.P2pSsvProxy__CallerNotClient -->
+<g id="node25" class="node" pointer-events="visible" data-name="P2pSsvProxy.P2pSsvProxy__CallerNotClient">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1795" rx="134.37" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1790.8" font-family="Times,serif" font-size="14.00" style="">P2pSsvProxy__CallerNotClient</text>
+</g>
+<!-- P2pSsvProxy.onlyClient&#45;&gt;P2pSsvProxy.P2pSsvProxy__CallerNotClient -->
+<g id="edge2" class="edge" data-name="P2pSsvProxy.onlyClient-&gt;P2pSsvProxy.P2pSsvProxy__CallerNotClient">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M225.08,-1759.87C286.5,-1765.85 383.5,-1775.29 461.47,-1782.88" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="461,-1786.35 471.29,-1783.84 461.68,-1779.38 461,-1786.35" style=""/>
+</g>
+<!-- P2pSsvProxy.onlyOperatorOrOwner -->
+<g id="node2" class="node" pointer-events="visible" data-name="P2pSsvProxy.onlyOperatorOrOwner">
+
+<polygon fill="#edad56" stroke="#1bc6a6" stroke-width="3" points="271.02,-1571.54 271.02,-1586.46 208.17,-1597 119.29,-1597 56.44,-1586.46 56.44,-1571.54 119.29,-1561 208.17,-1561 271.02,-1571.54" style=""/>
+<polygon fill="none" stroke="#1bc6a6" stroke-width="3" points="275.02,-1568.16 275.02,-1589.84 208.5,-1601 118.95,-1601 52.43,-1589.84 52.43,-1568.16 118.95,-1557 208.5,-1557 275.02,-1568.16" style=""/>
+<text text-anchor="middle" x="163.73" y="-1574.8" font-family="Times,serif" font-size="14.00" style="">onlyOperatorOrOwner</text>
+</g>
+<!-- P2pSsvProxy.owner -->
+<g id="node21" class="node" pointer-events="visible" data-name="P2pSsvProxy.owner">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1525" rx="35.34" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1520.8" font-family="Times,serif" font-size="14.00" style="">owner</text>
+</g>
+<!-- P2pSsvProxy.onlyOperatorOrOwner&#45;&gt;P2pSsvProxy.owner -->
+<g id="edge3" class="edge" data-name="P2pSsvProxy.onlyOperatorOrOwner-&gt;P2pSsvProxy.owner">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M260.42,-1564.23C288.44,-1560.08 319.15,-1555.69 347.45,-1552 413.37,-1543.4 489.75,-1535.04 537.96,-1529.95" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="538.19,-1533.45 547.77,-1528.92 537.46,-1526.49 538.19,-1533.45" style=""/>
+</g>
+<!-- P2pSsvProxy.operator -->
+<g id="node22" class="node" pointer-events="visible" data-name="P2pSsvProxy.operator">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1633" rx="43.42" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1628.8" font-family="Times,serif" font-size="14.00" style="">operator</text>
+</g>
+<!-- P2pSsvProxy.onlyOperatorOrOwner&#45;&gt;P2pSsvProxy.operator -->
+<g id="edge4" class="edge" data-name="P2pSsvProxy.onlyOperatorOrOwner-&gt;P2pSsvProxy.operator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M260.42,-1593.77C288.44,-1597.92 319.15,-1602.31 347.45,-1606 410.11,-1614.17 482.21,-1622.13 530.59,-1627.27" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="529.96,-1630.72 540.27,-1628.29 530.69,-1623.76 529.96,-1630.72" style=""/>
+</g>
+<!-- P2pSsvProxy.P2pSsvProxy__CallerNeitherOperatorNorOwner -->
+<g id="node26" class="node" pointer-events="visible" data-name="P2pSsvProxy.P2pSsvProxy__CallerNeitherOperatorNorOwner">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1579" rx="200.83" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1574.8" font-family="Times,serif" font-size="14.00" style="">P2pSsvProxy__CallerNeitherOperatorNorOwner</text>
+</g>
+<!-- P2pSsvProxy.onlyOperatorOrOwner&#45;&gt;P2pSsvProxy.P2pSsvProxy__CallerNeitherOperatorNorOwner -->
+<g id="edge5" class="edge" data-name="P2pSsvProxy.onlyOperatorOrOwner-&gt;P2pSsvProxy.P2pSsvProxy__CallerNeitherOperatorNorOwner">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M276.51,-1579C306.12,-1579 339.11,-1579 372.19,-1579" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="371.84,-1582.5 381.84,-1579 371.84,-1575.5 371.84,-1582.5" style=""/>
+</g>
+<!-- P2pSsvProxy.onlyOperatorOrOwnerOrClient -->
+<g id="node3" class="node" pointer-events="visible" data-name="P2pSsvProxy.onlyOperatorOrOwnerOrClient">
+
+<polygon fill="#edad56" stroke="#1bc6a6" stroke-width="3" points="307.67,-1665.54 307.67,-1680.46 223.35,-1691 104.1,-1691 19.78,-1680.46 19.78,-1665.54 104.1,-1655 223.35,-1655 307.67,-1665.54" style=""/>
+<polygon fill="none" stroke="#1bc6a6" stroke-width="3" points="311.68,-1662.01 311.68,-1683.99 223.6,-1695 103.85,-1695 15.77,-1683.99 15.77,-1662.01 103.85,-1651 223.6,-1651 311.68,-1662.01" style=""/>
+<text text-anchor="middle" x="163.73" y="-1668.8" font-family="Times,serif" font-size="14.00" style="">onlyOperatorOrOwnerOrClient</text>
+</g>
+<!-- P2pSsvProxy.onlyOperatorOrOwnerOrClient&#45;&gt;P2pSsvProxy.getClient -->
+<g id="edge8" class="edge" data-name="P2pSsvProxy.onlyOperatorOrOwnerOrClient-&gt;P2pSsvProxy.getClient">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M247.13,-1693.47C278.4,-1700.72 314.43,-1708.44 347.45,-1714 408.44,-1724.26 478.88,-1731.7 527.31,-1736.14" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="526.77,-1739.6 537.04,-1737.01 527.4,-1732.63 526.77,-1739.6" style=""/>
+</g>
+<!-- P2pSsvProxy.onlyOperatorOrOwnerOrClient&#45;&gt;P2pSsvProxy.owner -->
+<g id="edge7" class="edge" data-name="P2pSsvProxy.onlyOperatorOrOwnerOrClient-&gt;P2pSsvProxy.owner">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M238.37,-1651.47C263.45,-1641.65 290.44,-1628.08 311.45,-1610 334.45,-1590.21 321.81,-1568.22 347.45,-1552 405.49,-1515.29 487.64,-1514.65 538.82,-1518.86" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="538.46,-1522.34 548.74,-1519.79 539.12,-1515.37 538.46,-1522.34" style=""/>
+</g>
+<!-- P2pSsvProxy.onlyOperatorOrOwnerOrClient&#45;&gt;P2pSsvProxy.operator -->
+<g id="edge6" class="edge" data-name="P2pSsvProxy.onlyOperatorOrOwnerOrClient-&gt;P2pSsvProxy.operator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M305,-1659.68C382.05,-1652.36 473.3,-1643.7 530.43,-1638.28" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="530.49,-1641.79 540.12,-1637.36 529.83,-1634.82 530.49,-1641.79" style=""/>
+</g>
+<!-- P2pSsvProxy.P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient -->
+<g id="node27" class="node" pointer-events="visible" data-name="P2pSsvProxy.P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1687" rx="239.58" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1682.8" font-family="Times,serif" font-size="14.00" style="">P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient</text>
+</g>
+<!-- P2pSsvProxy.onlyOperatorOrOwnerOrClient&#45;&gt;P2pSsvProxy.P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient -->
+<g id="edge9" class="edge" data-name="P2pSsvProxy.onlyOperatorOrOwnerOrClient-&gt;P2pSsvProxy.P2pSsvProxy__CallerNeitherOperatorNorOwnerNorClient">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M312.95,-1677.93C325.39,-1678.34 338.16,-1678.76 351.04,-1679.19" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="350.82,-1682.69 360.93,-1679.52 351.05,-1675.69 350.82,-1682.69" style=""/>
+</g>
+<!-- P2pSsvProxy.onlyP2pSsvProxyFactory -->
+<g id="node4" class="node" pointer-events="visible" data-name="P2pSsvProxy.onlyP2pSsvProxyFactory">
+
+<polygon fill="#edad56" stroke="#1bc6a6" stroke-width="3" points="282.34,-1467.54 282.34,-1482.46 212.86,-1493 114.59,-1493 45.11,-1482.46 45.11,-1467.54 114.59,-1457 212.86,-1457 282.34,-1467.54" style=""/>
+<polygon fill="none" stroke="#1bc6a6" stroke-width="3" points="286.34,-1464.1 286.34,-1485.9 213.16,-1497 114.29,-1497 41.12,-1485.9 41.12,-1464.1 114.29,-1453 213.16,-1453 286.34,-1464.1" style=""/>
+<text text-anchor="middle" x="163.73" y="-1470.8" font-family="Times,serif" font-size="14.00" style="">onlyP2pSsvProxyFactory</text>
+</g>
+<!-- P2pSsvProxy.P2pSsvProxy__NotP2pSsvProxyFactoryCalled -->
+<g id="node28" class="node" pointer-events="visible" data-name="P2pSsvProxy.P2pSsvProxy__NotP2pSsvProxyFactoryCalled">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1471" rx="194" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1466.8" font-family="Times,serif" font-size="14.00" style="">P2pSsvProxy__NotP2pSsvProxyFactoryCalled</text>
+</g>
+<!-- P2pSsvProxy.onlyP2pSsvProxyFactory&#45;&gt;P2pSsvProxy.P2pSsvProxy__NotP2pSsvProxyFactoryCalled -->
+<g id="edge10" class="edge" data-name="P2pSsvProxy.onlyP2pSsvProxyFactory-&gt;P2pSsvProxy.P2pSsvProxy__NotP2pSsvProxyFactoryCalled">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M287.71,-1473.83C316.63,-1473.56 348.23,-1473.26 379.71,-1472.96" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="379.71,-1476.46 389.68,-1472.86 379.65,-1469.46 379.71,-1476.46" style=""/>
+</g>
+<!-- P2pSsvProxy.&lt;Constructor&gt; -->
+<g id="node5" class="node" pointer-events="visible" data-name="P2pSsvProxy.&lt;Constructor&gt;">
+
+<ellipse fill="#ff9797" stroke="#ff9797" stroke-width="3" cx="163.73" cy="-1417" rx="67.55" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-1412.8" font-family="Times,serif" font-size="14.00" style="">&lt;Constructor&gt;</text>
+</g>
+<!-- P2pSsvProxy.type -->
+<g id="node29" class="node" pointer-events="visible" data-name="P2pSsvProxy.type">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1201" rx="27.83" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1196.8" font-family="Times,serif" font-size="14.00" style="">type</text>
+</g>
+<!-- P2pSsvProxy.&lt;Constructor&gt;&#45;&gt;P2pSsvProxy.type -->
+<g id="edge12" class="edge" data-name="P2pSsvProxy.&lt;Constructor&gt;-&gt;P2pSsvProxy.type">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M231.57,-1420.12C259.6,-1417.89 290.47,-1410.22 311.45,-1390 364.55,-1338.81 292.61,-1277.32 347.45,-1228 401.9,-1179.03 493.98,-1184.56 546.38,-1192.85" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="545.68,-1196.28 556.13,-1194.53 546.87,-1189.38 545.68,-1196.28" style=""/>
+</g>
+<!-- P2pSsvProxy.P2pSsvProxy__NotP2pSsvProxyFactory -->
+<g id="node30" class="node" pointer-events="visible" data-name="P2pSsvProxy.P2pSsvProxy__NotP2pSsvProxyFactory">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1255" rx="168.58" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1250.8" font-family="Times,serif" font-size="14.00" style="">P2pSsvProxy__NotP2pSsvProxyFactory</text>
+</g>
+<!-- P2pSsvProxy.&lt;Constructor&gt;&#45;&gt;P2pSsvProxy.P2pSsvProxy__NotP2pSsvProxyFactory -->
+<g id="edge13" class="edge" data-name="P2pSsvProxy.&lt;Constructor&gt;-&gt;P2pSsvProxy.P2pSsvProxy__NotP2pSsvProxyFactory">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M232.11,-1418.94C259.56,-1416.37 289.85,-1408.78 311.45,-1390 349.64,-1356.81 308.14,-1313.85 347.45,-1282 367.77,-1265.54 392.45,-1255.53 418.14,-1249.79" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="418.71,-1253.25 427.85,-1247.89 417.36,-1246.38 418.71,-1253.25" style=""/>
+</g>
+<!-- P2pSsvProxy.IP2pSsvProxyFactory -->
+<g id="node31" class="node" pointer-events="visible" data-name="P2pSsvProxy.IP2pSsvProxyFactory">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1309" rx="95.62" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1304.8" font-family="Times,serif" font-size="14.00" style="">IP2pSsvProxyFactory</text>
+</g>
+<!-- P2pSsvProxy.&lt;Constructor&gt;&#45;&gt;P2pSsvProxy.IP2pSsvProxyFactory -->
+<g id="edge14" class="edge" data-name="P2pSsvProxy.&lt;Constructor&gt;-&gt;P2pSsvProxy.IP2pSsvProxyFactory">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M232.46,-1415.7C258.88,-1412.46 288.31,-1405.24 311.45,-1390 335.54,-1374.14 322.83,-1351.02 347.45,-1336 387.94,-1311.3 439.56,-1303.23 484.42,-1301.87" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="484.22,-1305.38 494.16,-1301.71 484.1,-1298.38 484.22,-1305.38" style=""/>
+</g>
+<!-- P2pSsvProxy.ISSVNetwork -->
+<g id="node32" class="node" pointer-events="visible" data-name="P2pSsvProxy.ISSVNetwork">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1363" rx="65.52" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1358.8" font-family="Times,serif" font-size="14.00" style="">ISSVNetwork</text>
+</g>
+<!-- P2pSsvProxy.&lt;Constructor&gt;&#45;&gt;P2pSsvProxy.ISSVNetwork -->
+<g id="edge15" class="edge" data-name="P2pSsvProxy.&lt;Constructor&gt;-&gt;P2pSsvProxy.ISSVNetwork">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M210.1,-1402.58C247.03,-1395.15 300.55,-1387.12 347.45,-1381 400.72,-1374.05 460.81,-1367.26 507.36,-1363.37" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="507.4,-1366.88 517.09,-1362.59 506.84,-1359.9 507.4,-1366.88" style=""/>
+</g>
+<!-- P2pSsvProxy.&lt;Constructor&gt;&#45;&gt;P2pSsvProxy.ISSVNetwork -->
+<g id="edge16" class="edge" data-name="P2pSsvProxy.&lt;Constructor&gt;-&gt;P2pSsvProxy.ISSVNetwork">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M231.91,-1414.58C266.41,-1410.27 309.14,-1404 347.45,-1399 406.7,-1391.27 474.39,-1383.73 522.5,-1377.01" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="522.81,-1380.5 532.21,-1375.62 521.82,-1373.57 522.81,-1380.5" style=""/>
+</g>
+<!-- P2pSsvProxy.IERC20 -->
+<g id="node33" class="node" pointer-events="visible" data-name="P2pSsvProxy.IERC20">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1417" rx="42.88" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1412.8" font-family="Times,serif" font-size="14.00" style="">IERC20</text>
+</g>
+<!-- P2pSsvProxy.&lt;Constructor&gt;&#45;&gt;P2pSsvProxy.IERC20 -->
+<g id="edge17" class="edge" data-name="P2pSsvProxy.&lt;Constructor&gt;-&gt;P2pSsvProxy.IERC20">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M230.09,-1411.95C312.78,-1409.58 453.71,-1409.69 531.09,-1412.27" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="530.71,-1415.76 540.84,-1412.64 530.97,-1408.77 530.71,-1415.76" style=""/>
+</g>
+<!-- P2pSsvProxy.&lt;Constructor&gt;&#45;&gt;P2pSsvProxy.IERC20 -->
+<g id="edge18" class="edge" data-name="P2pSsvProxy.&lt;Constructor&gt;-&gt;P2pSsvProxy.IERC20">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M230.09,-1422.05C312.78,-1424.42 453.71,-1424.31 531.09,-1421.73" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="530.97,-1425.23 540.84,-1421.36 530.71,-1418.24 530.97,-1425.23" style=""/>
+</g>
+<!-- ERC165Checker.supportsInterface -->
+<g id="node40" class="node" pointer-events="visible" data-name="ERC165Checker.supportsInterface">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-630" rx="78.14" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-625.8" font-family="Times,serif" font-size="14.00" style="">supportsInterface</text>
+</g>
+<!-- P2pSsvProxy.&lt;Constructor&gt;&#45;&gt;ERC165Checker.supportsInterface -->
+<g id="edge11" class="edge" data-name="P2pSsvProxy.&lt;Constructor&gt;-&gt;ERC165Checker.supportsInterface">
+
+<path fill="none" stroke="white" stroke-width="2" d="M230.23,-1421.9C259.38,-1420.32 291.56,-1412.69 311.45,-1390 414.88,-1272.06 246.68,-805.22 347.45,-685 383.25,-642.29 444.97,-628.9 496.66,-626.01" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="496.68,-629.51 506.54,-625.61 496.4,-622.51 496.68,-629.51" style=""/>
+</g>
+<!-- P2pSsvProxy.initialize -->
+<g id="node6" class="node" pointer-events="visible" data-name="P2pSsvProxy.initialize">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-1363" rx="44.64" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-1358.8" font-family="Times,serif" font-size="14.00" style="">initialize</text>
+</g>
+<!-- P2pSsvProxy.initialize&#45;&gt;P2pSsvProxy.type -->
+<g id="edge21" class="edge" data-name="P2pSsvProxy.initialize-&gt;P2pSsvProxy.type">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M209.25,-1366.06C241.29,-1365.84 283.6,-1360.21 311.45,-1336 349.64,-1302.81 308.14,-1259.85 347.45,-1228 404.06,-1182.15 494.56,-1186.32 546.29,-1193.58" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="545.46,-1197 555.88,-1195.06 546.53,-1190.08 545.46,-1197" style=""/>
+</g>
+<!-- P2pSsvProxy.IFeeDistributor -->
+<g id="node34" class="node" pointer-events="visible" data-name="P2pSsvProxy.IFeeDistributor">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1093" rx="70.65" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1088.8" font-family="Times,serif" font-size="14.00" style="">IFeeDistributor</text>
+</g>
+<!-- P2pSsvProxy.initialize&#45;&gt;P2pSsvProxy.IFeeDistributor -->
+<g id="edge19" class="edge" data-name="P2pSsvProxy.initialize-&gt;P2pSsvProxy.IFeeDistributor">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M208.71,-1367.28C241.55,-1367.88 285.12,-1362.78 311.45,-1336 379.69,-1266.6 276.85,-1186.99 347.45,-1120 391.37,-1078.32 462.26,-1075.25 515.37,-1080.39" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="514.78,-1083.85 525.11,-1081.48 515.56,-1076.89 514.78,-1083.85" style=""/>
+</g>
+<!-- P2pSsvProxy.P2pSsvProxy__Initialized -->
+<g id="node35" class="node" pointer-events="visible" data-name="P2pSsvProxy.P2pSsvProxy__Initialized">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1147" rx="111.79" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1142.8" font-family="Times,serif" font-size="14.00" style="">P2pSsvProxy__Initialized</text>
+</g>
+<!-- P2pSsvProxy.initialize&#45;&gt;P2pSsvProxy.P2pSsvProxy__Initialized -->
+<g id="edge22" class="edge" data-name="P2pSsvProxy.initialize-&gt;P2pSsvProxy.P2pSsvProxy__Initialized">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M208.65,-1366.88C241.23,-1367.23 284.51,-1361.97 311.45,-1336 364.55,-1284.81 292.61,-1223.32 347.45,-1174 385.36,-1139.91 441.5,-1132.23 489.8,-1133.51" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="489.37,-1137 499.51,-1133.93 489.67,-1130 489.37,-1137" style=""/>
+</g>
+<!-- IERC20.approve -->
+<g id="node41" class="node" pointer-events="visible" data-name="IERC20.approve">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-545" rx="42.28" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-540.8" font-family="Times,serif" font-size="14.00" style="">approve</text>
+</g>
+<!-- P2pSsvProxy.initialize&#45;&gt;IERC20.approve -->
+<g id="edge20" class="edge" data-name="P2pSsvProxy.initialize-&gt;IERC20.approve">
+
+<path fill="none" stroke="white" stroke-width="2" d="M208.24,-1368.07C241.72,-1369.3 286.38,-1364.65 311.45,-1336 365.37,-1274.38 294.92,-662.8 347.45,-600 391.75,-547.03 475.91,-539.14 531.48,-540.45" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="531.11,-543.94 541.24,-540.81 531.37,-536.94 531.11,-543.94" style=""/>
+</g>
+<!-- P2pSsvProxy.&lt;Fallback&gt; -->
+<g id="node7" class="node" pointer-events="visible" data-name="P2pSsvProxy.&lt;Fallback&gt;">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-1309" rx="55.36" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-1304.8" font-family="Times,serif" font-size="14.00" style="">&lt;Fallback&gt;</text>
+</g>
+<!-- P2pSsvProxy.&lt;Fallback&gt;&#45;&gt;P2pSsvProxy.getClient -->
+<g id="edge26" class="edge" data-name="P2pSsvProxy.&lt;Fallback&gt;-&gt;P2pSsvProxy.getClient">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M218.75,-1304.13C250.35,-1304.45 288.44,-1310.89 311.45,-1336 368.47,-1398.2 288.32,-1653.81 347.45,-1714 394.91,-1762.31 478.21,-1760.17 532.74,-1752.16" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="532.97,-1755.67 542.28,-1750.63 531.85,-1748.76 532.97,-1755.67" style=""/>
+</g>
+<!-- P2pSsvProxy.&lt;Fallback&gt;&#45;&gt;P2pSsvProxy.owner -->
+<g id="edge23" class="edge" data-name="P2pSsvProxy.&lt;Fallback&gt;-&gt;P2pSsvProxy.owner">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M219.47,-1305.22C250.33,-1306.14 287.4,-1312.81 311.45,-1336 364.55,-1387.19 292.61,-1448.68 347.45,-1498 399.73,-1545.02 486.7,-1541.79 539.93,-1534.12" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="540.38,-1537.6 549.71,-1532.58 539.29,-1530.68 540.38,-1537.6" style=""/>
+</g>
+<!-- P2pSsvProxy.&lt;Fallback&gt;&#45;&gt;P2pSsvProxy.operator -->
+<g id="edge24" class="edge" data-name="P2pSsvProxy.&lt;Fallback&gt;-&gt;P2pSsvProxy.operator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M218.78,-1304.45C250.19,-1304.93 288.06,-1311.42 311.45,-1336 394.91,-1423.69 261,-1521.25 347.45,-1606 396.12,-1653.71 479.94,-1651.49 534.14,-1643.65" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="534.6,-1647.13 543.92,-1642.1 533.5,-1640.21 534.6,-1647.13" style=""/>
+</g>
+<!-- P2pSsvProxy.P2pSsvProxy__SelectorNotAllowed -->
+<g id="node36" class="node" pointer-events="visible" data-name="P2pSsvProxy.P2pSsvProxy__SelectorNotAllowed">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-985" rx="152.27" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-980.8" font-family="Times,serif" font-size="14.00" style="">P2pSsvProxy__SelectorNotAllowed</text>
+</g>
+<!-- P2pSsvProxy.&lt;Fallback&gt;&#45;&gt;P2pSsvProxy.P2pSsvProxy__SelectorNotAllowed -->
+<g id="edge28" class="edge" data-name="P2pSsvProxy.&lt;Fallback&gt;-&gt;P2pSsvProxy.P2pSsvProxy__SelectorNotAllowed">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M218.78,-1313.55C250.19,-1313.07 288.06,-1306.58 311.45,-1282 394.91,-1194.31 261,-1096.75 347.45,-1012 380.37,-979.73 429.36,-970.31 474.4,-970.01" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="474.22,-973.5 484.26,-970.13 474.31,-966.51 474.22,-973.5" style=""/>
+</g>
+<!-- P2pSsvProxy.P2pSsvProxy__SuccessfullyCalledViaFallback -->
+<g id="node37" class="node" pointer-events="visible" data-name="P2pSsvProxy.P2pSsvProxy__SuccessfullyCalledViaFallback">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-1039" rx="193.93" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-1034.8" font-family="Times,serif" font-size="14.00" style="">P2pSsvProxy__SuccessfullyCalledViaFallback</text>
+</g>
+<!-- P2pSsvProxy.&lt;Fallback&gt;&#45;&gt;P2pSsvProxy.P2pSsvProxy__SuccessfullyCalledViaFallback -->
+<g id="edge29" class="edge" data-name="P2pSsvProxy.&lt;Fallback&gt;-&gt;P2pSsvProxy.P2pSsvProxy__SuccessfullyCalledViaFallback">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M219.21,-1313.26C250.38,-1312.6 287.84,-1306.01 311.45,-1282 379.69,-1212.6 276.85,-1132.99 347.45,-1066 357.19,-1056.76 368.25,-1049.42 380.15,-1043.64" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="381.25,-1046.98 389.03,-1039.78 378.46,-1040.56 381.25,-1046.98" style=""/>
+</g>
+<!-- P2pSsvProxy.P2pSsvProxy__CallingViaFallbackFailed -->
+<g id="node38" class="node" pointer-events="visible" data-name="P2pSsvProxy.P2pSsvProxy__CallingViaFallbackFailed">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-931" rx="172.53" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-926.8" font-family="Times,serif" font-size="14.00" style="">P2pSsvProxy__CallingViaFallbackFailed</text>
+</g>
+<!-- P2pSsvProxy.&lt;Fallback&gt;&#45;&gt;P2pSsvProxy.P2pSsvProxy__CallingViaFallbackFailed -->
+<g id="edge30" class="edge" data-name="P2pSsvProxy.&lt;Fallback&gt;-&gt;P2pSsvProxy.P2pSsvProxy__CallingViaFallbackFailed">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M218.61,-1313.74C250.16,-1313.37 288.24,-1306.93 311.45,-1282 410.18,-1175.96 245.11,-1060.56 347.45,-958 378.2,-927.19 423.56,-917.02 466.5,-915.79" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="466.43,-919.29 476.4,-915.7 466.37,-912.29 466.43,-919.29" style=""/>
+</g>
+<!-- IP2pSsvProxyFactory.isOperatorSelectorAllowed -->
+<g id="node43" class="node" pointer-events="visible" data-name="IP2pSsvProxyFactory.isOperatorSelectorAllowed">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-1019" rx="116.89" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-1014.8" font-family="Times,serif" font-size="14.00" style="">isOperatorSelectorAllowed</text>
+</g>
+<!-- P2pSsvProxy.&lt;Fallback&gt;&#45;&gt;IP2pSsvProxyFactory.isOperatorSelectorAllowed -->
+<g id="edge25" class="edge" data-name="P2pSsvProxy.&lt;Fallback&gt;-&gt;IP2pSsvProxyFactory.isOperatorSelectorAllowed">
+
+<path fill="none" stroke="white" stroke-width="2" d="M218.13,-1314.28C250.11,-1314.25 288.83,-1307.98 311.45,-1282 371.41,-1213.13 281.49,-524.14 347.45,-461 386.55,-423.58 795.55,-423.46 834.53,-461 877.06,-501.96 816.64,-946.72 854.53,-992 857.93,-996.06 861.78,-999.59 865.96,-1002.66" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="864.06,-1005.6 874.42,-1007.8 867.7,-999.62 864.06,-1005.6" style=""/>
+</g>
+<!-- IP2pSsvProxyFactory.isClientSelectorAllowed -->
+<g id="node44" class="node" pointer-events="visible" data-name="IP2pSsvProxyFactory.isClientSelectorAllowed">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-965" rx="105.96" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-960.8" font-family="Times,serif" font-size="14.00" style="">isClientSelectorAllowed</text>
+</g>
+<!-- P2pSsvProxy.&lt;Fallback&gt;&#45;&gt;IP2pSsvProxyFactory.isClientSelectorAllowed -->
+<g id="edge27" class="edge" data-name="P2pSsvProxy.&lt;Fallback&gt;-&gt;IP2pSsvProxyFactory.isClientSelectorAllowed">
+
+<path fill="none" stroke="white" stroke-width="2" d="M218.14,-1314.3C250.13,-1314.27 288.86,-1308 311.45,-1282 373.75,-1210.32 278.9,-493.73 347.45,-428 386.52,-390.55 791.6,-395.05 834.53,-428 876.01,-459.84 950.23,-822.59 972.04,-933.19" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="968.55,-933.56 973.91,-942.7 975.42,-932.21 968.55,-933.56" style=""/>
+</g>
+<!-- P2pSsvProxy._getOperatorIdsAndClusterIndex -->
+<g id="node8" class="node" pointer-events="visible" data-name="P2pSsvProxy._getOperatorIdsAndClusterIndex">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-769" rx="140.09" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-764.8" font-family="Times,serif" font-size="14.00" style="">_getOperatorIdsAndClusterIndex</text>
+</g>
+<!-- P2pSsvProxy._getBalance -->
+<g id="node9" class="node" pointer-events="visible" data-name="P2pSsvProxy._getBalance">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-823" rx="58.52" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-818.8" font-family="Times,serif" font-size="14.00" style="">_getBalance</text>
+</g>
+<!-- P2pSsvProxy._registerValidator -->
+<g id="node10" class="node" pointer-events="visible" data-name="P2pSsvProxy._registerValidator">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-877" rx="81.08" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-872.8" font-family="Times,serif" font-size="14.00" style="">_registerValidator</text>
+</g>
+<!-- ISSVClusters.Cluster -->
+<g id="node47" class="node" pointer-events="visible" data-name="ISSVClusters.Cluster">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-1329" rx="38.86" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-1324.8" font-family="Times,serif" font-size="14.00" style="">Cluster</text>
+</g>
+<!-- P2pSsvProxy._registerValidator&#45;&gt;ISSVClusters.Cluster -->
+<g id="edge31" class="edge" data-name="P2pSsvProxy._registerValidator-&gt;ISSVClusters.Cluster">
+
+<path fill="none" stroke="white" stroke-width="2" d="M648.47,-864.04C705.14,-855.82 787.93,-854.59 834.53,-904 864.68,-935.97 826.5,-1265.16 854.53,-1299 871.76,-1319.8 900.72,-1327.57 926.29,-1330.02" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="926.05,-1333.52 936.26,-1330.67 926.5,-1326.53 926.05,-1333.52" style=""/>
+</g>
+<!-- ISSVNetwork.registerValidator -->
+<g id="node48" class="node" pointer-events="visible" data-name="ISSVNetwork.registerValidator">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-395" rx="76.42" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-390.8" font-family="Times,serif" font-size="14.00" style="">registerValidator</text>
+</g>
+<!-- P2pSsvProxy._registerValidator&#45;&gt;ISSVNetwork.registerValidator -->
+<g id="edge32" class="edge" data-name="P2pSsvProxy._registerValidator-&gt;ISSVNetwork.registerValidator">
+
+<path fill="none" stroke="white" stroke-width="2" d="M654.66,-888.07C709.04,-893.18 784.76,-890.83 834.53,-850 966.96,-741.37 979.21,-511.4 979.02,-426.96" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="982.52,-427.03 978.92,-417.07 975.52,-427.1 982.52,-427.03" style=""/>
+</g>
+<!-- P2pSsvProxy.registerValidators -->
+<g id="node11" class="node" pointer-events="visible" data-name="P2pSsvProxy.registerValidators">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-1255" rx="80.44" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-1250.8" font-family="Times,serif" font-size="14.00" style="">registerValidators</text>
+</g>
+<!-- P2pSsvProxy.registerValidators&#45;&gt;P2pSsvProxy._getOperatorIdsAndClusterIndex -->
+<g id="edge33" class="edge" data-name="P2pSsvProxy.registerValidators-&gt;P2pSsvProxy._getOperatorIdsAndClusterIndex">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M244.32,-1258.29C269.18,-1255.09 294.5,-1246.72 311.45,-1228 376.12,-1156.6 280.35,-865.12 347.45,-796 382.16,-760.25 436.49,-752 484.53,-753.37" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="484.07,-756.85 494.22,-753.81 484.39,-749.86 484.07,-756.85" style=""/>
+</g>
+<!-- P2pSsvProxy.registerValidators&#45;&gt;P2pSsvProxy._getBalance -->
+<g id="edge34" class="edge" data-name="P2pSsvProxy.registerValidators-&gt;P2pSsvProxy._getBalance">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M244.57,-1258.13C269.3,-1254.88 294.48,-1246.52 311.45,-1228 368.47,-1165.8 288.32,-910.19 347.45,-850 392.47,-804.17 469.76,-803.74 524.14,-810.66" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="523.35,-814.08 533.75,-812.02 524.34,-807.15 523.35,-814.08" style=""/>
+</g>
+<!-- P2pSsvProxy.registerValidators&#45;&gt;P2pSsvProxy._registerValidator -->
+<g id="edge36" class="edge" data-name="P2pSsvProxy.registerValidators-&gt;P2pSsvProxy._registerValidator">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M244.41,-1257.97C269.12,-1254.72 294.33,-1246.39 311.45,-1228 410.18,-1121.96 245.11,-1006.56 347.45,-904 389.06,-862.3 457.45,-858.42 510.35,-863.3" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="509.77,-866.76 520.09,-864.35 510.52,-859.8 509.77,-866.76" style=""/>
+</g>
+<!-- P2pSsvProxy.registerValidators&#45;&gt;ISSVNetwork.registerValidator -->
+<g id="edge35" class="edge" data-name="P2pSsvProxy.registerValidators-&gt;ISSVNetwork.registerValidator">
+
+<path fill="none" stroke="white" stroke-width="2" d="M243.98,-1258.77C269.12,-1255.68 294.71,-1247.25 311.45,-1228 372.05,-1158.36 280.93,-462 347.45,-398 424.32,-324.04 749.51,-360.91 900.54,-382.76" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="899.9,-386.2 910.3,-384.19 900.91,-379.28 899.9,-386.2" style=""/>
+</g>
+<!-- ISSVNetwork.setFeeRecipientAddress -->
+<g id="node49" class="node" pointer-events="visible" data-name="ISSVNetwork.setFeeRecipientAddress">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-287" rx="104.22" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-282.8" font-family="Times,serif" font-size="14.00" style="">setFeeRecipientAddress</text>
+</g>
+<!-- P2pSsvProxy.registerValidators&#45;&gt;ISSVNetwork.setFeeRecipientAddress -->
+<g id="edge37" class="edge" data-name="P2pSsvProxy.registerValidators-&gt;ISSVNetwork.setFeeRecipientAddress">
+
+<path fill="none" stroke="white" stroke-width="2" d="M244.01,-1258.79C269.15,-1255.7 294.73,-1247.27 311.45,-1228 375.39,-1154.35 280.59,-422 347.45,-351 415.64,-278.59 701.93,-276.52 864.39,-281.56" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="864.17,-285.06 874.28,-281.89 864.4,-278.06 864.17,-285.06" style=""/>
+</g>
+<!-- P2pSsvProxy.removeValidators -->
+<g id="node12" class="node" pointer-events="visible" data-name="P2pSsvProxy.removeValidators">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-1147" rx="80.44" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-1142.8" font-family="Times,serif" font-size="14.00" style="">removeValidators</text>
+</g>
+<!-- P2pSsvProxy.P2pSsvProxy__AmountOfParametersError -->
+<g id="node39" class="node" pointer-events="visible" data-name="P2pSsvProxy.P2pSsvProxy__AmountOfParametersError">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-715" rx="177.74" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-710.8" font-family="Times,serif" font-size="14.00" style="">P2pSsvProxy__AmountOfParametersError</text>
+</g>
+<!-- P2pSsvProxy.removeValidators&#45;&gt;P2pSsvProxy.P2pSsvProxy__AmountOfParametersError -->
+<g id="edge38" class="edge" data-name="P2pSsvProxy.removeValidators-&gt;P2pSsvProxy.P2pSsvProxy__AmountOfParametersError">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M244.57,-1150.13C269.3,-1146.88 294.48,-1138.52 311.45,-1120 368.47,-1057.8 288.32,-802.19 347.45,-742 377.96,-710.95 423.28,-700.74 466.24,-699.53" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="466.18,-703.04 476.16,-699.46 466.13,-696.04 466.18,-703.04" style=""/>
+</g>
+<!-- ISSVNetwork.removeValidator -->
+<g id="node50" class="node" pointer-events="visible" data-name="ISSVNetwork.removeValidator">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-341" rx="76.42" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-336.8" font-family="Times,serif" font-size="14.00" style="">removeValidator</text>
+</g>
+<!-- P2pSsvProxy.removeValidators&#45;&gt;ISSVNetwork.removeValidator -->
+<g id="edge39" class="edge" data-name="P2pSsvProxy.removeValidators-&gt;ISSVNetwork.removeValidator">
+
+<path fill="none" stroke="white" stroke-width="2" d="M243.94,-1150.74C269.08,-1147.64 294.67,-1139.22 311.45,-1120 367.43,-1055.91 286.54,-414.42 347.45,-355 423.45,-280.87 746.03,-310.98 898.18,-329.97" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="897.68,-333.43 908.04,-331.22 898.56,-326.49 897.68,-333.43" style=""/>
+</g>
+<!-- P2pSsvProxy.liquidate -->
+<g id="node13" class="node" pointer-events="visible" data-name="P2pSsvProxy.liquidate">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-985" rx="44.65" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-980.8" font-family="Times,serif" font-size="14.00" style="">liquidate</text>
+</g>
+<!-- ISSVNetwork.liquidate -->
+<g id="node51" class="node" pointer-events="visible" data-name="ISSVNetwork.liquidate">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-179" rx="44.65" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-174.8" font-family="Times,serif" font-size="14.00" style="">liquidate</text>
+</g>
+<!-- P2pSsvProxy.liquidate&#45;&gt;ISSVNetwork.liquidate -->
+<g id="edge40" class="edge" data-name="P2pSsvProxy.liquidate-&gt;ISSVNetwork.liquidate">
+
+<path fill="none" stroke="white" stroke-width="2" d="M208.25,-990.08C241.74,-991.32 286.4,-986.67 311.45,-958 366.72,-894.76 287.78,-262.1 347.45,-203 387.6,-163.23 772.58,-171.97 920.62,-176.86" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="920.22,-180.35 930.33,-177.19 920.46,-173.36 920.22,-180.35" style=""/>
+</g>
+<!-- P2pSsvProxy.reactivate -->
+<g id="node14" class="node" pointer-events="visible" data-name="P2pSsvProxy.reactivate">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-877" rx="48.62" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-872.8" font-family="Times,serif" font-size="14.00" style="">reactivate</text>
+</g>
+<!-- ISSVNetwork.reactivate -->
+<g id="node52" class="node" pointer-events="visible" data-name="ISSVNetwork.reactivate">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-125" rx="48.62" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-120.8" font-family="Times,serif" font-size="14.00" style="">reactivate</text>
+</g>
+<!-- P2pSsvProxy.reactivate&#45;&gt;ISSVNetwork.reactivate -->
+<g id="edge41" class="edge" data-name="P2pSsvProxy.reactivate-&gt;ISSVNetwork.reactivate">
+
+<path fill="none" stroke="white" stroke-width="2" d="M212.01,-882.15C244.99,-882.88 287.27,-877.54 311.45,-850 361.75,-792.73 293.85,-219.18 347.45,-165 386.89,-125.13 765.53,-123.43 916.52,-124.36" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="916.08,-127.86 926.1,-124.43 916.13,-120.86 916.08,-127.86" style=""/>
+</g>
+<!-- P2pSsvProxy.depositToSSV -->
+<g id="node15" class="node" pointer-events="visible" data-name="P2pSsvProxy.depositToSSV">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-715" rx="67.25" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-710.8" font-family="Times,serif" font-size="14.00" style="">depositToSSV</text>
+</g>
+<!-- ISSVNetwork.deposit -->
+<g id="node53" class="node" pointer-events="visible" data-name="ISSVNetwork.deposit">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-71" rx="38.86" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-66.8" font-family="Times,serif" font-size="14.00" style="">deposit</text>
+</g>
+<!-- P2pSsvProxy.depositToSSV&#45;&gt;ISSVNetwork.deposit -->
+<g id="edge42" class="edge" data-name="P2pSsvProxy.depositToSSV-&gt;ISSVNetwork.deposit">
+
+<path fill="none" stroke="white" stroke-width="2" d="M167.78,-695.77C182.92,-602.93 253.05,-202.36 347.45,-127 389.88,-93.13 780.53,-94.49 834.53,-89 865.49,-85.86 900.09,-81.55 927.58,-77.93" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="928.01,-81.4 937.46,-76.62 927.09,-74.47 928.01,-81.4" style=""/>
+</g>
+<!-- P2pSsvProxy.withdrawFromSSV -->
+<g id="node16" class="node" pointer-events="visible" data-name="P2pSsvProxy.withdrawFromSSV">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-1039" rx="86.3" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-1034.8" font-family="Times,serif" font-size="14.00" style="">withdrawFromSSV</text>
+</g>
+<!-- ISSVNetwork.withdraw -->
+<g id="node54" class="node" pointer-events="visible" data-name="ISSVNetwork.withdraw">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-233" rx="47.52" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-228.8" font-family="Times,serif" font-size="14.00" style="">withdraw</text>
+</g>
+<!-- P2pSsvProxy.withdrawFromSSV&#45;&gt;ISSVNetwork.withdraw -->
+<g id="edge43" class="edge" data-name="P2pSsvProxy.withdrawFromSSV-&gt;ISSVNetwork.withdraw">
+
+<path fill="none" stroke="white" stroke-width="2" d="M250.46,-1041.82C273.43,-1038.11 296.12,-1029.56 311.45,-1012 367.86,-947.4 285.79,-300.6 347.45,-241 387.82,-201.98 768.24,-220.34 918.04,-229.19" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="917.74,-232.68 927.93,-229.78 918.16,-225.69 917.74,-232.68" style=""/>
+</g>
+<!-- P2pSsvProxy.withdrawSSVTokens -->
+<g id="node17" class="node" pointer-events="visible" data-name="P2pSsvProxy.withdrawSSVTokens">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-1201" rx="93.81" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-1196.8" font-family="Times,serif" font-size="14.00" style="">withdrawSSVTokens</text>
+</g>
+<!-- IERC20.transfer -->
+<g id="node42" class="node" pointer-events="visible" data-name="IERC20.transfer">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-491" rx="40.55" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-486.8" font-family="Times,serif" font-size="14.00" style="">transfer</text>
+</g>
+<!-- P2pSsvProxy.withdrawSSVTokens&#45;&gt;IERC20.transfer -->
+<g id="edge44" class="edge" data-name="P2pSsvProxy.withdrawSSVTokens-&gt;IERC20.transfer">
+
+<path fill="none" stroke="white" stroke-width="2" d="M258.77,-1202.15C278.78,-1197.81 297.93,-1189.36 311.45,-1174 407.92,-1064.41 247.25,-624.18 347.45,-518 395.25,-467.35 482.29,-471.32 536.97,-480.18" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="536.02,-483.57 546.48,-481.86 537.24,-476.68 536.02,-483.57" style=""/>
+</g>
+<!-- P2pSsvProxy.setFeeRecipientAddress -->
+<g id="node18" class="node" pointer-events="visible" data-name="P2pSsvProxy.setFeeRecipientAddress">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-1093" rx="104.22" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-1088.8" font-family="Times,serif" font-size="14.00" style="">setFeeRecipientAddress</text>
+</g>
+<!-- P2pSsvProxy.setFeeRecipientAddress&#45;&gt;ISSVNetwork.setFeeRecipientAddress -->
+<g id="edge45" class="edge" data-name="P2pSsvProxy.setFeeRecipientAddress-&gt;ISSVNetwork.setFeeRecipientAddress">
+
+<path fill="none" stroke="white" stroke-width="2" d="M269.03,-1091.64C285.25,-1086.8 300.3,-1078.79 311.45,-1066 368.99,-1000.03 284.16,-339.47 347.45,-279 384.3,-243.8 700.99,-264.01 871.13,-277.67" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="870.6,-281.14 880.85,-278.46 871.17,-274.16 870.6,-281.14" style=""/>
+</g>
+<!-- IFeeDistributor.client -->
+<g id="node55" class="node" pointer-events="visible" data-name="IFeeDistributor.client">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-1244" rx="32.47" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-1239.8" font-family="Times,serif" font-size="14.00" style="">client</text>
+</g>
+<!-- P2pSsvProxy.getClient&#45;&gt;IFeeDistributor.client -->
+<g id="edge46" class="edge" data-name="P2pSsvProxy.getClient-&gt;IFeeDistributor.client">
+
+<path fill="none" stroke="white" stroke-width="2" d="M628.55,-1750.64C683.89,-1761.12 782.16,-1769.66 834.53,-1714 866.17,-1680.38 828.46,-1337.09 854.53,-1299 872.53,-1272.72 906.14,-1258.85 933.79,-1251.61" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="934.51,-1255.04 943.44,-1249.35 932.91,-1248.23 934.51,-1255.04" style=""/>
+</g>
+<!-- P2pSsvProxy.getFactory -->
+<g id="node20" class="node" pointer-events="visible" data-name="P2pSsvProxy.getFactory">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-823" rx="52.17" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-818.8" font-family="Times,serif" font-size="14.00" style="">getFactory</text>
+</g>
+<!-- IP2pSsvProxyFactory.owner -->
+<g id="node45" class="node" pointer-events="visible" data-name="IP2pSsvProxyFactory.owner">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-1073" rx="35.34" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-1068.8" font-family="Times,serif" font-size="14.00" style="">owner</text>
+</g>
+<!-- P2pSsvProxy.owner&#45;&gt;IP2pSsvProxyFactory.owner -->
+<g id="edge47" class="edge" data-name="P2pSsvProxy.owner-&gt;IP2pSsvProxyFactory.owner">
+
+<path fill="none" stroke="white" stroke-width="2" d="M620.46,-1533.03C673.77,-1544.06 779.45,-1556.43 834.53,-1498 864.91,-1465.78 825.91,-1133.78 854.53,-1100 872.71,-1078.55 903.59,-1071.8 929.96,-1070.41" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="929.9,-1073.91 939.82,-1070.18 929.74,-1066.91 929.9,-1073.91" style=""/>
+</g>
+<!-- IP2pSsvProxyFactory.operator -->
+<g id="node46" class="node" pointer-events="visible" data-name="IP2pSsvProxyFactory.operator">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-1127" rx="43.42" ry="18" style=""/>
+<text text-anchor="middle" x="979.23" y="-1122.8" font-family="Times,serif" font-size="14.00" style="">operator</text>
+</g>
+<!-- P2pSsvProxy.operator&#45;&gt;IP2pSsvProxyFactory.operator -->
+<g id="edge48" class="edge" data-name="P2pSsvProxy.operator-&gt;IP2pSsvProxyFactory.operator">
+
+<path fill="none" stroke="white" stroke-width="2" d="M626.21,-1642.18C681.07,-1652.82 781.34,-1662.37 834.53,-1606 864.46,-1574.28 833.46,-1252.18 854.53,-1214 871.91,-1182.53 906.09,-1159.83 934.12,-1145.53" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="935.5,-1148.75 942.97,-1141.23 932.44,-1142.45 935.5,-1148.75" style=""/>
+</g>
+<!-- P2pSsvProxy.getFeeDistributor -->
+<g id="node23" class="node" pointer-events="visible" data-name="P2pSsvProxy.getFeeDistributor">
+
+<ellipse fill="#ffbdb9" stroke="#ffbdb9" stroke-width="3" cx="163.73" cy="-769" rx="79.32" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-764.8" font-family="Times,serif" font-size="14.00" style="">getFeeDistributor</text>
+</g>
+<!-- P2pSsvProxy.supportsInterface -->
+<g id="node24" class="node" pointer-events="visible" data-name="P2pSsvProxy.supportsInterface">
+
+<ellipse fill="#ff9797" stroke="#ff9797" stroke-width="3" cx="163.73" cy="-931" rx="78.14" ry="18" style=""/>
+<text text-anchor="middle" x="163.73" y="-926.8" font-family="Times,serif" font-size="14.00" style="">supportsInterface</text>
+</g>
+<!-- P2pSsvProxy.supportsInterface&#45;&gt;P2pSsvProxy.type -->
+<g id="edge49" class="edge" data-name="P2pSsvProxy.supportsInterface-&gt;P2pSsvProxy.type">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M242.31,-928.38C267.46,-931.54 293.47,-939.72 311.45,-958 379.69,-1027.4 276.85,-1107.01 347.45,-1174 400.71,-1224.54 493.63,-1218.31 546.4,-1209.51" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="547.03,-1212.95 556.24,-1207.72 545.78,-1206.06 547.03,-1212.95" style=""/>
+</g>
+<!-- IP2pSsvProxy.supportsInterface -->
+<g id="node56" class="node" pointer-events="visible" data-name="IP2pSsvProxy.supportsInterface">
+
+<ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-34" rx="78.14" ry="18" style=""/>
+<text text-anchor="middle" x="586.99" y="-29.8" font-family="Times,serif" font-size="14.00" style="">supportsInterface</text>
+</g>
+<!-- P2pSsvProxy.supportsInterface&#45;&gt;IP2pSsvProxy.supportsInterface -->
+<g id="edge50" class="edge" data-name="P2pSsvProxy.supportsInterface-&gt;IP2pSsvProxy.supportsInterface">
+
+<path fill="none" stroke="white" stroke-width="2" d="M241.63,-934.99C267.49,-932.13 294.14,-923.79 311.45,-904 365.58,-842.13 303.88,-234.71 347.45,-165 385.28,-104.47 461.54,-69.76 517.69,-51.48" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="518.67,-54.84 527.17,-48.51 516.58,-48.16 518.67,-54.84" style=""/>
+</g>
+<!-- key -->
+<g id="node57" class="node" pointer-events="visible" data-name="key">
+
+<polygon fill="#edad56" stroke="none" stroke-width="3" points="228.73,-1950 98.73,-1950 98.73,-1862 228.73,-1862 228.73,-1950" style=""/>
+<text text-anchor="start" x="148.36" y="-1931.4" font-family="Times,serif" font-size="14.00" style="">Internal Call</text>
+<text text-anchor="start" x="144.47" y="-1911.4" font-family="Times,serif" font-size="14.00" style="">External Call</text>
+<text text-anchor="start" x="121.93" y="-1891.4" font-family="Times,serif" font-size="14.00" style="">Defined Contract</text>
+<text text-anchor="start" x="108.33" y="-1871.4" font-family="Times,serif" font-size="14.00" style="">Undefined Contract</text>
+</g>
+<!-- key2 -->
+<g id="node58" class="node" pointer-events="visible" data-name="key2">
+
+<polygon fill="#edad56" stroke="none" stroke-width="3" points="613.99,-1950 559.99,-1950 559.99,-1862 613.99,-1862 613.99,-1950" style=""/>
+<text text-anchor="start" x="576.99" y="-1931.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<text text-anchor="start" x="576.99" y="-1911.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<polygon fill="#445773" stroke="none" points="574.99,-1886 574.99,-1906 599.99,-1906 599.99,-1886 574.99,-1886" style=""/>
+<text text-anchor="start" x="576.99" y="-1891.4" font-family="Times,serif" font-size="14.00" style="">   </text>
+<polygon fill="none" stroke="#e8726d" points="576.99,-1868 576.99,-1884 597.99,-1884 597.99,-1868 576.99,-1868" style=""/>
+</g>
+<!-- key&#45;&gt;key2 -->
+<g id="edge51" class="edge" data-name="key-&gt;key2">
+
+<path fill="none" stroke="#1bc6a6" stroke-width="2" d="M221.73,-1936C373.86,-1936 415.12,-1936 560.97,-1936" style=""/>
+<polygon fill="#1bc6a6" stroke="#1bc6a6" stroke-width="2" points="560.97,-1939.5 570.97,-1936 560.97,-1932.5 560.97,-1939.5" style=""/>
+</g>
+<!-- key&#45;&gt;key2 -->
+<g id="edge52" class="edge" data-name="key-&gt;key2">
+
+<path fill="none" stroke="white" stroke-width="2" d="M221.73,-1916C373.86,-1916 415.12,-1916 560.97,-1916" style=""/>
+<polygon fill="white" stroke="white" stroke-width="2" points="560.97,-1919.5 570.97,-1916 560.97,-1912.5 560.97,-1919.5" style=""/>
+</g>
+</g>
+</svg>
