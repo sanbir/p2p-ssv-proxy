@@ -190,9 +190,7 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
             uint256 snapshot = uint256(_ssvOperators[i].snapshot);
             clusterIndex += uint64(snapshot >> 32) + (uint32(block.number) - uint32(snapshot)) * uint64(_ssvOperators[i].fee / 10_000_000);
 
-            unchecked {
-                ++i;
-            }
+            unchecked {++i;}
         }
     }
 
@@ -246,7 +244,8 @@ contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
             uint64 clusterIndex
         ) = _getOperatorIdsAndClusterIndex(_ssvPayload.ssvOperators);
 
-        uint64 currentNetworkFeeIndex = uint64(uint256(_ssvPayload.ssvSlot0) >> 192) + uint64(block.number - uint32(uint256(_ssvPayload.ssvSlot0))) * uint64(uint256(_ssvPayload.ssvSlot0) >> 128);
+        uint256 ssvSlot0 = uint256(_ssvPayload.ssvSlot0);
+        uint64 currentNetworkFeeIndex = uint64(ssvSlot0 >> 192) + uint64(block.number - uint32(ssvSlot0)) * uint64(ssvSlot0 >> 128);
 
         uint256 balance = _getBalance(_ssvPayload.cluster, clusterIndex, currentNetworkFeeIndex, _ssvPayload.tokenAmount);
 
