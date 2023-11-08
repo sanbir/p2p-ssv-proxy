@@ -13,7 +13,7 @@ import "../access/OwnableWithOperator.sol";
 import "../structs/P2pStructs.sol";
 import "../interfaces/IDepositContract.sol";
 import "../p2pSsvProxyFactory/IP2pSsvProxyFactory.sol";
-import "../assetRecovering/OwnableTokenRecoverer.sol";
+import "../assetRecovering/OwnableAssetRecoverer.sol";
 import "./IP2pSsvProxy.sol";
 import "../interfaces/p2p/IFeeDistributorFactory.sol";
 
@@ -58,7 +58,7 @@ error P2pSsvProxy__SelectorNotAllowed(address _caller, bytes4 _selector);
 /// Thus, client to P2pSsvProxy instances is a 1-to-many relation.
 /// SSV tokens are managed by P2P.
 /// Clients cover the costs of SSV tokens by EL rewards via FeeDistributor instance.
-contract P2pSsvProxy is OwnableTokenRecoverer, ERC165, IP2pSsvProxy {
+contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
 
     /// @notice P2pSsvProxyFactory address
     IP2pSsvProxyFactory private immutable i_p2pSsvProxyFactory;
