@@ -232,6 +232,25 @@ contract MainnetIntegration is Test {
         });
     }
 
+    function getDepositData1DifferentLength() private pure returns(DepositData memory) {
+        bytes[] memory signatures = new bytes[](4);
+        signatures[0] = bytes(hex'b30e5adc7e414df9895082fc262142f4f238e768f76937a79c34dfae4417a44c9271d81118a97d933d033c7fa52f91f00cf52c016dd493eccfc694ab708e9c33b289da7c4c4d2d1357b89340bbaf7256b50cf69e6c8a18db37dc24eafe5b7c26');
+        signatures[1] = bytes(hex'a4407a0a3675c31807d029b71916120880f3500c5373c2c0ab604bd7fcd1c4548aebf3f7ac3a1d8d3935dc68b088c2a1195456f2e52244cfa07657aa53e28a77d54b5399a5dfca1246b2292d1bdcbfb523e5423304fc88ca587d3f986e660f2b');
+        signatures[2] = bytes(hex'aad460f178be421f88a28293f27e4eba3b72e4be18d0803dcba581de735c950f4bfcfc431f6e8bf8e46a8bb7bae303ab12bba13862d66256807f08960677ab018d352849e7e580c99b05ffcb1ff7ec7a9d09bdd055a69d16ea80c533a4e5f0a2');
+        signatures[3] = bytes(hex'93a3bd7abe123e171b41e5dcdd3ba7d040e3d1d69e41ed3cf67c1215fcca14b2ffb6bd603021bed758a7d67aa323c264180c92b13d063e12f6d6911ebc24e932566c01c87dacea02f1571369680b5645ec10a9b44fe51cc147aa775837dd91b2');
+        bytes32[] memory depositDataRoots = new bytes32[](5);
+        depositDataRoots[0] = bytes32(hex'b91266d5b4e92690874f3815ea7b7b8bf0d72f6fb9819c7a4c6b5151bf15ce88');
+        depositDataRoots[1] = bytes32(hex'3f751c3138d9da913371cd993991e3392eadebb815563bac82583bc357b73292');
+        depositDataRoots[2] = bytes32(hex'89d95e435cb1535044ff888a3bcbf49ba4a950667def6dff3032e6a9e0655efd');
+        depositDataRoots[3] = bytes32(hex'2db2efe5d6e8bdf6e95cc61c21b5b0295fa77ee0589dacbf830e7f68cfe9db8f');
+        depositDataRoots[4] = bytes32(hex'2b86e89e1cdace0d21853457ac6b958a348c0ac6e94b2ae5d8c85873e8ec684d');
+
+        return DepositData({
+            signatures: signatures,
+            depositDataRoots: depositDataRoots
+        });
+    }
+
     function getSsvPayload2() private view returns(SsvPayload memory) {
         SsvOperator[] memory ssvOperators = new SsvOperator[](4);
 
@@ -300,6 +319,17 @@ contract MainnetIntegration is Test {
 
         vm.deal(client, 1000 ether);
         vm.startPrank(client);
+
+        vm.expectRevert(abi.encodeWithSelector(
+            P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength.selector, 5, 4, 5
+        ));
+        p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 160 ether}(
+            getDepositData1DifferentLength(),
+            address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
+            getSsvPayload1(),
+            clientConfig,
+            referrerConfig
+        );
 
         p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 160 ether}(
             getDepositData1(),
