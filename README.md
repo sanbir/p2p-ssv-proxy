@@ -4,6 +4,18 @@
 
 Their primary purpose of these contracts is to batch and proxy SSV validator registrations so that SSV tokens are abstracted away from the clients. 
 
+## Running tests
+
+```shell
+cd p2p-ssv-proxy
+cp .env_example .env
+# edit .env with the actual values
+curl -L https://foundry.paradigm.xyz | bash
+source /Users/$USER/.bashrc
+foundryup
+forge test
+```
+
 ## SSV validator registration use cases
 
 ### 1. With ETH deposit
@@ -277,11 +289,11 @@ P2pSsvProxyFactory exists as a single instance for everyone. It is the entry poi
 
 - **UML Class Diagram**
     
-    ![Untitled](P2P%20SSV%20Proxy%20contracts%20doc_img/Untitled.png)
+    ![Untitled](P2P%20SSV%20Proxy%20contracts%20doc_img/factory_class.png)
     
 - **Call Graph**
     
-    ![Untitled](P2P%20SSV%20Proxy%20contracts%20doc_img/Untitled.svg)
+    ![Untitled](P2P%20SSV%20Proxy%20contracts%20doc_img/factory_calls.svg)
     
 
 It stores:
@@ -347,11 +359,11 @@ P2pSsvProxy has identity tied to `FeeDistributor` *.* A new instance of `P2pSsvP
 
 - **UML Class Diagram**
     
-    ![Untitled](P2P%20SSV%20Proxy%20contracts%20doc_img/Untitled%201.png)
+    ![Untitled](P2P%20SSV%20Proxy%20contracts%20doc_img/proxy_class.png)
     
 - **Call Graph**
     
-    ![Untitled](P2P%20SSV%20Proxy%20contracts%20doc_img/Untitled%201.svg)
+    ![Untitled](P2P%20SSV%20Proxy%20contracts%20doc_img/proxy_calls.svg)
     
 
 It stores:
