@@ -2,13 +2,7 @@
 
 ## Description
 
-These contracts solve the problem described [here](https://www.notion.so/SSV-fee-management-83b245564de94231992921314a7abe8a?pvs=21). 
-
-Their primary purpose is to batch and proxy SSV validator registrations so that SSV tokens are abstracted away from the clients. 
-
-### Source code
-
-[https://github.com/p2p-org/p2p-ssv-proxy](https://github.com/p2p-org/p2p-ssv-proxy)
+Their primary purpose of these contracts is to batch and proxy SSV validator registrations so that SSV tokens are abstracted away from the clients. 
 
 ## SSV validator registration use cases
 
@@ -27,24 +21,24 @@ Steps 1 - 3 can be done using the native tools (like [staking-deposit-cli](https
 
 1. Client reads a list of addresses of allowed SSV operator owners from **P2pSsvProxyFactory** contract’s `getAllowedSsvOperatorOwners` function. (For example, it can return 4 addresses).
 2. Client reads allowed SSV operator IDs from **P2pSsvProxyFactory** contract’s `getAllowedSsvOperatorIds` function providing it with the address of the SSV operator owner from the previous step each time it’s called. (For example, for 4 addresses, `getAllowedSsvOperatorIds` function should be called 4 times. As a result, the client gets 4 SSV operator IDs).
-3. Client predicts `**FeeDistributor**` instance address by reading **`FeeDistributorFactory`**’s `predictFeeDistributorAddress` function. 
+3. Client predicts `FeeDistributor` instance address by reading **`FeeDistributorFactory`**’s `predictFeeDistributorAddress` function. 
     
     Need to provide it with:
     
     - `_referenceFeeDistributor` - address of the template `FeeDistributor` (can be of any type like `ElOnlyFeeDistributor`, `OracleFeeDistributor`, or `ContractWcFeeDistributor`)
     - `_clientConfig` (basis points, client fee recipient address)
     - `_referrerConfig`(basis points, referrer fee recipient address)
-4. Client predicts `**P2pSsvProxy`** instance address by reading `**P2pSsvProxyFactory**`'s `predictP2pSsvProxyAddress` function, providing it with the `FeeDistributor` instance address from the previous step.
+4. Client predicts **`P2pSsvProxy`** instance address by reading `P2pSsvProxyFactory`'s `predictP2pSsvProxyAddress` function, providing it with the `FeeDistributor` instance address from the previous step.
 5. Client generates 100 SSV keyshares JSON files choosing operator IDs from Step 5 and cluster owner from Step 7. 
     
-    (`P2pSsvProxy` ****instance address is the cluster owner).
+    (`P2pSsvProxy` instance address is the cluster owner).
     
     [ssv-keys](https://github.com/bloxapp/ssv-keys) tool can be used for generation.
     
 6. Client reads operator snapshots from **SSVNetwork** contract’s storage slots. Each operator has its own snapshot.
     
     <aside>
-    💡 This can be done using any library with RPC access to Ethereum execution layer blockchain (`eth_getStorageAt` ****RPC Method, e.g. [ethers.js](https://docs.ethers.org/v5/api/providers/provider/#Provider-getStorageAt), [web3.py](https://web3py.readthedocs.io/en/v5/web3.eth.html#web3.eth.Eth.get_storage_at), etc.).
+    💡 This can be done using any library with RPC access to Ethereum execution layer blockchain (`eth_getStorageAt` RPC Method, e.g. [ethers.js](https://docs.ethers.org/v5/api/providers/provider/#Provider-getStorageAt), [web3.py](https://web3py.readthedocs.io/en/v5/web3.eth.html#web3.eth.Eth.get_storage_at), etc.).
     
     </aside>
     
@@ -380,7 +374,7 @@ Native ETH2 (Beacon) deposit contract, 1 for all.
 
 ### FeeDistributorFactory
 
-`**FeeDistributorFactory**` 1 for all. Predicts the address and creates FeeDistributor instances.
+`FeeDistributorFactory` 1 for all. Predicts the address and creates FeeDistributor instances.
 
 ```solidity
 function predictFeeDistributorAddress(
