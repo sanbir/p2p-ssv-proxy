@@ -3,93 +3,168 @@
 
 pragma solidity 0.8.18;
 
-import "./IP2pSsvProxyFactory.sol";
-import "../assetRecovering/OwnableAssetRecoverer.sol";
-import "../access/OwnableWithOperator.sol";
+import "../@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "../@openzeppelin/contracts/proxy/Clones.sol";
 import "../@openzeppelin/contracts/utils/introspection/ERC165.sol";
+
 import "../interfaces/IDepositContract.sol";
 import "../interfaces/p2p/IFeeDistributor.sol";
 import "../interfaces/p2p/IFeeDistributorFactory.sol";
-import "../p2pSsvProxy/P2pSsvProxy.sol";
-import "../structs/P2pStructs.sol";
-import "../@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "../@openzeppelin/contracts/proxy/Clones.sol";
 import "../interfaces/ssv/ISSVViews.sol";
 
+import "../assetRecovering/OwnableAssetRecoverer.sol";
+import "../access/OwnableWithOperator.sol";
+import "../p2pSsvProxy/P2pSsvProxy.sol";
+import "../structs/P2pStructs.sol";
+import "./IP2pSsvProxyFactory.sol";
 
+/// @notice Passed address is not a valid FeeDistributorFactory
+/// @param _passedAddress Passed address
 error P2pSsvProxyFactory__NotFeeDistributorFactory(address _passedAddress);
 
+/// @notice Passed address is not a valid FeeDistributor
+/// @param _passedAddress Passed address
 error P2pSsvProxyFactory__NotFeeDistributor(address _passedAddress);
 
+/// @notice Passed address is not a valid P2pSsvProxy
+/// @param _passedAddress Passed address
 error P2pSsvProxyFactory__NotP2pSsvProxy(address _passedAddress);
 
+/// @notice Caller in not an allowed SSV operator owner
+/// @param _caller Caller address
 error P2pSsvProxyFactory__NotAllowedSsvOperatorOwner(address _caller);
 
-error P2pSsvProxyFactory__MaxAllowedSsvOperatorIdsExceeded();
-
-error P2pSsvProxyFactory__OldAndNewCountsShouldMatch(uint256 oldCount, uint256 newCount);
-
-error P2pSsvProxyFactory__TryingToReplaceMoreThanExist(uint256 countToReplace, uint256 existingCount);
-
+/// @notice Cannot add an already existing SSV operator owner address
+/// @param _ssvOperatorOwner an already existing SSV operator owner address
 error P2pSsvProxyFactory__SsvOperatorOwnerAlreadyExists(address _ssvOperatorOwner);
 
+/// @notice Cannot remove a nonexisting SSV operator owner address
+/// @param _ssvOperatorOwner a nonexisting SSV operator owner address
 error P2pSsvProxyFactory__SsvOperatorOwnerDoesNotExist(address _ssvOperatorOwner);
 
+/// @notice This SSV operator ID is not allowed. Check both the operator owner address and the ID for being allowed
+/// @param _ssvOperatorOwner operator owner address
+/// @param _ssvOperatorId operator ID
 error P2pSsvProxyFactory__SsvOperatorNotAllowed(address _ssvOperatorOwner, uint64 _ssvOperatorId);
 
-error P2pSsvProxyFactory__DuplicateOperatorOwnersNotAllowed(address _ssvOperatorOwner);
+/// @notice All operators should belong to different owners
+/// @param _ssvOperatorOwner operator owner who owns at least 2 of the passed operator IDs
+/// @param _ssvOperatorId1 passed operator ID owned by the same owner
+/// @param _ssvOperatorId2 passed operator ID owned by the same owner
+error P2pSsvProxyFactory__DuplicateOperatorOwnersNotAllowed(
+    address _ssvOperatorOwner,
+    uint64 _ssvOperatorId1,
+    uint64 _ssvOperatorId2
+);
 
-error P2pSsvProxyFactory__DuplicateIdsNotAllowed();
+/// @notice All the SSV operator IDs must be unique
+/// @param _ssvOperatorId duplicated operator ID
+error P2pSsvProxyFactory__DuplicateIdsNotAllowed(uint64 _ssvOperatorId);
 
+/// @notice ETH value passed with the transaction must be equal to the needed value
+/// @param _needed needed ETH value
+/// @param _paid actually sent ETH value
 error P2pSsvProxyFactory__NotEnoughEtherPaidToCoverSsvFees(uint256 _needed, uint256 _paid);
+
+/// @notice ETH value passed with the transaction must be equal to 32 times validator count
+/// @param _actualEthValue actually sent ETH value
+error P2pSsvProxyFactory__EthValueMustBe32TimesValidatorCount(uint256 _actualEthValue);
 
 /// @dev We assume, SSV won't either drop 7539x or soar higher than 100 ETH.
 /// If it does, this contract won't be operational and another contract will have to be deployed.
 error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiOutOfRange();
 
+/// @notice SSV per ETH exchange rate has not been set. Cannot register validators without it.
 error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
 
+/// @notice This SSV operator ID does not belong to the passed owner
+/// @param _operatorId SSV operator ID
+/// @param _passedOwner passed address for SSV operator owner
+/// @param _actualOwner actual SSV operator owner address
 error P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(
     uint64 _operatorId,
     address _passedOwner,
     address _actualOwner
 );
 
+/// @notice Should pass at least 1 selector
 error P2pSsvProxyFactory__CannotSetZeroSelectors();
 
+/// @notice Should pass at least 1 SSV operator owner
 error P2pSsvProxyFactory__CannotSetZeroAllowedSsvOperatorOwners();
 
+/// @notice Should pass at least 1 SSV operator owner
 error P2pSsvProxyFactory__CannotRemoveZeroAllowedSsvOperatorOwners();
 
+/// @notice There should equal number of pubkeys, signatures, and depositDataRoots
+/// @param _ssvValidators validators list length
+/// @param _signaturesLength signatures list length
+/// @param _depositDataRootsLength depositDataRoots list length
 error P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength(
     uint256 _ssvValidatorsLength,
     uint256 _signaturesLength,
     uint256 _depositDataRootsLength
 );
 
+/// @title Entry point for SSV validator registration
+/// @dev Deploys P2pSsvProxy instances
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
     using EnumerableSet for EnumerableSet.AddressSet;
 
+    /// @notice Beacon Deposit Contract
     IDepositContract private immutable i_depositContract;
+
+    /// @notice FeeDistributorFactory
     IFeeDistributorFactory private immutable i_feeDistributorFactory;
+
+    /// @notice SSV ERC-20 token
     IERC20 private immutable i_ssvToken;
+
+    /// @notice SSVNetworkViews
     ISSVViews private immutable i_ssvViews;
 
+    /// @notice Template set by P2P to be used for new FeeDistributor instances.
+    /// @dev Can be changed by P2P at any time. It will only affect the new clusters.
+    /// Existing clusters will keep their existing FeeDistributor instance.
     address private s_referenceFeeDistributor;
+
+    /// @notice Template set by P2P to be used for new P2pSsvProxy instances.
+    /// @dev Can be changed by P2P at any time. It will only affect the new clusters.
+    /// Existing clusters will keep their existing P2pSsvProxy instance.
     P2pSsvProxy private s_referenceP2pSsvProxy;
 
+    /// @notice a set of addresses of SSV operator owners (both P2P and partners).
+    /// @dev Only P2P can add or remove addresses from the set.
     EnumerableSet.AddressSet private s_allowedSsvOperatorOwners;
+
+    /// @notice a mapping of (operator owner address → SSV operator IDs list).
+    /// @dev The list of allowed SSV operator IDs for each address is limited to 8 IDs.
+    /// The operator owner can update only their list. P2P can update lists of any owners.
     mapping(address => uint64[MAX_ALLOWED_SSV_OPERATOR_IDS]) private s_allowedSsvOperatorIds;
 
+    /// @notice a mapping of (client address → a list of addresses of the deployed client P2pSsvProxy instances).
+    /// @dev Updated automatically during P2pSsvProxy instance deployment.
     mapping(address => address[]) private s_allClientP2pSsvProxies;
+
+    /// @notice a list of all ever deployed client P2pSsvProxy instances.
+    /// @dev Updated automatically during P2pSsvProxy instance deployment.
     address[] private s_allP2pSsvProxies;
 
+    /// @notice a mapping to check if a certain selector (function signature) is allowed for clients to call on SSVNetwork via P2pSsvProxy.
     mapping(bytes4 => bool) private s_clientSelectors;
+
+    /// @notice a mapping to check if a certain selector (function signature) is allowed for a P2P operator to call on SSVNetwork via P2pSsvProxy.
     mapping(bytes4 => bool) private s_operatorSelectors;
 
-    /// @notice If 1 SSV = 0.007539 ETH, it should be 0.007539 * 10^18 = 7539000000000000
+    /// @notice Exchange rate between SSV and ETH set by P2P.
+    /// @dev (If 1 SSV = 0.007539 ETH, it should be 0.007539 * 10^18 = 7539000000000000).
+    /// Only used during validator registration without ETH deposits to cover SSV token costs with client ETH.
+    /// SSV tokens exchanged with this rate cannot be withdrawn by the client.
+    /// P2P is willing to tolarate potential discrepancies with the market exchange rate for the sake of simplicity.
+    /// The client agrees to this rate when calls `registerValidators` function.
     uint256 private s_ssvPerEthExchangeRateDividedByWei;
 
+    /// @notice If the given _ssvOperatorOwner is not allowed, revert
     modifier onlyAllowedSsvOperatorOwner(address _ssvOperatorOwner) {
         bool isAllowed = s_allowedSsvOperatorOwners.contains(_ssvOperatorOwner);
         if (!isAllowed) {
@@ -98,6 +173,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         _;
     }
 
+    /// @notice If the msg.sender is not an allowed SSV operator owner, revert
     modifier onlySsvOperatorOwner() {
         bool isAllowed = s_allowedSsvOperatorOwners.contains(msg.sender);
         if (!isAllowed) {
@@ -106,6 +182,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         _;
     }
 
+    /// @notice Revert if either 1) one of the operator IDs is not allowed 2) at least 2 operator IDs belong to the same owner
     modifier onlyAllowedOperators(SsvOperator[] calldata _operators) {
         uint256 operatorCount = _operators.length;
         for (uint256 i = 0; i < operatorCount;) {
@@ -128,7 +205,11 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
             for (uint256 k = 0; k < operatorCount;) {
                 if (i != k && currentOperatorOwner == _operators[k].owner) {
-                    revert P2pSsvProxyFactory__DuplicateOperatorOwnersNotAllowed(currentOperatorOwner);
+                    revert P2pSsvProxyFactory__DuplicateOperatorOwnersNotAllowed(
+                        currentOperatorOwner,
+                        _operators[i].id,
+                        _operators[k].id
+                    );
                 }
 
                 unchecked {++k;}
@@ -140,6 +221,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         _;
     }
 
+    /// @dev Set values that are constant, common for all clients, known at the initial deploy time.
+    /// @param _feeDistributorFactory FeeDistributorFactory address
+    /// @param _referenceFeeDistributor reference FeeDistributor address
     constructor(
         address _feeDistributorFactory,
         address _referenceFeeDistributor
@@ -282,38 +366,6 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         emit P2pSsvProxyFactory__AllowedSsvOperatorOwnersRemoved(_allowedSsvOperatorOwnersToRemove);
     }
 
-    function _setSsvOperatorIds(
-        uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] calldata _operatorIds,
-        address _ssvOperatorOwner
-    ) private {
-        for (uint i = 0; i < _operatorIds.length;) {
-            uint64 id = _operatorIds[i];
-
-            for (uint j = i + 1; j < _operatorIds.length;) {
-                if (id == _operatorIds[j] && id != 0) {
-                    revert P2pSsvProxyFactory__DuplicateIdsNotAllowed();
-                }
-                unchecked {
-                    ++j;
-                }
-            }
-
-            if (id != 0) {
-                (address actualOwner,,,,,) = i_ssvViews.getOperatorById(id);
-                if (actualOwner != _ssvOperatorOwner) {
-                    revert P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(id, _ssvOperatorOwner, actualOwner);
-                }
-            }
-
-            unchecked {
-                ++i;
-            }
-        }
-
-        s_allowedSsvOperatorIds[_ssvOperatorOwner] = _operatorIds;
-        emit P2pSsvProxyFactory__SsvOperatorIdsSet(_ssvOperatorOwner, _operatorIds);
-    }
-
     function setSsvOperatorIds(
         uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] calldata _operatorIds
     ) external onlySsvOperatorOwner {
@@ -327,51 +379,14 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         _setSsvOperatorIds(_operatorIds, _ssvOperatorOwner);
     }
 
-    function _clearSsvOperatorIds(address _ssvOperatorOwner) private {
-        delete s_allowedSsvOperatorIds[_ssvOperatorOwner];
-        emit P2pSsvProxyFactory__SsvOperatorIdsCleared(_ssvOperatorOwner);
-    }
-
     function clearSsvOperatorIds() external onlySsvOperatorOwner {
         _clearSsvOperatorIds(msg.sender);
     }
 
-    function clearSsvOperatorIds(address _ssvOperatorOwner) external onlyOperatorOrOwner {
+    function clearSsvOperatorIds(
+        address _ssvOperatorOwner
+    ) external onlyOperatorOrOwner {
         _clearSsvOperatorIds(_ssvOperatorOwner);
-    }
-
-    function _makeBeaconDeposits(
-        DepositData calldata _depositData,
-        address _withdrawalCredentialsAddress,
-        SsvValidator[] calldata _ssvValidators
-    ) private {
-        uint256 validatorCount = _ssvValidators.length;
-
-        if (_depositData.signatures.length != validatorCount || _depositData.depositDataRoots.length != validatorCount) {
-            revert P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength(
-                validatorCount,
-                _depositData.signatures.length,
-                _depositData.depositDataRoots.length
-            );
-        }
-
-        for (uint256 i = 0; i < validatorCount;) {
-            // ETH deposit
-            bytes memory withdrawalCredentials = abi.encodePacked(
-                hex'010000000000000000000000',
-                _withdrawalCredentialsAddress
-            );
-            i_depositContract.deposit{value: 32 ether}(
-                _ssvValidators[i].pubkey,
-                withdrawalCredentials,
-                _depositData.signatures[i],
-                _depositData.depositDataRoots[i]
-            );
-
-            unchecked {
-                ++i;
-            }
-        }
     }
 
     function predictP2pSsvProxyAddress(
@@ -401,18 +416,6 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         _makeBeaconDeposits(_depositData, _withdrawalCredentialsAddress, _ssvPayload.ssvValidators);
 
         p2pSsvProxy = _registerValidators(_ssvPayload, _clientConfig, _referrerConfig);
-    }
-
-    function _checkEthValue(uint256 _tokenAmount) private view {
-        uint256 exchangeRate = s_ssvPerEthExchangeRateDividedByWei;
-        if (exchangeRate == 0) {
-            revert P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
-        }
-
-        uint256 ssvTokensValueInWei = (_tokenAmount * exchangeRate) / 10**18;
-        if (msg.value != ssvTokensValueInWei) {
-            revert P2pSsvProxyFactory__NotEnoughEtherPaidToCoverSsvFees(ssvTokensValueInWei, msg.value);
-        }
     }
 
     function registerValidators(
@@ -499,8 +502,95 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
-        return interfaceId == type(IP2pSsvProxyFactory).interfaceId || super.supportsInterface(interfaceId);
+    function _checkEthValue(
+        uint256 _tokenAmount
+    ) private view {
+        uint256 exchangeRate = s_ssvPerEthExchangeRateDividedByWei;
+        if (exchangeRate == 0) {
+            revert P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
+        }
+
+        uint256 ssvTokensValueInWei = (_tokenAmount * exchangeRate) / 10**18;
+        if (msg.value != ssvTokensValueInWei) {
+            revert P2pSsvProxyFactory__NotEnoughEtherPaidToCoverSsvFees(ssvTokensValueInWei, msg.value);
+        }
+    }
+
+    function _setSsvOperatorIds(
+        uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] calldata _operatorIds,
+        address _ssvOperatorOwner
+    ) private {
+        for (uint i = 0; i < _operatorIds.length;) {
+            uint64 id = _operatorIds[i];
+
+            for (uint j = i + 1; j < _operatorIds.length;) {
+                if (id == _operatorIds[j] && id != 0) {
+                    revert P2pSsvProxyFactory__DuplicateIdsNotAllowed(id);
+                }
+                unchecked {
+                    ++j;
+                }
+            }
+
+            if (id != 0) {
+                (address actualOwner,,,,,) = i_ssvViews.getOperatorById(id);
+                if (actualOwner != _ssvOperatorOwner) {
+                    revert P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(id, _ssvOperatorOwner, actualOwner);
+                }
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        s_allowedSsvOperatorIds[_ssvOperatorOwner] = _operatorIds;
+        emit P2pSsvProxyFactory__SsvOperatorIdsSet(_ssvOperatorOwner, _operatorIds);
+    }
+
+    function _clearSsvOperatorIds(
+        address _ssvOperatorOwner
+    ) private {
+        delete s_allowedSsvOperatorIds[_ssvOperatorOwner];
+        emit P2pSsvProxyFactory__SsvOperatorIdsCleared(_ssvOperatorOwner);
+    }
+
+    function _makeBeaconDeposits(
+        DepositData calldata _depositData,
+        address _withdrawalCredentialsAddress,
+        SsvValidator[] calldata _ssvValidators
+    ) private {
+        uint256 validatorCount = _ssvValidators.length;
+
+        if (msg.value != COLLATERAL * validatorCount) {
+            revert P2pSsvProxyFactory__EthValueMustBe32TimesValidatorCount(msg.value);
+        }
+
+        if (_depositData.signatures.length != validatorCount || _depositData.depositDataRoots.length != validatorCount) {
+            revert P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength(
+                validatorCount,
+                _depositData.signatures.length,
+                _depositData.depositDataRoots.length
+            );
+        }
+
+        for (uint256 i = 0; i < validatorCount;) {
+            // ETH deposit
+            bytes memory withdrawalCredentials = abi.encodePacked(
+                hex'010000000000000000000000',
+                _withdrawalCredentialsAddress
+            );
+            i_depositContract.deposit{value: COLLATERAL}(
+                _ssvValidators[i].pubkey,
+                withdrawalCredentials,
+                _depositData.signatures[i],
+                _depositData.depositDataRoots[i]
+            );
+
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     function owner() public view override(Ownable, OwnableBase, IOwnable) returns (address) {
@@ -551,5 +641,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     function getNeededAmountOfEtherToCoverSsvFees(uint256 _tokenAmount) external view returns (uint256) {
         return (_tokenAmount * s_ssvPerEthExchangeRateDividedByWei) / 10**18;
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+        return interfaceId == type(IP2pSsvProxyFactory).interfaceId || super.supportsInterface(interfaceId);
     }
 }

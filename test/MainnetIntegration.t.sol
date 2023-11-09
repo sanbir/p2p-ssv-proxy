@@ -331,6 +331,17 @@ contract MainnetIntegration is Test {
             referrerConfig
         );
 
+        vm.expectRevert(abi.encodeWithSelector(
+            P2pSsvProxyFactory__EthValueMustBe32TimesValidatorCount.selector, 159 ether
+        ));
+        p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 159 ether}(
+            getDepositData1(),
+            address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
+            getSsvPayload1(),
+            clientConfig,
+            referrerConfig
+        );
+
         p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 160 ether}(
             getDepositData1(),
             address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),

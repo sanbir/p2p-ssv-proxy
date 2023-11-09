@@ -61,7 +61,8 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
     ) external;
 
     /// @notice Liquidate SSV clusters
-    /// @dev Should be called by P2P only
+    /// @dev Should be called by P2P only.
+    /// This function is just batching calls for convenience. It's always possible to call the same function on SSVNetwork via fallback
     /// @param _operatorIds SSV operator IDs
     /// @param _clusters SSV clusters
     function liquidate(
@@ -71,6 +72,7 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
 
     /// @notice Reactivate SSV clusters
     /// @dev Should be called by P2P only
+    /// This function is just batching calls for convenience. It's always possible to call the same function on SSVNetwork via fallback
     /// @param _tokenAmount SSV token amount to be deposited for reactivation
     /// @param _operatorIds SSV operator IDs
     /// @param _clusters SSV clusters
@@ -82,6 +84,7 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
 
     /// @notice Deposit SSV tokens to SSV clusters
     /// @dev Can be called by anyone
+    /// This function is just batching calls for convenience. It's possible to call the same function on SSVNetwork directly
     /// @param _tokenAmount SSV token amount to be deposited
     /// @param _operatorIds SSV operator IDs
     /// @param _clusters SSV clusters
@@ -93,6 +96,7 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
 
     /// @notice Withdraw SSV tokens from SSV clusters to this contract
     /// @dev Should be called by P2P only
+    /// This function is just batching calls for convenience. It's always possible to call the same function on SSVNetwork via fallback
     /// @param _tokenAmount SSV token amount to be withdrawn
     /// @param _operatorIds SSV operator IDs
     /// @param _clusters SSV clusters
