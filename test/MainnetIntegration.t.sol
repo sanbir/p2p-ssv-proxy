@@ -331,9 +331,7 @@ contract MainnetIntegration is Test {
             referrerConfig
         );
 
-        vm.expectRevert(abi.encodeWithSelector(
-            P2pSsvProxyFactory__EthValueMustBe32TimesValidatorCount.selector, 159 ether
-        ));
+        vm.expectRevert(abi.encodeWithSelector(P2pSsvProxyFactory__EthValueMustBe32TimesValidatorCount.selector, 159 ether));
         p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 159 ether}(
             getDepositData1(),
             address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
@@ -422,7 +420,9 @@ contract MainnetIntegration is Test {
 
         vm.expectRevert(abi.encodeWithSelector(
             P2pSsvProxyFactory__DuplicateOperatorOwnersNotAllowed.selector,
-            ssvPayload1.ssvOperators[3].owner
+            ssvPayload1.ssvOperators[3].owner,
+            ssvPayload1.ssvOperators[3].id,
+            ssvPayload1.ssvOperators[2].id
         ));
         p2pSsvProxyFactory.registerValidators{value: neededEth}(
             ssvPayload1,
