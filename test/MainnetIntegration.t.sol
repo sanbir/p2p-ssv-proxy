@@ -497,8 +497,8 @@ contract MainnetIntegration is Test {
         console.log("test_removeValidators finsihed");
     }
 
-    function test_liquidate() public {
-        console.log("test_liquidate started");
+    function test_liquidateAndReactivate() public {
+        console.log("test_liquidateAndReactivate started");
 
         vm.startPrank(owner);
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
@@ -529,6 +529,14 @@ contract MainnetIntegration is Test {
         ISSVNetwork.Cluster[] memory _clusters = new ISSVNetwork.Cluster[](1);
         _clusters[0] = clusterAfter1stRegistation;
 
+        ISSVClusters.Cluster memory clusterAfterLiquidation = ISSVClusters.Cluster({
+            validatorCount: 5,
+            networkFeeIndex: 0,
+            index: 0,
+            active: false,
+            balance: 0
+        });
+
         uint256 ssvTokenBalanceBefore = ssvToken.balanceOf(proxy1);
 
         vm.startPrank(owner);
@@ -537,13 +545,7 @@ contract MainnetIntegration is Test {
         emit ClusterLiquidated(
             proxy1,
             _operatorIds,
-            ISSVClusters.Cluster({
-                validatorCount: 5,
-                networkFeeIndex: 0,
-                index: 0,
-                active: false,
-                balance: 0
-            })
+            clusterAfterLiquidation
         );
 
         P2pSsvProxy(proxy1).liquidate(_operatorIds, _clusters);
@@ -566,7 +568,22 @@ contract MainnetIntegration is Test {
 
         assertEq(ssvOwnerTokenBalanceAfter - ssvOwnerTokenBalanceBefore, ssvPayload1.tokenAmount);
 
-        console.log("test_liquidate finsihed");
+        vm.startPrank(owner);
+
+        ssvToken.transfer(proxy1, ssvPayload1.tokenAmount);
+        _clusters[0] = clusterAfterLiquidation;
+
+        vm.expectEmit();
+        emit ClusterReactivated(
+            proxy1,
+            _operatorIds,
+            clusterAfter1stRegistation
+        );
+
+        P2pSsvProxy(proxy1).reactivate(ssvPayload1.tokenAmount, _operatorIds, _clusters);
+        vm.stopPrank();
+
+        console.log("test_liquidateAndReactivate finsihed");
     }
 
     function test_registerValidators() public {
