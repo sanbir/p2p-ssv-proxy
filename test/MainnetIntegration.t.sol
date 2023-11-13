@@ -406,6 +406,61 @@ contract MainnetIntegration is Test {
         vm.stopPrank();
     }
 
+    function test_viewFunctions() public {
+        console.log("test_viewFunctions started");
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        vm.stopPrank();
+
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        vm.startPrank(ssvOwner);
+        IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
+        vm.stopPrank();
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+
+        address proxy1 = predictProxyAddress();
+        address feeDistributor = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, clientConfig, referrerConfig);
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+
+        vm.expectEmit();
+        emit FeeRecipientAddressUpdated(
+            proxy1,
+            feeDistributor
+        );
+        p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload1,
+            clientConfig,
+            referrerConfig
+        );
+        vm.stopPrank();
+
+        address clientFromProxy = P2pSsvProxy(proxy1).getClient();
+        assertEq(clientFromProxy, client);
+
+        address factoryFromProxy = P2pSsvProxy(proxy1).getFactory();
+        assertEq(factoryFromProxy, address(p2pSsvProxyFactory));
+
+        address feeDistributorFromProxy = P2pSsvProxy(proxy1).getFeeDistributor();
+        assertEq(feeDistributorFromProxy, feeDistributor);
+
+        address ownerFromProxy = P2pSsvProxy(proxy1).owner();
+        assertEq(ownerFromProxy, owner);
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.changeOperator(operator);
+        vm.stopPrank();
+
+        address operatorFromProxy = P2pSsvProxy(proxy1).operator();
+        assertEq(operatorFromProxy, operator);
+
+        console.log("test_viewFunctions finsihed");
+    }
+
     function test_setFeeRecipientAddress() public {
         console.log("test_setFeeRecipientAddress started");
 
