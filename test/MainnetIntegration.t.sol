@@ -439,6 +439,7 @@ contract MainnetIntegration is Test {
         );
         vm.stopPrank();
 
+        {
         address clientFromProxy = P2pSsvProxy(proxy1).getClient();
         assertEq(clientFromProxy, client);
 
@@ -450,13 +451,45 @@ contract MainnetIntegration is Test {
 
         address ownerFromProxy = P2pSsvProxy(proxy1).owner();
         assertEq(ownerFromProxy, owner);
+        }
 
         vm.startPrank(owner);
         p2pSsvProxyFactory.changeOperator(operator);
         vm.stopPrank();
 
+        {
         address operatorFromProxy = P2pSsvProxy(proxy1).operator();
         assertEq(operatorFromProxy, operator);
+
+        address operatorFromFactory = p2pSsvProxyFactory.operator();
+        assertEq(operatorFromFactory, operator);
+
+        address ownerFromFactory = p2pSsvProxyFactory.owner();
+        assertEq(ownerFromFactory, owner);
+
+        address[] memory allClientP2pSsvProxies = p2pSsvProxyFactory.getAllClientP2pSsvProxies(client);
+        assertEq(allClientP2pSsvProxies[0], proxy1);
+
+        uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory ids = p2pSsvProxyFactory.getAllowedSsvOperatorIds(ssvPayload1.ssvOperators[1].owner);
+        assertEq(ids[0], ssvPayload1.ssvOperators[1].id);
+
+        address[] memory ssvOperatorOwners = p2pSsvProxyFactory.getAllowedSsvOperatorOwners();
+        assertEq(ssvOperatorOwners[1], ssvPayload1.ssvOperators[1].owner);
+
+        address[] memory allProxies = p2pSsvProxyFactory.getAllP2pSsvProxies();
+        assertEq(allProxies[0], proxy1);
+        }
+
+        {
+            address feeDistributorFactoryFromP2pSsvProxyFactory = p2pSsvProxyFactory.getFeeDistributorFactory();
+            assertEq(feeDistributorFactoryFromP2pSsvProxyFactory, address(feeDistributorFactory));
+
+            uint256 neededAmountOfEtherToCoverSsvFees = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+            assertEq(neededAmountOfEtherToCoverSsvFees, (ssvPayload1.tokenAmount * 7539000000000000) / 10**18);
+
+            address referenceFeeDistributorFromFactory = p2pSsvProxyFactory.getReferenceFeeDistributor();
+            assertEq(referenceFeeDistributorFromFactory, referenceFeeDistributor);
+        }
 
         console.log("test_viewFunctions finsihed");
     }
