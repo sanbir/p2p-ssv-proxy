@@ -497,6 +497,29 @@ contract MainnetIntegration is Test {
 
             uint256 ssvPerEthExchangeRateDividedByWeiFromFactory = p2pSsvProxyFactory.getSsvPerEthExchangeRateDividedByWei();
             assertEq(ssvPerEthExchangeRateDividedByWeiFromFactory, SsvPerEthExchangeRateDividedByWei);
+
+            bytes4[] memory selectors = new bytes4[](1);
+            selectors[0] = ISSVClusters.withdraw.selector;
+
+            bool isOperatorSelectorAllowedFromFactoryBefore = p2pSsvProxyFactory.isOperatorSelectorAllowed(selectors[0]);
+            assertEq(isOperatorSelectorAllowedFromFactoryBefore, false);
+
+            vm.startPrank(owner);
+            p2pSsvProxyFactory.setAllowedSelectorsForOperator(selectors);
+            vm.stopPrank();
+
+            bool isOperatorSelectorAllowedFromFactoryAfter = p2pSsvProxyFactory.isOperatorSelectorAllowed(selectors[0]);
+            assertEq(isOperatorSelectorAllowedFromFactoryAfter, true);
+
+            bool isClientSelectorAllowedFromFactoryBefore = p2pSsvProxyFactory.isClientSelectorAllowed(selectors[0]);
+            assertEq(isClientSelectorAllowedFromFactoryBefore, false);
+
+            vm.startPrank(owner);
+            p2pSsvProxyFactory.setAllowedSelectorsForClient(selectors);
+            vm.stopPrank();
+
+            bool isClientSelectorAllowedFromFactoryAfter = p2pSsvProxyFactory.isClientSelectorAllowed(selectors[0]);
+            assertEq(isClientSelectorAllowedFromFactoryAfter, true);
         }
 
         console.log("test_viewFunctions finsihed");
