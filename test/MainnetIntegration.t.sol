@@ -32,6 +32,18 @@ contract MainnetIntegration is Test {
 
     uint64[] public operatorIds;
 
+    event ValidatorAdded(address indexed owner, uint64[] operatorIds, bytes publicKey, bytes shares, ISSVClusters.Cluster cluster);
+
+    event ValidatorRemoved(address indexed owner, uint64[] operatorIds, bytes publicKey, ISSVClusters.Cluster cluster);
+
+    event ClusterLiquidated(address indexed owner, uint64[] operatorIds, ISSVClusters.Cluster cluster);
+
+    event ClusterReactivated(address indexed owner, uint64[] operatorIds, ISSVClusters.Cluster cluster);
+
+    event ClusterWithdrawn(address indexed owner, uint64[] operatorIds, uint256 value, ISSVClusters.Cluster cluster);
+
+    event ClusterDeposited(address indexed owner, uint64[] operatorIds, uint256 value, ISSVClusters.Cluster cluster);
+
     function setUp() public {
         vm.createSelectFork("mainnet", 18476533);
 
@@ -390,6 +402,188 @@ contract MainnetIntegration is Test {
         );
 
         vm.stopPrank();
+    }
+
+    function test_setReferenceFeeDistributor() public {
+        console.log("test_setReferenceFeeDistributor started");
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        vm.stopPrank();
+
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        vm.startPrank(ssvOwner);
+        IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
+        vm.stopPrank();
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+        address proxy1 = p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload1,
+            clientConfig,
+            referrerConfig
+        );
+        vm.stopPrank();
+
+        address referenceFeeDistributor2 = 0x6091767Be457a5A7f7d368dD68Ebf2f416728d97;
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setReferenceFeeDistributor(referenceFeeDistributor2);
+        vm.stopPrank();
+
+        address feeDistributor2 = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor2, clientConfig, referrerConfig);
+        address proxy2 = p2pSsvProxyFactory.predictP2pSsvProxyAddress(feeDistributor2);
+
+        assertNotEq(proxy1, proxy2);
+
+        console.log("test_setReferenceFeeDistributor finsihed");
+    }
+
+    function test_removeValidators() public {
+        console.log("test_removeValidators started");
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        vm.stopPrank();
+
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        vm.startPrank(ssvOwner);
+        IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
+        vm.stopPrank();
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+        address proxy1 = p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload1,
+            clientConfig,
+            referrerConfig
+        );
+        vm.stopPrank();
+
+        bytes[] memory _pubkeys = new bytes[](2);
+        _pubkeys[0] = ssvPayload1.ssvValidators[1].pubkey;
+        _pubkeys[1] = ssvPayload1.ssvValidators[3].pubkey;
+        uint64[] memory _operatorIds = new uint64[](4);
+        _operatorIds[0] = ssvPayload1.ssvOperators[0].id;
+        _operatorIds[1] = ssvPayload1.ssvOperators[1].id;
+        _operatorIds[2] = ssvPayload1.ssvOperators[2].id;
+        _operatorIds[3] = ssvPayload1.ssvOperators[3].id;
+        ISSVNetwork.Cluster[] memory _clusters = new ISSVNetwork.Cluster[](2);
+        _clusters[0] = clusterAfter1stRegistation;
+        _clusters[1] = clusterAfter1stRegistation;
+        _clusters[1].validatorCount = 4;
+
+        ISSVNetwork.Cluster memory clusterAfterRemoval = clusterAfter1stRegistation;
+        clusterAfterRemoval.validatorCount = 3;
+
+        vm.startPrank(owner);
+
+        vm.expectEmit();
+        emit ValidatorRemoved(
+            proxy1,
+            _operatorIds,
+            ssvPayload1.ssvValidators[3].pubkey,
+            clusterAfterRemoval
+        );
+
+        P2pSsvProxy(proxy1).removeValidators(_pubkeys, _operatorIds, _clusters);
+        vm.stopPrank();
+
+        console.log("test_removeValidators finsihed");
+    }
+
+    function test_liquidateAndReactivate() public {
+        console.log("test_liquidateAndReactivate started");
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        vm.stopPrank();
+
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        vm.startPrank(ssvOwner);
+        IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
+        vm.stopPrank();
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+        address proxy1 = p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload1,
+            clientConfig,
+            referrerConfig
+        );
+        vm.stopPrank();
+
+        uint64[] memory _operatorIds = new uint64[](4);
+        _operatorIds[0] = ssvPayload1.ssvOperators[0].id;
+        _operatorIds[1] = ssvPayload1.ssvOperators[1].id;
+        _operatorIds[2] = ssvPayload1.ssvOperators[2].id;
+        _operatorIds[3] = ssvPayload1.ssvOperators[3].id;
+        ISSVNetwork.Cluster[] memory _clusters = new ISSVNetwork.Cluster[](1);
+        _clusters[0] = clusterAfter1stRegistation;
+
+        ISSVClusters.Cluster memory clusterAfterLiquidation = ISSVClusters.Cluster({
+            validatorCount: 5,
+            networkFeeIndex: 0,
+            index: 0,
+            active: false,
+            balance: 0
+        });
+
+        uint256 ssvTokenBalanceBefore = ssvToken.balanceOf(proxy1);
+
+        vm.startPrank(owner);
+
+        vm.expectEmit();
+        emit ClusterLiquidated(
+            proxy1,
+            _operatorIds,
+            clusterAfterLiquidation
+        );
+
+        P2pSsvProxy(proxy1).liquidate(_operatorIds, _clusters);
+        vm.stopPrank();
+
+        uint256 ssvTokenBalanceAfter = ssvToken.balanceOf(proxy1);
+
+        assertEq(ssvTokenBalanceAfter - ssvTokenBalanceBefore, ssvPayload1.tokenAmount);
+
+        uint256 ssvOwnerTokenBalanceBefore = ssvToken.balanceOf(owner);
+
+        vm.expectRevert(abi.encodeWithSelector(OwnableBase__CallerNotOwner.selector, address(this), owner));
+        P2pSsvProxy(proxy1).withdrawSSVTokens(owner, ssvPayload1.tokenAmount);
+
+        vm.startPrank(owner);
+        P2pSsvProxy(proxy1).withdrawSSVTokens(owner, ssvPayload1.tokenAmount);
+        vm.stopPrank();
+
+        uint256 ssvOwnerTokenBalanceAfter = ssvToken.balanceOf(owner);
+
+        assertEq(ssvOwnerTokenBalanceAfter - ssvOwnerTokenBalanceBefore, ssvPayload1.tokenAmount);
+
+        vm.startPrank(owner);
+
+        ssvToken.transfer(proxy1, ssvPayload1.tokenAmount);
+        _clusters[0] = clusterAfterLiquidation;
+
+        vm.expectEmit();
+        emit ClusterReactivated(
+            proxy1,
+            _operatorIds,
+            clusterAfter1stRegistation
+        );
+
+        P2pSsvProxy(proxy1).reactivate(ssvPayload1.tokenAmount, _operatorIds, _clusters);
+        vm.stopPrank();
+
+        console.log("test_liquidateAndReactivate finsihed");
     }
 
     function test_registerValidators() public {
