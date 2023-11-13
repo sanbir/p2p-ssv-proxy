@@ -529,6 +529,8 @@ contract MainnetIntegration is Test {
         ISSVNetwork.Cluster[] memory _clusters = new ISSVNetwork.Cluster[](1);
         _clusters[0] = clusterAfter1stRegistation;
 
+        uint256 ssvTokenBalanceBefore = ssvToken.balanceOf(proxy1);
+
         vm.startPrank(owner);
 
         vm.expectEmit();
@@ -546,6 +548,23 @@ contract MainnetIntegration is Test {
 
         P2pSsvProxy(proxy1).liquidate(_operatorIds, _clusters);
         vm.stopPrank();
+
+        uint256 ssvTokenBalanceAfter = ssvToken.balanceOf(proxy1);
+
+        assertEq(ssvTokenBalanceAfter - ssvTokenBalanceBefore, ssvPayload1.tokenAmount);
+
+        uint256 ssvOwnerTokenBalanceBefore = ssvToken.balanceOf(owner);
+
+        vm.expectRevert(abi.encodeWithSelector(OwnableBase__CallerNotOwner.selector, address(this), owner));
+        P2pSsvProxy(proxy1).withdrawSSVTokens(owner, ssvPayload1.tokenAmount);
+
+        vm.startPrank(owner);
+        P2pSsvProxy(proxy1).withdrawSSVTokens(owner, ssvPayload1.tokenAmount);
+        vm.stopPrank();
+
+        uint256 ssvOwnerTokenBalanceAfter = ssvToken.balanceOf(owner);
+
+        assertEq(ssvOwnerTokenBalanceAfter - ssvOwnerTokenBalanceBefore, ssvPayload1.tokenAmount);
 
         console.log("test_liquidate finsihed");
     }
