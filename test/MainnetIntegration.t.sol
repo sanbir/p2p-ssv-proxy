@@ -44,6 +44,8 @@ contract MainnetIntegration is Test {
 
     event ClusterDeposited(address indexed owner, uint64[] operatorIds, uint256 value, ISSVClusters.Cluster cluster);
 
+    event FeeRecipientAddressUpdated(address indexed owner, address recipientAddress);
+
     function setUp() public {
         vm.createSelectFork("mainnet", 18476533);
 
@@ -402,6 +404,52 @@ contract MainnetIntegration is Test {
         );
 
         vm.stopPrank();
+    }
+
+    function test_setFeeRecipientAddress() public {
+        console.log("test_setFeeRecipientAddress started");
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        vm.stopPrank();
+
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        vm.startPrank(ssvOwner);
+        IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
+        vm.stopPrank();
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+
+        address proxy1 = predictProxyAddress();
+        address feeDistributor = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, clientConfig, referrerConfig);
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+
+        vm.expectEmit();
+        emit FeeRecipientAddressUpdated(
+            proxy1,
+            feeDistributor
+        );
+        p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload1,
+            clientConfig,
+            referrerConfig
+        );
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+
+        vm.expectEmit();
+        emit FeeRecipientAddressUpdated(
+            proxy1,
+            client
+        );
+        P2pSsvProxy(proxy1).setFeeRecipientAddress(client);
+        vm.stopPrank();
+
+        console.log("test_setFeeRecipientAddress finsihed");
     }
 
     function test_setReferenceFeeDistributor() public {
