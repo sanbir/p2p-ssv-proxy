@@ -583,6 +583,24 @@ contract MainnetIntegration is Test {
         P2pSsvProxy(proxy1).reactivate(ssvPayload1.tokenAmount, _operatorIds, _clusters);
         vm.stopPrank();
 
+        _clusters[0] = clusterAfter1stRegistation;
+        deal(address(ssvToken), address(this), 50000 ether);
+
+        ssvToken.transfer(proxy1, 42 ether);
+
+        ISSVClusters.Cluster memory clusterAfterDeposit = clusterAfter1stRegistation;
+        clusterAfterDeposit.balance += 42 ether;
+
+        vm.expectEmit();
+        emit ClusterDeposited(
+            proxy1,
+            _operatorIds,
+            42 ether,
+            clusterAfterDeposit
+        );
+
+        P2pSsvProxy(proxy1).depositToSSV(42 ether, _operatorIds, _clusters);
+
         console.log("test_liquidateAndReactivate finsihed");
     }
 
