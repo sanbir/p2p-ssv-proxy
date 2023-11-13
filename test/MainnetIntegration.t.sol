@@ -392,6 +392,43 @@ contract MainnetIntegration is Test {
         vm.stopPrank();
     }
 
+    function test_setReferenceFeeDistributor() public {
+        console.log("test_setReferenceFeeDistributor started");
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        vm.stopPrank();
+
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        vm.startPrank(ssvOwner);
+        IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
+        vm.stopPrank();
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+        address proxy1 = p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload1,
+            clientConfig,
+            referrerConfig
+        );
+        vm.stopPrank();
+
+        address referenceFeeDistributor2 = 0x6091767Be457a5A7f7d368dD68Ebf2f416728d97;
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setReferenceFeeDistributor(referenceFeeDistributor2);
+        vm.stopPrank();
+
+        address feeDistributor2 = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor2, clientConfig, referrerConfig);
+        address proxy2 = p2pSsvProxyFactory.predictP2pSsvProxyAddress(feeDistributor2);
+
+        assertNotEq(proxy1, proxy2);
+
+        console.log("test_setReferenceFeeDistributor finsihed");
+    }
+
     function test_registerValidators() public {
         console.log("test_registerValidators started");
 
