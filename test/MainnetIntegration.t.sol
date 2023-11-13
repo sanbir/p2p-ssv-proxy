@@ -24,6 +24,7 @@ contract MainnetIntegration is Test {
     address payable public constant client = payable(address(0xDd1CD16F95e44Ef7E55CC33Ee6C1aF9AB7CEC7fC));
     IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0x86a9f3e908b4658A1327952Eb1eC297a4212E1bb);
     address public constant referenceFeeDistributor = 0x7109DeEb07aa9Eed1e2613F88b2f3E1e6C05163f;
+    address public referenceP2pSsvProxy;
     ISSVClusters.Cluster public clusterAfter1stRegistation;
 
     FeeRecipient public clientConfig;
@@ -31,6 +32,7 @@ contract MainnetIntegration is Test {
     address public proxyAddress;
 
     uint64[] public operatorIds;
+    uint256 public constant SsvPerEthExchangeRateDividedByWei = 7539000000000000;
 
     event ValidatorAdded(address indexed owner, uint64[] operatorIds, bytes publicKey, bytes shares, ISSVClusters.Cluster cluster);
 
@@ -52,8 +54,8 @@ contract MainnetIntegration is Test {
         vm.startPrank(owner);
 
         p2pSsvProxyFactory = new P2pSsvProxyFactory(address(feeDistributorFactory), referenceFeeDistributor);
-        P2pSsvProxy referenceP2pSsvProxy = new P2pSsvProxy(address(p2pSsvProxyFactory));
-        p2pSsvProxyFactory.setReferenceP2pSsvProxy(address(referenceP2pSsvProxy));
+        referenceP2pSsvProxy = address(new P2pSsvProxy(address(p2pSsvProxyFactory)));
+        p2pSsvProxyFactory.setReferenceP2pSsvProxy(referenceP2pSsvProxy);
 
         operatorIds = new uint64[](4);
         operatorIds[0] = 20;
@@ -76,7 +78,7 @@ contract MainnetIntegration is Test {
         p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[2], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[2]);
         p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[3], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
 
-        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
 
         vm.stopPrank();
 
@@ -383,7 +385,7 @@ contract MainnetIntegration is Test {
 
     function registerValidators() private {
         vm.startPrank(owner);
-        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
         vm.stopPrank();
 
         SsvPayload memory ssvPayload1 = getSsvPayload1();
@@ -410,7 +412,7 @@ contract MainnetIntegration is Test {
         console.log("test_viewFunctions started");
 
         vm.startPrank(owner);
-        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
         vm.stopPrank();
 
         SsvPayload memory ssvPayload1 = getSsvPayload1();
@@ -485,10 +487,16 @@ contract MainnetIntegration is Test {
             assertEq(feeDistributorFactoryFromP2pSsvProxyFactory, address(feeDistributorFactory));
 
             uint256 neededAmountOfEtherToCoverSsvFees = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
-            assertEq(neededAmountOfEtherToCoverSsvFees, (ssvPayload1.tokenAmount * 7539000000000000) / 10**18);
+            assertEq(neededAmountOfEtherToCoverSsvFees, (ssvPayload1.tokenAmount * SsvPerEthExchangeRateDividedByWei) / 10**18);
 
             address referenceFeeDistributorFromFactory = p2pSsvProxyFactory.getReferenceFeeDistributor();
             assertEq(referenceFeeDistributorFromFactory, referenceFeeDistributor);
+
+            address referenceP2pSsvProxyFromFactory = p2pSsvProxyFactory.getReferenceP2pSsvProxy();
+            assertEq(referenceP2pSsvProxyFromFactory, referenceP2pSsvProxy);
+
+            uint256 ssvPerEthExchangeRateDividedByWeiFromFactory = p2pSsvProxyFactory.getSsvPerEthExchangeRateDividedByWei();
+            assertEq(ssvPerEthExchangeRateDividedByWeiFromFactory, SsvPerEthExchangeRateDividedByWei);
         }
 
         console.log("test_viewFunctions finsihed");
@@ -498,7 +506,7 @@ contract MainnetIntegration is Test {
         console.log("test_setFeeRecipientAddress started");
 
         vm.startPrank(owner);
-        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
         vm.stopPrank();
 
         SsvPayload memory ssvPayload1 = getSsvPayload1();
@@ -544,7 +552,7 @@ contract MainnetIntegration is Test {
         console.log("test_setReferenceFeeDistributor started");
 
         vm.startPrank(owner);
-        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
         vm.stopPrank();
 
         SsvPayload memory ssvPayload1 = getSsvPayload1();
@@ -581,7 +589,7 @@ contract MainnetIntegration is Test {
         console.log("test_removeValidators started");
 
         vm.startPrank(owner);
-        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
         vm.stopPrank();
 
         SsvPayload memory ssvPayload1 = getSsvPayload1();
@@ -637,7 +645,7 @@ contract MainnetIntegration is Test {
         console.log("test_liquidateAndReactivate started");
 
         vm.startPrank(owner);
-        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
         vm.stopPrank();
 
         SsvPayload memory ssvPayload1 = getSsvPayload1();
@@ -752,7 +760,7 @@ contract MainnetIntegration is Test {
         console.log("test_DuplicateOperatorOwner started");
 
         vm.startPrank(owner);
-        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
         vm.stopPrank();
 
         SsvPayload memory ssvPayload1 = getSsvPayload1WithDuplicateOperatorOwner();
