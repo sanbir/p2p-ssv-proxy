@@ -608,6 +608,72 @@ contract MainnetIntegration is Test {
         console.log("test_setReferenceFeeDistributor finsihed");
     }
 
+    function test_settersAndRemovers() public {
+        console.log("test_settersAndRemovers started");
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
+        vm.stopPrank();
+
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        vm.startPrank(ssvOwner);
+        IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
+        vm.stopPrank();
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+
+        address feeDistributor = 0x6bCBFF73A652B6cB1852c4d85cc34894F5120e28;
+        address proxy1 = p2pSsvProxyFactory.predictP2pSsvProxyAddress(feeDistributor);
+        assertEq(proxy1.code.length, 0);
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.createP2pSsvProxy(feeDistributor);
+        vm.stopPrank();
+
+        assertNotEq(proxy1.code.length, 0);
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+        address proxy2 = p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload1,
+            clientConfig,
+            referrerConfig
+        );
+        vm.stopPrank();
+
+        address[] memory ssvOperatorOwners = new address[](2);
+        ssvOperatorOwners[0] = 0x8D174A0a34A244C4E2B6568f373dA136a2ffafc8;
+        ssvOperatorOwners[1] = 0xf2659Cc196829c6676B1E0E1a71A8797ceC6778A;
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setAllowedSsvOperatorOwners(ssvOperatorOwners);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(0), 0, 0, 0, 0, 0, 40, 0], ssvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(0), 0, 44, 0, 0, 0, 0, 0], ssvOperatorOwners[1]);
+        vm.stopPrank();
+
+        vm.startPrank(ssvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(37), 38, 39, 40, 0, 0, 0, 0]);
+        vm.stopPrank();
+
+        vm.startPrank(ssvOperatorOwners[1]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(45), 0, 44, 0, 43, 0, 11, 0]);
+        p2pSsvProxyFactory.clearSsvOperatorIds();
+        p2pSsvProxyFactory.clearSsvOperatorIds();
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.removeAllowedSsvOperatorOwners(ssvOperatorOwners);
+        vm.stopPrank();
+
+        vm.startPrank(ssvOperatorOwners[1]);
+        vm.expectRevert(abi.encodeWithSelector(P2pSsvProxyFactory__NotAllowedSsvOperatorOwner.selector, ssvOperatorOwners[1]));
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(45), 0, 44, 0, 43, 0, 11, 0]);
+        vm.stopPrank();
+
+        console.log("test_settersAndRemovers finsihed");
+    }
+
     function test_removeValidators() public {
         console.log("test_removeValidators started");
 
