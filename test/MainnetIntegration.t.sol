@@ -32,7 +32,8 @@ contract MainnetIntegration is Test {
     address public proxyAddress;
 
     uint64[] public operatorIds;
-    uint256 public constant SsvPerEthExchangeRateDividedByWei = 7539000000000000;
+    uint112 public constant SsvPerEthExchangeRateDividedByWei = 7539000000000000;
+    uint112 public constant MaxSsvTokenAmountPerValidator = 30 ether;
 
     event ValidatorAdded(address indexed owner, uint64[] operatorIds, bytes publicKey, bytes shares, ISSVClusters.Cluster cluster);
 
@@ -79,6 +80,7 @@ contract MainnetIntegration is Test {
         p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[3], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
 
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
+        p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(MaxSsvTokenAmountPerValidator);
 
         vm.stopPrank();
 
@@ -635,7 +637,7 @@ contract MainnetIntegration is Test {
 
         vm.deal(client, 1000 ether);
         vm.startPrank(client);
-        address proxy2 = p2pSsvProxyFactory.registerValidators{value: neededEth}(
+        p2pSsvProxyFactory.registerValidators{value: neededEth}(
             ssvPayload1,
             clientConfig,
             referrerConfig

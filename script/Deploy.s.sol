@@ -41,7 +41,8 @@ contract Deploy is Script {
         p2pSsvProxyFactory.setSsvOperatorIds([uint64(vm.envUint("OPERATOR_ID_3")), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[2]);
         p2pSsvProxyFactory.setSsvOperatorIds([uint64(vm.envUint("OPERATOR_ID_4")), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
 
-        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(vm.envUint("EXCHANGE_RATE"));
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(uint112(vm.envUint("EXCHANGE_RATE")));
+        p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(uint112(vm.envUint("MAX_SSV_TOKEN_AMOUNT_PER_VALIDATOR")));
 
         p2pSsvProxyFactory.changeOperator(vm.envAddress("FACTORY_OPERATOR"));
 
