@@ -370,6 +370,25 @@ contract MainnetIntegration is Test {
 
         vm.roll(block.number + 5000);
 
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(MaxSsvTokenAmountPerValidator / 10);
+        vm.stopPrank();
+
+        vm.startPrank(client);
+        vm.expectRevert(P2pSsvProxyFactory__MaxSsvTokenAmountPerValidatorExceeded.selector);
+        p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 64 ether}(
+            getDepositData2(),
+            address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
+            getSsvPayload2(),
+            clientConfig,
+            referrerConfig
+        );
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(MaxSsvTokenAmountPerValidator);
+        vm.stopPrank();
+
         vm.startPrank(client);
 
         p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 64 ether}(
