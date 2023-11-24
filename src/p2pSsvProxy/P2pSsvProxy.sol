@@ -178,8 +178,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
 
     /// @inheritdoc IP2pSsvProxy
     function registerValidators(
-        SsvPayload calldata _ssvPayload,
-        address _feeDistributorInstance
+        SsvPayload calldata _ssvPayload
     ) external onlyP2pSsvProxyFactory {
         (
             uint64[] memory operatorIds,
@@ -216,7 +215,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
             unchecked {++i;}
         }
 
-        i_ssvNetwork.setFeeRecipientAddress(_feeDistributorInstance);
+        i_ssvNetwork.setFeeRecipientAddress(address(s_feeDistributor));
     }
 
     /// @inheritdoc IP2pSsvProxy

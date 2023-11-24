@@ -545,10 +545,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
         i_ssvToken.transfer(address(p2pSsvProxy), _ssvPayload.tokenAmount);
 
-        P2pSsvProxy(p2pSsvProxy).registerValidators(
-            _ssvPayload,
-            feeDistributorInstance
-        );
+        P2pSsvProxy(p2pSsvProxy).registerValidators(_ssvPayload);
 
         emit P2pSsvProxyFactory__RegistrationCompleted(p2pSsvProxy);
     }
