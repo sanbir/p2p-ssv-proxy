@@ -254,15 +254,21 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
         i_depositContract = (block.chainid == 1)
             ? IDepositContract(0x00000000219ab540356cBB839Cbe05303d7705Fa)
-            : IDepositContract(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b);
+            : (block.chainid == 5)
+                ? IDepositContract(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b)
+                : IDepositContract(0x4242424242424242424242424242424242424242);
 
         i_ssvToken = (block.chainid == 1)
             ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
-            : IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
+            : (block.chainid == 5)
+                ? IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7)
+                : IERC20(0xad45A78180961079BFaeEe349704F411dfF947C6);
 
         i_ssvViews = (block.chainid == 1)
             ? ISSVViews(0xafE830B6Ee262ba11cce5F32fDCd760FFE6a66e4)
-            : ISSVViews(0xAE2C84c48272F5a1746150ef333D5E5B51F68763);
+            : (block.chainid == 5)
+                ? ISSVViews(0xAE2C84c48272F5a1746150ef333D5E5B51F68763)
+                : ISSVViews(0x352A18AEe90cdcd825d1E37d9939dCA86C00e281);
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
