@@ -171,8 +171,6 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
                 return(add(data, 0x20), mload(data))
             }
         } else {
-            emit P2pSsvProxy__CallingViaFallbackFailed(caller, selector);
-
             // Decode the reason from the error data returned from the call and revert with it.
             revert(string(data));
         }
