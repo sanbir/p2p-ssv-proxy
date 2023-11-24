@@ -703,12 +703,13 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             );
         }
 
+        bytes memory withdrawalCredentials = abi.encodePacked(
+            hex'010000000000000000000000',
+            _withdrawalCredentialsAddress
+        );
+
         for (uint256 i = 0; i < validatorCount;) {
             // ETH deposit
-            bytes memory withdrawalCredentials = abi.encodePacked(
-                hex'010000000000000000000000',
-                _withdrawalCredentialsAddress
-            );
             i_depositContract.deposit{value: COLLATERAL}(
                 _ssvValidators[i].pubkey,
                 withdrawalCredentials,
