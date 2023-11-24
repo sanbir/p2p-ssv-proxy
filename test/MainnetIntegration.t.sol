@@ -541,6 +541,13 @@ contract MainnetIntegration is Test {
 
             bool isClientSelectorAllowedFromFactoryAfter = p2pSsvProxyFactory.isClientSelectorAllowed(selectors[0]);
             assertEq(isClientSelectorAllowedFromFactoryAfter, true);
+
+            vm.startPrank(owner);
+            p2pSsvProxyFactory.removeAllowedSelectorsForClient(selectors);
+            vm.stopPrank();
+
+            isClientSelectorAllowedFromFactoryAfter = p2pSsvProxyFactory.isClientSelectorAllowed(selectors[0]);
+            assertEq(isClientSelectorAllowedFromFactoryAfter, false);
         }
 
         console.log("test_viewFunctions finsihed");
@@ -963,6 +970,17 @@ contract MainnetIntegration is Test {
 
         assertTrue(success2);
         assertEq(data2, bytes(''));
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.removeAllowedSelectorsForOperator(selectors);
+        vm.stopPrank();
+
+        vm.startPrank(operator);
+        (bool success3, bytes memory data3) = proxyAddress.call(callData);
+        vm.stopPrank();
+
+        assertFalse(success3);
+        assertEq(data3, abi.encodeWithSelector(P2pSsvProxy__SelectorNotAllowed.selector, operator, ISSVClusters.withdraw.selector));
 
         console.log("test_NewOperatorSelectors finished");
     }

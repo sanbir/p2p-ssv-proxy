@@ -58,9 +58,21 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
         bytes4[] _selectors
     );
 
+    /// @notice Emits when selectors were disallowed for clients
+    /// @param _selectors disallowed selectors
+    event P2pSsvProxyFactory__AllowedSelectorsForClientRemoved(
+        bytes4[] _selectors
+    );
+
     /// @notice Emits when new selectors were allowed for operator
     /// @param _selectors newly allowed selectors
     event P2pSsvProxyFactory__AllowedSelectorsForOperatorSet(
+        bytes4[] _selectors
+    );
+
+    /// @notice Emits when selectors were disallowed for operator
+    /// @param _selectors disallowed selectors
+    event P2pSsvProxyFactory__AllowedSelectorsForOperatorRemoved(
         bytes4[] _selectors
     );
 
@@ -106,9 +118,17 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
     /// @param _selectors selectors (function signatures) to allow for clients
     function setAllowedSelectorsForClient(bytes4[] calldata _selectors) external;
 
+    /// @notice Disallow selectors (function signatures) for clients to call on SSVNetwork via P2pSsvProxy
+    /// @param _selectors selectors (function signatures) to disallow for clients
+    function removeAllowedSelectorsForClient(bytes4[] calldata _selectors) external;
+
     /// @notice Allow selectors (function signatures) for P2P operator to call on SSVNetwork via P2pSsvProxy
     /// @param _selectors selectors (function signatures) to allow for P2P operator
     function setAllowedSelectorsForOperator(bytes4[] calldata _selectors) external;
+
+    /// @notice Disallow selectors (function signatures) for P2P operator to call on SSVNetwork via P2pSsvProxy
+    /// @param _selectors selectors (function signatures) to disallow for P2P operator
+    function removeAllowedSelectorsForOperator(bytes4[] calldata _selectors) external;
 
     /// @notice Set template to be used for new FeeDistributor instances
     /// @param _referenceFeeDistributor template to be used for new FeeDistributor instances

@@ -99,6 +99,9 @@ error P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(
 /// @notice Should pass at least 1 selector
 error P2pSsvProxyFactory__CannotSetZeroSelectors();
 
+/// @notice Should pass at least 1 selector
+error P2pSsvProxyFactory__CannotRemoveZeroSelectors();
+
 /// @notice Should pass at least 1 SSV operator owner
 error P2pSsvProxyFactory__CannotSetZeroAllowedSsvOperatorOwners();
 
@@ -315,6 +318,25 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
+    function removeAllowedSelectorsForClient(bytes4[] calldata _selectors) external onlyOwner {
+        uint256 count = _selectors.length;
+
+        if (count == 0) {
+            revert P2pSsvProxyFactory__CannotRemoveZeroSelectors();
+        }
+
+        for (uint256 i = 0; i < count;) {
+            s_clientSelectors[_selectors[i]] = false;
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        emit P2pSsvProxyFactory__AllowedSelectorsForClientRemoved(_selectors);
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
     function setAllowedSelectorsForOperator(bytes4[] calldata _selectors) external onlyOwner {
         uint256 count = _selectors.length;
 
@@ -331,6 +353,25 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
 
         emit P2pSsvProxyFactory__AllowedSelectorsForOperatorSet(_selectors);
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
+    function removeAllowedSelectorsForOperator(bytes4[] calldata _selectors) external onlyOwner {
+        uint256 count = _selectors.length;
+
+        if (count == 0) {
+            revert P2pSsvProxyFactory__CannotRemoveZeroSelectors();
+        }
+
+        for (uint256 i = 0; i < count;) {
+            s_operatorSelectors[_selectors[i]] = false;
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        emit P2pSsvProxyFactory__AllowedSelectorsForOperatorRemoved(_selectors);
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
