@@ -362,7 +362,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         // see https://github.com/bloxapp/ssv-network/blob/1e61c35736578d4b03bacbff9da2128ad12a5620/contracts/libraries/ClusterLib.sol#L16
         uint64 networkFee = uint64(_currentNetworkFeeIndex - _cluster.networkFeeIndex) * _cluster.validatorCount;
         uint64 usage = (_newIndex - _cluster.index) * _cluster.validatorCount + networkFee;
-        uint256 expandedUsage = usage * 10_000_000;
+        uint256 expandedUsage = uint256(usage) * 10_000_000;
         balance = expandedUsage > balanceBefore? 0 : balanceBefore - expandedUsage;
     }
 
