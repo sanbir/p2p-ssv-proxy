@@ -46,6 +46,7 @@ contract GoerliIntegration is Test {
         p2pSsvProxyFactory.setSsvOperatorIds([uint64(123), 0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
 
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
+        p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(30 ether);
 
         vm.stopPrank();
 

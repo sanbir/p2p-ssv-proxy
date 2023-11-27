@@ -25,14 +25,6 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
         bytes4 indexed _selector
     );
 
-    /// @notice Emits when an error occurred during the call of SSVNetwork via fallback
-    /// @param _caller caller of P2pSsvProxy
-    /// @param _selector selector of the function from SSVNetwork
-    event P2pSsvProxy__CallingViaFallbackFailed(
-        address indexed _caller,
-        bytes4 indexed _selector
-    );
-
     /// @notice Initialize the P2pSsvProxy instance
     /// @dev Should only be called by P2pSsvProxyFactory
     /// @param _feeDistributor FeeDistributor instance that determines the identity of this P2pSsvProxy instance
@@ -43,10 +35,8 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
     /// @notice Register a batch of validators with SSV
     /// @dev Should be called by P2pSsvProxyFactory only
     /// @param _ssvPayload struct with the SSV data required for registration
-    /// @param _feeDistributorInstance instance of FeeDistributor to be used as EL fee recipient in SSV
     function registerValidators(
-        SsvPayload calldata _ssvPayload,
-        address _feeDistributorInstance
+        SsvPayload calldata _ssvPayload
     ) external;
 
     /// @notice Remove a batch of validators from SSV

@@ -37,7 +37,13 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
     /// @notice Emits when a new value for ssvPerEthExchangeRateDividedByWei has been set
     /// @param _ssvPerEthExchangeRateDividedByWei new value for ssvPerEthExchangeRateDividedByWei
     event P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiSet(
-        uint256 _ssvPerEthExchangeRateDividedByWei
+        uint112 _ssvPerEthExchangeRateDividedByWei
+    );
+
+    /// @notice Emits when a new value for maximum amount of SSV tokens per validator has been set
+    /// @param _maxSsvTokenAmountPerValidator new value for maximum amount of SSV tokens per validator
+    event P2pSsvProxyFactory__MaxSsvTokenAmountPerValidatorSet(
+        uint112 _maxSsvTokenAmountPerValidator
     );
 
     /// @notice Emits when a new reference P2pSsvProxy has been set
@@ -52,9 +58,21 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
         bytes4[] _selectors
     );
 
+    /// @notice Emits when selectors were disallowed for clients
+    /// @param _selectors disallowed selectors
+    event P2pSsvProxyFactory__AllowedSelectorsForClientRemoved(
+        bytes4[] _selectors
+    );
+
     /// @notice Emits when new selectors were allowed for operator
     /// @param _selectors newly allowed selectors
     event P2pSsvProxyFactory__AllowedSelectorsForOperatorSet(
+        bytes4[] _selectors
+    );
+
+    /// @notice Emits when selectors were disallowed for operator
+    /// @param _selectors disallowed selectors
+    event P2pSsvProxyFactory__AllowedSelectorsForOperatorRemoved(
         bytes4[] _selectors
     );
 
@@ -86,7 +104,11 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
     /// @notice Set Exchange rate between SSV and ETH set by P2P.
     /// @dev (If 1 SSV = 0.007539 ETH, it should be 0.007539 * 10^18 = 7539000000000000).
     /// @param _ssvPerEthExchangeRateDividedByWei Exchange rate
-    function setSsvPerEthExchangeRateDividedByWei(uint256 _ssvPerEthExchangeRateDividedByWei) external;
+    function setSsvPerEthExchangeRateDividedByWei(uint112 _ssvPerEthExchangeRateDividedByWei) external;
+
+    /// @notice Set Maximum amount of SSV tokens per validator that is allowed for client to deposit during `depositEthAndRegisterValidators`
+    /// @param _maxSsvTokenAmountPerValidator Maximum amount of SSV tokens per validator
+    function setMaxSsvTokenAmountPerValidator(uint112 _maxSsvTokenAmountPerValidator) external;
 
     /// @notice Set template to be used for new P2pSsvProxy instances
     /// @param _referenceP2pSsvProxy template to be used for new P2pSsvProxy instances
@@ -96,9 +118,17 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
     /// @param _selectors selectors (function signatures) to allow for clients
     function setAllowedSelectorsForClient(bytes4[] calldata _selectors) external;
 
+    /// @notice Disallow selectors (function signatures) for clients to call on SSVNetwork via P2pSsvProxy
+    /// @param _selectors selectors (function signatures) to disallow for clients
+    function removeAllowedSelectorsForClient(bytes4[] calldata _selectors) external;
+
     /// @notice Allow selectors (function signatures) for P2P operator to call on SSVNetwork via P2pSsvProxy
     /// @param _selectors selectors (function signatures) to allow for P2P operator
     function setAllowedSelectorsForOperator(bytes4[] calldata _selectors) external;
+
+    /// @notice Disallow selectors (function signatures) for P2P operator to call on SSVNetwork via P2pSsvProxy
+    /// @param _selectors selectors (function signatures) to disallow for P2P operator
+    function removeAllowedSelectorsForOperator(bytes4[] calldata _selectors) external;
 
     /// @notice Set template to be used for new FeeDistributor instances
     /// @param _referenceFeeDistributor template to be used for new FeeDistributor instances
@@ -236,7 +266,11 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
     /// P2P is willing to tolarate potential discrepancies with the market exchange rate for the sake of simplicity.
     /// The client agrees to this rate when calls `registerValidators` function.
     /// @return exchange rate between SSV and ETH set by P2P
-    function getSsvPerEthExchangeRateDividedByWei() external view returns (uint256);
+    function getSsvPerEthExchangeRateDividedByWei() external view returns (uint112);
+
+    /// @notice Returns the maximum amount of SSV tokens per validator that is allowed for client to deposit during `depositEthAndRegisterValidators`
+    /// @return maximum amount of SSV tokens per validator
+    function getMaxSsvTokenAmountPerValidator() external view returns (uint112);
 
     /// @notice Returns needed amount of ETH to cover SSV fees by SSV token amount
     /// @param _tokenAmount SSV token amount

@@ -127,11 +127,15 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
 
         i_ssvNetwork = (block.chainid == 1)
             ? ISSVNetwork(0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1)
-            : ISSVNetwork(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D);
+            : (block.chainid == 5)
+                    ? ISSVNetwork(0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D)
+                    : ISSVNetwork(0x38A4794cCEd47d3baf7370CcC43B560D3a1beEFA);
 
         i_ssvToken = (block.chainid == 1)
             ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
-            : IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
+            : (block.chainid == 5)
+                    ? IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7)
+                    : IERC20(0xad45A78180961079BFaeEe349704F411dfF947C6);
     }
 
     /// @inheritdoc IP2pSsvProxy
@@ -167,8 +171,6 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
                 return(add(data, 0x20), mload(data))
             }
         } else {
-            emit P2pSsvProxy__CallingViaFallbackFailed(caller, selector);
-
             // Decode the reason from the error data returned from the call and revert with it.
             revert(string(data));
         }
@@ -176,8 +178,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
 
     /// @inheritdoc IP2pSsvProxy
     function registerValidators(
-        SsvPayload calldata _ssvPayload,
-        address _feeDistributorInstance
+        SsvPayload calldata _ssvPayload
     ) external onlyP2pSsvProxyFactory {
         (
             uint64[] memory operatorIds,
@@ -214,7 +215,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
             unchecked {++i;}
         }
 
-        i_ssvNetwork.setFeeRecipientAddress(_feeDistributorInstance);
+        i_ssvNetwork.setFeeRecipientAddress(address(s_feeDistributor));
     }
 
     /// @inheritdoc IP2pSsvProxy

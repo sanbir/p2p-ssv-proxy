@@ -322,7 +322,7 @@ P2pSsvProxyFactory’s functions:
         
             FeeRecipient calldata _clientConfig,
             FeeRecipient calldata _referrerConfig
-        ) external payable returns (address p2pSsvProxy)
+        ) external payable returns (address p2pSsvProxy);
         ```
         
 - `registerValidators` - batch validator registration without ETH deposit. Callable by anyone.
@@ -333,7 +333,7 @@ P2pSsvProxyFactory’s functions:
             SsvPayload calldata _ssvPayload,
             FeeRecipient calldata _clientConfig,
             FeeRecipient calldata _referrerConfig
-        ) external payable returns (address)
+        ) external payable returns (address);
         ```
         
 - `predictP2pSsvProxyAddress` - get `P2pSsvProxy` instance address for a given `FeeDistributor` instance address.
@@ -342,12 +342,12 @@ P2pSsvProxyFactory’s functions:
         ```solidity
         function predictP2pSsvProxyAddress(
             address _feeDistributorInstance
-        ) external view returns (address)
+        ) external view returns (address);
         ```
         
 
 - Mainnet: TBD
-- Goerli: [0x33C0155e0a4F7A425ad9BCDB007EA038D263007C](https://goerli.etherscan.io/address/0x33c0155e0a4f7a425ad9bcdb007ea038d263007c)
+- Goerli: [0x687Cc3F02e1C9B2b87989f76eB3Bd215b1cBfd38](https://goerli.etherscan.io/address/0x687Cc3F02e1C9B2b87989f76eB3Bd215b1cBfd38)
 
 ### **P2pSsvProxy**
 
@@ -375,7 +375,7 @@ P2pSsvProxy allows to call all `SSVNetwork` functions having P2pSsvProxy instanc
 For the client, only `removeValidator` function is available out of the box. It’s still possible for P2P to allow any other functions for clients to call. It’s done via P2pSsvProxyFactory’s `setAllowedSelectorsForClient` function.
 
 - Mainnet: TBD
-- Goerli: [0x5d23Ff103954a7069Ac84Bd8ec757c929fc1A595](https://goerli.etherscan.io/address/0x5d23Ff103954a7069Ac84Bd8ec757c929fc1A595)
+- Goerli: [0xb00C3a8D951b0C4bac8Db2f006c614F05D29E666](https://goerli.etherscan.io/address/0xb00C3a8D951b0C4bac8Db2f006c614F05D29E666)
 
 ### **DepositContract**
 

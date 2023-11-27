@@ -74,8 +74,17 @@ error P2pSsvProxyFactory__EthValueMustBe32TimesValidatorCount(uint256 _actualEth
 /// If it does, this contract won't be operational and another contract will have to be deployed.
 error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiOutOfRange();
 
+/// @notice Maximum amount of SSV tokens per validator must be >= 10^12 and <= 10^24
+error P2pSsvProxyFactory__MaxSsvTokenAmountPerValidatorOutOfRange();
+
 /// @notice SSV per ETH exchange rate has not been set. Cannot register validators without it.
 error P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
+
+/// @notice Maximum amount of SSV tokens per validator has not been set. Cannot do depositEthAndRegisterValidators without it.
+error P2pSsvProxyFactory__MaxSsvTokenAmountPerValidatorNotSet();
+
+/// @notice Cannot use token amount per validator larger than Maximum amount of SSV tokens per validator.
+error P2pSsvProxyFactory__MaxSsvTokenAmountPerValidatorExceeded();
 
 /// @notice This SSV operator ID does not belong to the passed owner
 /// @param _operatorId SSV operator ID
@@ -89,6 +98,9 @@ error P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(
 
 /// @notice Should pass at least 1 selector
 error P2pSsvProxyFactory__CannotSetZeroSelectors();
+
+/// @notice Should pass at least 1 selector
+error P2pSsvProxyFactory__CannotRemoveZeroSelectors();
 
 /// @notice Should pass at least 1 SSV operator owner
 error P2pSsvProxyFactory__CannotSetZeroAllowedSsvOperatorOwners();
@@ -162,7 +174,10 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     /// SSV tokens exchanged with this rate cannot be withdrawn by the client.
     /// P2P is willing to tolarate potential discrepancies with the market exchange rate for the sake of simplicity.
     /// The client agrees to this rate when calls `registerValidators` function.
-    uint256 private s_ssvPerEthExchangeRateDividedByWei;
+    uint112 private s_ssvPerEthExchangeRateDividedByWei;
+
+    /// @notice Maximum amount of SSV tokens per validator that is allowed for client to deposit during `depositEthAndRegisterValidators`
+    uint112 private s_maxSsvTokenAmountPerValidator;
 
     /// @notice If the given _ssvOperatorOwner is not allowed, revert
     modifier onlyAllowedSsvOperatorOwner(address _ssvOperatorOwner) {
@@ -242,25 +257,41 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
         i_depositContract = (block.chainid == 1)
             ? IDepositContract(0x00000000219ab540356cBB839Cbe05303d7705Fa)
-            : IDepositContract(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b);
+            : (block.chainid == 5)
+                    ? IDepositContract(0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b)
+                    : IDepositContract(0x4242424242424242424242424242424242424242);
 
         i_ssvToken = (block.chainid == 1)
             ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
-            : IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7);
+            : (block.chainid == 5)
+                    ? IERC20(0x3a9f01091C446bdE031E39ea8354647AFef091E7)
+                    : IERC20(0xad45A78180961079BFaeEe349704F411dfF947C6);
 
         i_ssvViews = (block.chainid == 1)
             ? ISSVViews(0xafE830B6Ee262ba11cce5F32fDCd760FFE6a66e4)
-            : ISSVViews(0xAE2C84c48272F5a1746150ef333D5E5B51F68763);
+            : (block.chainid == 5)
+                    ? ISSVViews(0xAE2C84c48272F5a1746150ef333D5E5B51F68763)
+                    : ISSVViews(0x352A18AEe90cdcd825d1E37d9939dCA86C00e281);
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
-    function setSsvPerEthExchangeRateDividedByWei(uint256 _ssvPerEthExchangeRateDividedByWei) external onlyOwner {
+    function setSsvPerEthExchangeRateDividedByWei(uint112 _ssvPerEthExchangeRateDividedByWei) external onlyOwner {
         if (_ssvPerEthExchangeRateDividedByWei < 10 ** 12 || _ssvPerEthExchangeRateDividedByWei > 10 ** 20) {
             revert P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiOutOfRange();
         }
 
         s_ssvPerEthExchangeRateDividedByWei = _ssvPerEthExchangeRateDividedByWei;
         emit P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiSet(_ssvPerEthExchangeRateDividedByWei);
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
+    function setMaxSsvTokenAmountPerValidator(uint112 _maxSsvTokenAmountPerValidator) external onlyOwner {
+        if (_maxSsvTokenAmountPerValidator < 10 ** 12 || _maxSsvTokenAmountPerValidator > 10 ** 24) {
+            revert P2pSsvProxyFactory__MaxSsvTokenAmountPerValidatorOutOfRange();
+        }
+
+        s_maxSsvTokenAmountPerValidator = _maxSsvTokenAmountPerValidator;
+        emit P2pSsvProxyFactory__MaxSsvTokenAmountPerValidatorSet(_maxSsvTokenAmountPerValidator);
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
@@ -293,6 +324,25 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
+    function removeAllowedSelectorsForClient(bytes4[] calldata _selectors) external onlyOwner {
+        uint256 count = _selectors.length;
+
+        if (count == 0) {
+            revert P2pSsvProxyFactory__CannotRemoveZeroSelectors();
+        }
+
+        for (uint256 i = 0; i < count;) {
+            s_clientSelectors[_selectors[i]] = false;
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        emit P2pSsvProxyFactory__AllowedSelectorsForClientRemoved(_selectors);
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
     function setAllowedSelectorsForOperator(bytes4[] calldata _selectors) external onlyOwner {
         uint256 count = _selectors.length;
 
@@ -309,6 +359,25 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         }
 
         emit P2pSsvProxyFactory__AllowedSelectorsForOperatorSet(_selectors);
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
+    function removeAllowedSelectorsForOperator(bytes4[] calldata _selectors) external onlyOwner {
+        uint256 count = _selectors.length;
+
+        if (count == 0) {
+            revert P2pSsvProxyFactory__CannotRemoveZeroSelectors();
+        }
+
+        for (uint256 i = 0; i < count;) {
+            s_operatorSelectors[_selectors[i]] = false;
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        emit P2pSsvProxyFactory__AllowedSelectorsForOperatorRemoved(_selectors);
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
@@ -427,6 +496,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy) {
+        _checkTokenAmount(_ssvPayload.tokenAmount, _ssvPayload.ssvValidators.length);
+
         _makeBeaconDeposits(_depositData, _withdrawalCredentialsAddress, _ssvPayload.ssvValidators);
 
         p2pSsvProxy = _registerValidators(_ssvPayload, _clientConfig, _referrerConfig);
@@ -441,6 +512,21 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         _checkEthValue(_ssvPayload.tokenAmount);
 
         p2pSsvProxy = _registerValidators(_ssvPayload, _clientConfig, _referrerConfig);
+    }
+
+    function _checkTokenAmount(
+        uint256 _tokenAmount,
+        uint256 _validatorCount
+    ) private view {
+        uint112 maxSsvTokenAmountPerValidator = s_maxSsvTokenAmountPerValidator;
+
+        if (maxSsvTokenAmountPerValidator == 0) {
+            revert P2pSsvProxyFactory__MaxSsvTokenAmountPerValidatorNotSet();
+        }
+
+        if (_tokenAmount > maxSsvTokenAmountPerValidator * _validatorCount) {
+            revert P2pSsvProxyFactory__MaxSsvTokenAmountPerValidatorExceeded();
+        }
     }
 
     /// @notice Register validators with SSV (up to 60, calldata size is the limit) without ETH deposits
@@ -459,10 +545,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
         i_ssvToken.transfer(address(p2pSsvProxy), _ssvPayload.tokenAmount);
 
-        P2pSsvProxy(p2pSsvProxy).registerValidators(
-            _ssvPayload,
-            feeDistributorInstance
-        );
+        P2pSsvProxy(p2pSsvProxy).registerValidators(_ssvPayload);
 
         emit P2pSsvProxyFactory__RegistrationCompleted(p2pSsvProxy);
     }
@@ -542,7 +625,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     function _checkEthValue(
         uint256 _tokenAmount
     ) private view {
-        uint256 exchangeRate = s_ssvPerEthExchangeRateDividedByWei;
+        uint112 exchangeRate = s_ssvPerEthExchangeRateDividedByWei;
         if (exchangeRate == 0) {
             revert P2pSsvProxyFactory__SsvPerEthExchangeRateDividedByWeiNotSet();
         }
@@ -620,12 +703,13 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             );
         }
 
+        bytes memory withdrawalCredentials = abi.encodePacked(
+            hex'010000000000000000000000',
+            _withdrawalCredentialsAddress
+        );
+
         for (uint256 i = 0; i < validatorCount;) {
             // ETH deposit
-            bytes memory withdrawalCredentials = abi.encodePacked(
-                hex'010000000000000000000000',
-                _withdrawalCredentialsAddress
-            );
             i_depositContract.deposit{value: COLLATERAL}(
                 _ssvValidators[i].pubkey,
                 withdrawalCredentials,
@@ -690,13 +774,18 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
-    function getSsvPerEthExchangeRateDividedByWei() external view returns (uint256) {
+    function getSsvPerEthExchangeRateDividedByWei() external view returns (uint112) {
         return s_ssvPerEthExchangeRateDividedByWei;
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
     function getNeededAmountOfEtherToCoverSsvFees(uint256 _tokenAmount) external view returns (uint256) {
         return (_tokenAmount * s_ssvPerEthExchangeRateDividedByWei) / 10**18;
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
+    function getMaxSsvTokenAmountPerValidator() external view returns (uint112) {
+        return s_maxSsvTokenAmountPerValidator;
     }
 
     /// @inheritdoc ERC165

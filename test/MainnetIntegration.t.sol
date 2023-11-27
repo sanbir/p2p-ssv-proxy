@@ -32,7 +32,8 @@ contract MainnetIntegration is Test {
     address public proxyAddress;
 
     uint64[] public operatorIds;
-    uint256 public constant SsvPerEthExchangeRateDividedByWei = 7539000000000000;
+    uint112 public constant SsvPerEthExchangeRateDividedByWei = 7539000000000000;
+    uint112 public constant MaxSsvTokenAmountPerValidator = 30 ether;
 
     event ValidatorAdded(address indexed owner, uint64[] operatorIds, bytes publicKey, bytes shares, ISSVClusters.Cluster cluster);
 
@@ -79,6 +80,7 @@ contract MainnetIntegration is Test {
         p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[3], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
 
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
+        p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(MaxSsvTokenAmountPerValidator);
 
         vm.stopPrank();
 
@@ -368,6 +370,25 @@ contract MainnetIntegration is Test {
 
         vm.roll(block.number + 5000);
 
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(MaxSsvTokenAmountPerValidator / 10);
+        vm.stopPrank();
+
+        vm.startPrank(client);
+        vm.expectRevert(P2pSsvProxyFactory__MaxSsvTokenAmountPerValidatorExceeded.selector);
+        p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 64 ether}(
+            getDepositData2(),
+            address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f),
+            getSsvPayload2(),
+            clientConfig,
+            referrerConfig
+        );
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(MaxSsvTokenAmountPerValidator);
+        vm.stopPrank();
+
         vm.startPrank(client);
 
         p2pSsvProxyFactory.depositEthAndRegisterValidators{value: 64 ether}(
@@ -497,6 +518,36 @@ contract MainnetIntegration is Test {
 
             uint256 ssvPerEthExchangeRateDividedByWeiFromFactory = p2pSsvProxyFactory.getSsvPerEthExchangeRateDividedByWei();
             assertEq(ssvPerEthExchangeRateDividedByWeiFromFactory, SsvPerEthExchangeRateDividedByWei);
+
+            bytes4[] memory selectors = new bytes4[](1);
+            selectors[0] = ISSVClusters.withdraw.selector;
+
+            bool isOperatorSelectorAllowedFromFactoryBefore = p2pSsvProxyFactory.isOperatorSelectorAllowed(selectors[0]);
+            assertEq(isOperatorSelectorAllowedFromFactoryBefore, false);
+
+            vm.startPrank(owner);
+            p2pSsvProxyFactory.setAllowedSelectorsForOperator(selectors);
+            vm.stopPrank();
+
+            bool isOperatorSelectorAllowedFromFactoryAfter = p2pSsvProxyFactory.isOperatorSelectorAllowed(selectors[0]);
+            assertEq(isOperatorSelectorAllowedFromFactoryAfter, true);
+
+            bool isClientSelectorAllowedFromFactoryBefore = p2pSsvProxyFactory.isClientSelectorAllowed(selectors[0]);
+            assertEq(isClientSelectorAllowedFromFactoryBefore, false);
+
+            vm.startPrank(owner);
+            p2pSsvProxyFactory.setAllowedSelectorsForClient(selectors);
+            vm.stopPrank();
+
+            bool isClientSelectorAllowedFromFactoryAfter = p2pSsvProxyFactory.isClientSelectorAllowed(selectors[0]);
+            assertEq(isClientSelectorAllowedFromFactoryAfter, true);
+
+            vm.startPrank(owner);
+            p2pSsvProxyFactory.removeAllowedSelectorsForClient(selectors);
+            vm.stopPrank();
+
+            isClientSelectorAllowedFromFactoryAfter = p2pSsvProxyFactory.isClientSelectorAllowed(selectors[0]);
+            assertEq(isClientSelectorAllowedFromFactoryAfter, false);
         }
 
         console.log("test_viewFunctions finsihed");
@@ -583,6 +634,72 @@ contract MainnetIntegration is Test {
         assertNotEq(proxy1, proxy2);
 
         console.log("test_setReferenceFeeDistributor finsihed");
+    }
+
+    function test_settersAndRemovers() public {
+        console.log("test_settersAndRemovers started");
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
+        vm.stopPrank();
+
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        vm.startPrank(ssvOwner);
+        IMockSsvNetwork(ssvNetworkAddress).setRegisterAuth(proxyAddress, true, true);
+        vm.stopPrank();
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
+
+        address feeDistributor = 0x6bCBFF73A652B6cB1852c4d85cc34894F5120e28;
+        address proxy1 = p2pSsvProxyFactory.predictP2pSsvProxyAddress(feeDistributor);
+        assertEq(proxy1.code.length, 0);
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.createP2pSsvProxy(feeDistributor);
+        vm.stopPrank();
+
+        assertNotEq(proxy1.code.length, 0);
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+        p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            ssvPayload1,
+            clientConfig,
+            referrerConfig
+        );
+        vm.stopPrank();
+
+        address[] memory ssvOperatorOwners = new address[](2);
+        ssvOperatorOwners[0] = 0x8D174A0a34A244C4E2B6568f373dA136a2ffafc8;
+        ssvOperatorOwners[1] = 0xf2659Cc196829c6676B1E0E1a71A8797ceC6778A;
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setAllowedSsvOperatorOwners(ssvOperatorOwners);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(0), 0, 0, 0, 0, 0, 40, 0], ssvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(0), 0, 44, 0, 0, 0, 0, 0], ssvOperatorOwners[1]);
+        vm.stopPrank();
+
+        vm.startPrank(ssvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(37), 38, 39, 40, 0, 0, 0, 0]);
+        vm.stopPrank();
+
+        vm.startPrank(ssvOperatorOwners[1]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(45), 0, 44, 0, 43, 0, 11, 0]);
+        p2pSsvProxyFactory.clearSsvOperatorIds();
+        p2pSsvProxyFactory.clearSsvOperatorIds();
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.removeAllowedSsvOperatorOwners(ssvOperatorOwners);
+        vm.stopPrank();
+
+        vm.startPrank(ssvOperatorOwners[1]);
+        vm.expectRevert(abi.encodeWithSelector(P2pSsvProxyFactory__NotAllowedSsvOperatorOwner.selector, ssvOperatorOwners[1]));
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(45), 0, 44, 0, 43, 0, 11, 0]);
+        vm.stopPrank();
+
+        console.log("test_settersAndRemovers finsihed");
     }
 
     function test_removeValidators() public {
@@ -853,6 +970,17 @@ contract MainnetIntegration is Test {
 
         assertTrue(success2);
         assertEq(data2, bytes(''));
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.removeAllowedSelectorsForOperator(selectors);
+        vm.stopPrank();
+
+        vm.startPrank(operator);
+        (bool success3, bytes memory data3) = proxyAddress.call(callData);
+        vm.stopPrank();
+
+        assertFalse(success3);
+        assertEq(data3, abi.encodeWithSelector(P2pSsvProxy__SelectorNotAllowed.selector, operator, ISSVClusters.withdraw.selector));
 
         console.log("test_NewOperatorSelectors finished");
     }

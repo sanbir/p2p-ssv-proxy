@@ -4,6 +4,6 @@ out = "out"
 libs = ["lib"]
 cache_path  = 'forge-cache'
 
-rpc_endpoints = { mainnet = "https://rpc.ankr.com/eth", goerli = "https://rpc.ankr.com/eth_goerli" }
+rpc_endpoints = { mainnet = "https://rpc.ankr.com/eth", goerli = "https://rpc.ankr.com/eth_goerli", holesky = "https://rpc.ankr.com/eth_holesky" }
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
