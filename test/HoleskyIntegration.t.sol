@@ -21,7 +21,7 @@ contract HoleskyIntegration is Test {
     address payable public constant client = payable(address(0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f));
 
     function setUp() public {
-        vm.createSelectFork("holesky", 383525);
+        vm.createSelectFork("holesky", 1325093);
 
         address feeDistributorFactory = address(0xAF01ac4acE27a5d33b68B72aABa31C2fE4fb169C);
         address referenceFeeDistributor = address(0x93C357c42d652E615948c013213D9e8822Ab1183);
