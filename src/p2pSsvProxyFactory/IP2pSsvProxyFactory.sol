@@ -218,6 +218,19 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy);
 
+    /// @notice Deposit SSV tokens from P2pSsvProxyFactory to SSV cluster
+    /// @dev Can only be called by P2pSsvProxyFactory owner
+    /// @param _clusterOwner SSV cluster owner (usually, P2pSsvProxy instance)
+    /// @param _tokenAmount SSV token amount to be deposited
+    /// @param _operatorIds SSV operator IDs
+    /// @param _cluster SSV cluster
+    function depositToSSV(
+        address _clusterOwner,
+        uint256 _tokenAmount,
+        uint64[] calldata _operatorIds,
+        ISSVNetwork.Cluster calldata _cluster
+    ) external;
+
     /// @notice Returns the FeeDistributorFactory address
     /// @return FeeDistributorFactory address
     function getFeeDistributorFactory() external view returns (address);

@@ -123,6 +123,9 @@ error P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength(
 contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC165, IP2pSsvProxyFactory {
     using EnumerableSet for EnumerableSet.AddressSet;
 
+    /// @notice SSVNetwork address
+    ISSVNetwork private immutable i_ssvNetwork;
+
     /// @notice Beacon Deposit Contract
     IDepositContract private immutable i_depositContract;
 
@@ -266,6 +269,12 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         i_ssvViews = (block.chainid == 1)
             ? ISSVViews(0xafE830B6Ee262ba11cce5F32fDCd760FFE6a66e4)
             : ISSVViews(0x352A18AEe90cdcd825d1E37d9939dCA86C00e281);
+
+        i_ssvNetwork = (block.chainid == 1)
+            ? ISSVNetwork(0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1)
+            : ISSVNetwork(0x38A4794cCEd47d3baf7370CcC43B560D3a1beEFA);
+
+        i_ssvToken.approve(address(i_ssvNetwork), type(uint256).max);
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
@@ -506,6 +515,16 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         _checkEthValue(_ssvPayload.tokenAmount);
 
         p2pSsvProxy = _registerValidators(_ssvPayload, _clientConfig, _referrerConfig);
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
+    function depositToSSV(
+        address _clusterOwner,
+        uint256 _tokenAmount,
+        uint64[] calldata _operatorIds,
+        ISSVNetwork.Cluster calldata _cluster
+    ) external onlyOwner {
+        i_ssvNetwork.deposit(_clusterOwner, _operatorIds, _tokenAmount, _cluster);
     }
 
     function _checkTokenAmount(

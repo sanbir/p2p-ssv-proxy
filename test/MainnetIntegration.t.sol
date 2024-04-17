@@ -1034,4 +1034,39 @@ contract MainnetIntegration is Test {
 
         console.log("test_WithdrawSsvTokens finished");
     }
+
+    function test_DepositToSSV() public {
+        console.log("test_DepositToSSV started");
+
+        registerValidators();
+
+        uint256 factoryBalanceBefore = ssvToken.balanceOf(address(p2pSsvProxyFactory));
+
+        uint256 tokenAmount = 42;
+
+        ISSVClusters.Cluster memory clusterAfterDeposit = ISSVClusters.Cluster({
+            validatorCount: clusterAfter1stRegistation.validatorCount,
+            networkFeeIndex: clusterAfter1stRegistation.networkFeeIndex,
+            index: clusterAfter1stRegistation.index,
+            active: true,
+            balance: clusterAfter1stRegistation.balance + tokenAmount
+        });
+
+        vm.startPrank(owner);
+
+        vm.expectEmit();
+        emit ClusterDeposited(
+            proxyAddress,
+            operatorIds,
+            tokenAmount,
+            clusterAfterDeposit
+        );
+        p2pSsvProxyFactory.depositToSSV(proxyAddress, tokenAmount, operatorIds, clusterAfter1stRegistation);
+        vm.stopPrank();
+
+        uint256 factoryBalanceAfter = ssvToken.balanceOf(address(p2pSsvProxyFactory));
+        assertEq(factoryBalanceBefore - factoryBalanceAfter, tokenAmount);
+
+        console.log("test_DepositToSSV finished");
+    }
 }
