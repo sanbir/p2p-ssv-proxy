@@ -1052,8 +1052,14 @@ contract MainnetIntegration is Test {
             balance: clusterAfter1stRegistation.balance + tokenAmount
         });
 
-        vm.startPrank(owner);
+        vm.startPrank(operator);
+        vm.expectRevert(abi.encodeWithSelector(
+            OwnableBase__CallerNotOwner.selector, operator, owner
+        ));
+        p2pSsvProxyFactory.depositToSSV(proxyAddress, tokenAmount, operatorIds, clusterAfter1stRegistation);
+        vm.stopPrank();
 
+        vm.startPrank(owner);
         vm.expectEmit();
         emit ClusterDeposited(
             proxyAddress,
