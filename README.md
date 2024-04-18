@@ -301,7 +301,7 @@ It stores:
 - `referenceFeeDistributor` - a template set by P2P to be used for new `FeeDistributor` instances. Can be changed by P2P at any time. It will only affect the new clusters. Existing clusters will keep their existing `FeeDistributor` instance.
 - `referenceP2pSsvProxy` - a template set by P2P to be used for new `P2pSsvProxy` instances. Can be changed by P2P at any time. It will only affect the new clusters. Existing clusters will keep their existing `P2pSsvProxy` instance.
 - `allowedSsvOperatorOwners` - a set of addresses of SSV operator owners (both P2P and partners). Only P2P can add or remove addresses from the set.
-- `allowedSsvOperatorIds` - a mapping of (operator owner address → SSV operator IDs list). The list of allowed SSV operator IDs for each address is limited to 8 IDs. The operator owner can update only their list. P2P can update lists of any owners.
+- `allowedSsvOperatorIds` - a mapping of (operator owner address → SSV operator IDs list). The list of allowed SSV operator IDs for each address is limited to 16 IDs. The operator owner can update only their list. P2P can update lists of any owners.
 - `allClientP2pSsvProxies` - a mapping of (client address → a list of addresses of the deployed client `P2pSsvProxy` instances). Updated automatically during `P2pSsvProxy` instance deployment.
 - `allP2pSsvProxies` - a list of all ever deployed client `P2pSsvProxy` instances. Updated automatically during `P2pSsvProxy` instance deployment.
 - `clientSelectors` - a mapping to check if a certain selector (function signature) is allowed for clients to call on `SSVNetwork` via `P2pSsvProxy`.

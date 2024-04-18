@@ -74,10 +74,10 @@ contract MainnetIntegration is Test {
 
         IChangeOperator(address(feeDistributorFactory)).changeOperator(address(p2pSsvProxyFactory));
 
-        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[0], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[0]);
-        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[1], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[1]);
-        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[2], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[2]);
-        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[3], 0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
+        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[0],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[1],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[1]);
+        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[2],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[2]);
+        p2pSsvProxyFactory.setSsvOperatorIds([operatorIds[3],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
 
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
         p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(MaxSsvTokenAmountPerValidator);
@@ -676,16 +676,16 @@ contract MainnetIntegration is Test {
 
         vm.startPrank(owner);
         p2pSsvProxyFactory.setAllowedSsvOperatorOwners(ssvOperatorOwners);
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(0), 0, 0, 0, 0, 0, 40, 0], ssvOperatorOwners[0]);
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(0), 0, 44, 0, 0, 0, 0, 0], ssvOperatorOwners[1]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(0), 0, 0, 0, 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0], ssvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(0), 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], ssvOperatorOwners[1]);
         vm.stopPrank();
 
         vm.startPrank(ssvOperatorOwners[0]);
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(37), 38, 39, 40, 0, 0, 0, 0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(37), 38, 39, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         vm.stopPrank();
 
         vm.startPrank(ssvOperatorOwners[1]);
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(45), 0, 44, 0, 43, 0, 11, 0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(45), 0, 44, 0, 43, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         p2pSsvProxyFactory.clearSsvOperatorIds();
         p2pSsvProxyFactory.clearSsvOperatorIds();
         vm.stopPrank();
@@ -696,7 +696,7 @@ contract MainnetIntegration is Test {
 
         vm.startPrank(ssvOperatorOwners[1]);
         vm.expectRevert(abi.encodeWithSelector(P2pSsvProxyFactory__NotAllowedSsvOperatorOwner.selector, ssvOperatorOwners[1]));
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(45), 0, 44, 0, 43, 0, 11, 0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(45), 0, 44, 0, 43, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         vm.stopPrank();
 
         console.log("test_settersAndRemovers finsihed");
