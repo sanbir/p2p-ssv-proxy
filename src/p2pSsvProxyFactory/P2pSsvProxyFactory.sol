@@ -562,10 +562,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
         address[] calldata _operatorOwners,
         uint64[] calldata _operatorIds,
-
         bytes[] calldata _publicKeys,
         bytes[] calldata _sharesData,
-
         uint256 _amount,
         ISSVNetwork.Cluster calldata _cluster,
 
