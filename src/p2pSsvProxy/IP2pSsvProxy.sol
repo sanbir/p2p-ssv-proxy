@@ -105,6 +105,10 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
         uint256 _amount
     ) external;
 
+    /// @notice Withdraw all SSV tokens from this contract to P2pSsvProxyFactory
+    /// @dev Should be called by P2P only
+    function withdrawAllSSVTokensToFactory() external;
+
     /// @notice Set a new fee recipient address for this contract (cluster owner)
     /// @dev Should be called by P2P only.
     /// Another FeeDistributor instance can become the fee recipient (e.g. if service percentages change).
@@ -115,6 +119,11 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
     function setFeeRecipientAddress(
         address _feeRecipientAddress
     ) external;
+
+    /// @notice Fires the exit event for a set of validators
+    /// @param publicKeys The public keys of the validators to be exited
+    /// @param operatorIds Array of IDs of operators managing the validators
+    function bulkExitValidator(bytes[] calldata publicKeys, uint64[] calldata operatorIds) external;
 
     /// @notice Returns the client address
     /// @return address client address

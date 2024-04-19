@@ -308,10 +308,23 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
     }
 
     /// @inheritdoc IP2pSsvProxy
+    function withdrawAllSSVTokensToFactory() external onlyOwner {
+        uint256 balance = i_ssvToken.balanceOf(address(this));
+        i_ssvToken.transfer(address(i_p2pSsvProxyFactory), balance);
+    }
+
+    /// @inheritdoc IP2pSsvProxy
     function setFeeRecipientAddress(
         address _feeRecipientAddress
     ) external onlyOperatorOrOwner {
         i_ssvNetwork.setFeeRecipientAddress(_feeRecipientAddress);
+    }
+
+    /// @notice Fires the exit event for a set of validators
+    /// @param publicKeys The public keys of the validators to be exited
+    /// @param operatorIds Array of IDs of operators managing the validators
+    function bulkExitValidator(bytes[] calldata publicKeys, uint64[] calldata operatorIds) external onlyOperatorOrOwnerOrClient {
+        i_ssvNetwork.bulkExitValidator(publicKeys, operatorIds);
     }
 
     /// @notice Extract operatorIds and clusterIndex out of SsvOperator list
