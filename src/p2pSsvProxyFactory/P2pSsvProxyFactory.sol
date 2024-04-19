@@ -245,7 +245,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     /// @notice Revert if either 1) one of the operator IDs is not allowed 2) at least 2 operator IDs belong to the same owner
-    modifier onlyAllowedOperators2(address[] calldata _operatorOwners, uint64[] calldata _operatorIds) {
+    modifier onlyAllowedOperatorsByOwner(address[] calldata _operatorOwners, uint64[] calldata _operatorIds) {
         uint256 ownersCount = _operatorOwners.length;
         uint256 idsCount = _operatorIds.length;
         if (ownersCount != idsCount) {
@@ -576,7 +576,16 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
         _makeBeaconDeposits(_depositData, _withdrawalCredentialsAddress, _publicKeys);
 
-        p2pSsvProxy = _registerValidators(_operatorOwners, _operatorIds, _publicKeys, _sharesData, _amount, _cluster, _clientConfig, _referrerConfig);
+        p2pSsvProxy = _registerValidators(
+            _operatorOwners,
+            _operatorIds,
+            _publicKeys,
+            _sharesData,
+            _amount,
+            _cluster,
+            _clientConfig,
+            _referrerConfig
+        );
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
@@ -638,14 +647,14 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     /// @notice Register validators with SSV
     /// @dev Common logic for depositEthAndRegisterValidators and registerValidators functions
-    /// @param _operatorOwners TODO
-    /// @param _operatorIds TODO
-    /// @param _publicKeys TODO
-    /// @param _sharesData TODO
-    /// @param _amount TODO
-    /// @param _cluster TODO
-    /// @param _clientConfig TODO
-    /// @param _referrerConfig TODO
+    /// @param _operatorOwners SSV operator owner addresses
+    /// @param _operatorIds SSV operator IDs
+    /// @param _publicKeys validator public keys
+    /// @param _sharesData encrypted shares related to the validator
+    /// @param _amount amount of ERC-20 SSV tokens to deposit into the cluster
+    /// @param _cluster SSV cluster
+    /// @param _clientConfig address and basis points (percent * 100) of the client (for FeeDistributor)
+    /// @param _referrerConfig address and basis points (percent * 100) of the referrer (for FeeDistributor)
     /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
     function _registerValidators(
         address[] calldata _operatorOwners,
@@ -659,7 +668,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
-    ) private onlyAllowedOperators2(_operatorOwners, _operatorIds) returns (address p2pSsvProxy) {
+    ) private onlyAllowedOperatorsByOwner(_operatorOwners, _operatorIds) returns (address p2pSsvProxy) {
         address feeDistributorInstance = _createFeeDistributor(_clientConfig, _referrerConfig);
         p2pSsvProxy = _createP2pSsvProxy(feeDistributorInstance);
 

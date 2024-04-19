@@ -210,12 +210,12 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
     /// @notice Batch deposit ETH and register validators with SSV (up to 50, calldata size is the limit)
     /// @param _depositData signatures and depositDataRoots from Beacon deposit data
     /// @param _withdrawalCredentialsAddress address for 0x01 withdrawal credentials from Beacon deposit data (1 for the batch)
-    /// @param _operatorOwners TODO
-    /// @param _operatorIds TODO
-    /// @param _publicKeys TODO
-    /// @param _sharesData TODO
-    /// @param _amount TODO
-    /// @param _cluster TODO
+    /// @param _operatorOwners SSV operator owner addresses
+    /// @param _operatorIds SSV operator IDs
+    /// @param _publicKeys validator public keys
+    /// @param _sharesData encrypted shares related to the validator
+    /// @param _amount amount of ERC-20 SSV tokens to deposit into the cluster
+    /// @param _cluster SSV cluster
     /// @param _clientConfig address and basis points (percent * 100) of the client (for FeeDistributor)
     /// @param _referrerConfig address and basis points (percent * 100) of the referrer (for FeeDistributor)
     /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
