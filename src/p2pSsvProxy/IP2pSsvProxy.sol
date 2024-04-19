@@ -39,6 +39,21 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
         SsvPayload calldata _ssvPayload
     ) external;
 
+    /// @notice Registers new validators on the SSV Network
+    /// @dev Should be called by P2pSsvProxyFactory only
+    /// @param publicKeys The public keys of the new validators
+    /// @param operatorIds Array of IDs of operators managing this validator
+    /// @param sharesData Encrypted shares related to the new validators
+    /// @param amount Amount of SSV tokens to be deposited
+    /// @param cluster Cluster to be used with the new validator
+    function bulkRegisterValidators(
+        bytes[] calldata publicKeys,
+        uint64[] calldata operatorIds,
+        bytes[] calldata sharesData,
+        uint256 amount,
+        ISSVNetwork.Cluster calldata cluster
+    ) external;
+
     /// @notice Remove a batch of validators from SSV
     /// @dev Can be called either by P2P or by the client
     /// @param _pubkeys validator pubkeys

@@ -215,6 +215,18 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
     }
 
     /// @inheritdoc IP2pSsvProxy
+    function bulkRegisterValidators(
+        bytes[] calldata publicKeys,
+        uint64[] calldata operatorIds,
+        bytes[] calldata sharesData,
+        uint256 amount,
+        ISSVNetwork.Cluster calldata cluster
+    ) external onlyP2pSsvProxyFactory {
+        i_ssvNetwork.bulkRegisterValidator(publicKeys, operatorIds, sharesData, amount, cluster);
+        i_ssvNetwork.setFeeRecipientAddress(address(s_feeDistributor));
+    }
+
+    /// @inheritdoc IP2pSsvProxy
     function removeValidators(
         bytes[] calldata _pubkeys,
         uint64[] calldata _operatorIds,

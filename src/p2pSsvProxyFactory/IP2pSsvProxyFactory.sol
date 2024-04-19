@@ -207,6 +207,35 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy);
 
+    /// @notice Batch deposit ETH and register validators with SSV (up to 50, calldata size is the limit)
+    /// @param _depositData signatures and depositDataRoots from Beacon deposit data
+    /// @param _withdrawalCredentialsAddress address for 0x01 withdrawal credentials from Beacon deposit data (1 for the batch)
+    /// @param _operatorOwners TODO
+    /// @param _operatorIds TODO
+    /// @param _publicKeys TODO
+    /// @param _sharesData TODO
+    /// @param _amount TODO
+    /// @param _cluster TODO
+    /// @param _clientConfig address and basis points (percent * 100) of the client (for FeeDistributor)
+    /// @param _referrerConfig address and basis points (percent * 100) of the referrer (for FeeDistributor)
+    /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
+    function depositEthAndRegisterValidators(
+        DepositData calldata _depositData,
+        address _withdrawalCredentialsAddress,
+
+        address[] calldata _operatorOwners,
+        uint64[] calldata _operatorIds,
+
+        bytes[] calldata _publicKeys,
+        bytes[] calldata _sharesData,
+
+        uint256 _amount,
+        ISSVNetwork.Cluster calldata _cluster,
+
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) external payable returns (address p2pSsvProxy);
+
     /// @notice Register validators with SSV (up to 60, calldata size is the limit) without ETH deposits
     /// @param _ssvPayload a stuct with data necessary for SSV registration (see `SsvPayload` struct for details)
     /// @param _clientConfig address and basis points (percent * 100) of the client (for FeeDistributor)
