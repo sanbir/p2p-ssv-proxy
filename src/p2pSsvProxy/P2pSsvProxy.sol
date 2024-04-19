@@ -288,7 +288,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         uint256 _tokenAmount,
         uint64[] calldata _operatorIds,
         ISSVNetwork.Cluster[] calldata _clusters
-    ) external onlyOperatorOrOwner {
+    ) public onlyOperatorOrOwner {
         uint256 tokenPerValidator = _tokenAmount / _clusters.length;
         uint256 validatorCount = _clusters.length;
 
@@ -308,9 +308,18 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
     }
 
     /// @inheritdoc IP2pSsvProxy
-    function withdrawAllSSVTokensToFactory() external onlyOperatorOrOwner {
+    function withdrawAllSSVTokensToFactory() public onlyOperatorOrOwner {
         uint256 balance = i_ssvToken.balanceOf(address(this));
         i_ssvToken.transfer(address(i_p2pSsvProxyFactory), balance);
+    }
+
+    function withdrawFromSSVToFactory(
+        uint256 _tokenAmount,
+        uint64[] calldata _operatorIds,
+        ISSVNetwork.Cluster[] calldata _clusters
+    ) external {
+        withdrawFromSSV(_tokenAmount, _operatorIds, _clusters);
+        withdrawAllSSVTokensToFactory();
     }
 
     /// @inheritdoc IP2pSsvProxy

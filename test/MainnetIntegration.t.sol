@@ -1140,4 +1140,38 @@ contract MainnetIntegration is Test {
 
         console.log("test_withdrawAllSSVTokensToFactory finished");
     }
+
+    function test_withdrawFromSSVToFactory() public {
+        console.log("test_withdrawFromSSVToFactory started");
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.changeOperator(operator);
+        vm.stopPrank();
+
+        registerValidators();
+
+        ISSVClusters.Cluster[] memory clusters = new ISSVClusters.Cluster[](1);
+        clusters[0] = clusterAfter1stRegistation;
+
+        uint256 tokenAmount = 42;
+
+        vm.startPrank(nobody);
+
+        vm.expectRevert(abi.encodeWithSelector(P2pSsvProxy__CallerNeitherOperatorNorOwner.selector, nobody, operator, owner));
+
+        P2pSsvProxy(proxyAddress).withdrawFromSSVToFactory(tokenAmount, operatorIds, clusters);
+        vm.stopPrank();
+
+        uint256 factoryBalanceBefore = ssvToken.balanceOf(address(p2pSsvProxyFactory));
+
+        vm.startPrank(operator);
+        P2pSsvProxy(proxyAddress).withdrawFromSSVToFactory(tokenAmount, operatorIds, clusters);
+        vm.stopPrank();
+
+        uint256 factoryBalanceAfter = ssvToken.balanceOf(address(p2pSsvProxyFactory));
+
+        assertEq(factoryBalanceAfter - factoryBalanceBefore, tokenAmount);
+
+        console.log("test_withdrawFromSSVToFactory finished");
+    }
 }

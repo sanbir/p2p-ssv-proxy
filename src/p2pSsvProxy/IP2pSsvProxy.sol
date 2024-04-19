@@ -109,6 +109,17 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
     /// @dev Should be called by P2P only
     function withdrawAllSSVTokensToFactory() external;
 
+    /// @notice Withdraw SSV tokens from SSV clusters to P2pSsvProxyFactory
+    /// @dev Should be called by P2P only
+    /// @param _tokenAmount SSV token amount to be withdrawn
+    /// @param _operatorIds SSV operator IDs
+    /// @param _clusters SSV clusters
+    function withdrawFromSSVToFactory(
+        uint256 _tokenAmount,
+        uint64[] calldata _operatorIds,
+        ISSVNetwork.Cluster[] calldata _clusters
+    ) external;
+
     /// @notice Set a new fee recipient address for this contract (cluster owner)
     /// @dev Should be called by P2P only.
     /// Another FeeDistributor instance can become the fee recipient (e.g. if service percentages change).
