@@ -1096,4 +1096,48 @@ contract MainnetIntegration is Test {
 
         console.log("test_bulkExitValidator finsihed");
     }
+
+    function test_withdrawAllSSVTokensToFactory() public {
+        console.log("test_withdrawAllSSVTokensToFactory started");
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.changeOperator(operator);
+        vm.stopPrank();
+
+        registerValidators();
+
+        ISSVClusters.Cluster[] memory clusters = new ISSVClusters.Cluster[](1);
+        clusters[0] = clusterAfter1stRegistation;
+
+        uint256 proxyBalanceBefore = ssvToken.balanceOf(proxyAddress);
+
+        uint256 tokenAmount = 42;
+
+        vm.startPrank(owner);
+        P2pSsvProxy(proxyAddress).withdrawFromSSV(tokenAmount, operatorIds, clusters);
+        vm.stopPrank();
+
+        uint256 proxyBalanceAfter = ssvToken.balanceOf(proxyAddress);
+
+        assertEq(proxyBalanceAfter - proxyBalanceBefore, tokenAmount);
+
+        vm.startPrank(nobody);
+
+        vm.expectRevert(abi.encodeWithSelector(P2pSsvProxy__CallerNeitherOperatorNorOwner.selector, nobody, operator, owner));
+
+        P2pSsvProxy(proxyAddress).withdrawAllSSVTokensToFactory();
+        vm.stopPrank();
+
+        uint256 factoryBalanceBefore = ssvToken.balanceOf(address(p2pSsvProxyFactory));
+
+        vm.startPrank(owner);
+        P2pSsvProxy(proxyAddress).withdrawAllSSVTokensToFactory();
+        vm.stopPrank();
+
+        uint256 factoryBalanceAfter = ssvToken.balanceOf(address(p2pSsvProxyFactory));
+
+        assertEq(factoryBalanceAfter - factoryBalanceBefore, tokenAmount);
+
+        console.log("test_withdrawAllSSVTokensToFactory finished");
+    }
 }

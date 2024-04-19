@@ -308,7 +308,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
     }
 
     /// @inheritdoc IP2pSsvProxy
-    function withdrawAllSSVTokensToFactory() external onlyOwner {
+    function withdrawAllSSVTokensToFactory() external onlyOperatorOrOwner {
         uint256 balance = i_ssvToken.balanceOf(address(this));
         i_ssvToken.transfer(address(i_p2pSsvProxyFactory), balance);
     }
