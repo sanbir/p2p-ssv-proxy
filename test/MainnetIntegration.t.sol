@@ -1084,6 +1084,13 @@ contract MainnetIntegration is Test {
             ssvPayload1.ssvValidators[1].pubkey
         );
 
+        vm.expectEmit();
+        emit ValidatorExited(
+            proxy1,
+            _operatorIds,
+            ssvPayload1.ssvValidators[3].pubkey
+        );
+
         P2pSsvProxy(proxy1).bulkExitValidator(_pubkeys, _operatorIds);
         vm.stopPrank();
 
