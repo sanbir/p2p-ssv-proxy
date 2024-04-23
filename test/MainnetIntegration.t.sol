@@ -459,7 +459,6 @@ contract MainnetIntegration is Test {
         vm.stopPrank();
 
         DepositData memory depositData2 = getDepositData2();
-        SsvPayload memory ssvPayload2 = getSsvPayload2();
 
         bytes[] memory pubKeys2 = new bytes[](2);
         bytes[] memory sharesData2 = new bytes[](2);
@@ -526,6 +525,38 @@ contract MainnetIntegration is Test {
 
         p2pSsvProxyFactory.registerValidators{value: neededEth}(
             ssvPayload1,
+            clientConfig,
+            referrerConfig
+        );
+
+        vm.stopPrank();
+    }
+
+    function registerValidators_via_bulkRegisterValidators() private {
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
+        vm.stopPrank();
+
+        bytes[] memory pubKeys1 = new bytes[](5);
+        bytes[] memory sharesData1 = new bytes[](5);
+        for (uint256 i = 0; i < 5; i++) {
+            pubKeys1[i] = validatorPubKeys[i];
+            sharesData1[i] = validatorSharesData[i];
+        }
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(getTokenAmount1());
+
+        p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            allowedSsvOperatorOwners,
+            operatorIds,
+            pubKeys1,
+            sharesData1,
+            getTokenAmount1(),
+            getCluster1(),
+
             clientConfig,
             referrerConfig
         );
@@ -951,6 +982,14 @@ contract MainnetIntegration is Test {
         registerValidators();
 
         console.log("test_registerValidators finsihed");
+    }
+
+    function test_registerValidators_via_bulkRegisterValidators() public {
+        console.log("test_registerValidators_via_bulkRegisterValidators started");
+
+        registerValidators_via_bulkRegisterValidators();
+
+        console.log("test_registerValidators_via_bulkRegisterValidators finsihed");
     }
 
     function test_DuplicateOperatorOwner() public {

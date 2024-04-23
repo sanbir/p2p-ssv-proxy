@@ -598,6 +598,32 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
+    function registerValidators(
+        address[] calldata _operatorOwners,
+        uint64[] calldata _operatorIds,
+        bytes[] calldata _publicKeys,
+        bytes[] calldata _sharesData,
+        uint256 _amount,
+        ISSVNetwork.Cluster calldata _cluster,
+
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) external payable returns (address p2pSsvProxy) {
+        _checkEthValue(_amount);
+
+        p2pSsvProxy = _registerValidators(
+            _operatorOwners,
+            _operatorIds,
+            _publicKeys,
+            _sharesData,
+            _amount,
+            _cluster,
+            _clientConfig,
+            _referrerConfig
+        );
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
     function depositToSSV(
         address _clusterOwner,
         uint256 _tokenAmount,
