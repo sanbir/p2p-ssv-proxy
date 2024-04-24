@@ -14,6 +14,7 @@ import "../src/structs/P2pStructs.sol";
 import "../src/mocks/IChangeOperator.sol";
 import "../src/mocks/IMockSsvNetwork.sol";
 import "../src/mocks/IMockSsvNetworkViews.sol";
+import "../src/interfaces/ssv/ISSVOperators.sol";
 
 contract MainnetIntegration is Test {
     address public constant ssvOwner = 0xb35096b074fdb9bBac63E3AdaE0Bbde512B2E6b6;
@@ -1357,5 +1358,52 @@ contract MainnetIntegration is Test {
         assertEq(factoryBalanceAfter - factoryBalanceBefore, tokenAmount);
 
         console.log("test_withdrawFromSSVToFactory finished");
+    }
+
+    function test_registerValidators_Whitelisted() public {
+        console.log("test_registerValidators_Whitelisted started");
+
+        for (uint256 i = 0; i < allowedSsvOperatorOwners.length; i++) {
+            address operator = allowedSsvOperatorOwners[i];
+            vm.startPrank(operator);
+
+            ISSVOperators(ssvNetworkAddress).reduceOperatorFee(operatorIds[i], 0);
+
+            vm.stopPrank();
+        }
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
+        vm.stopPrank();
+
+        bytes[] memory pubKeys1 = new bytes[](5);
+        bytes[] memory sharesData1 = new bytes[](5);
+        for (uint256 i = 0; i < 5; i++) {
+            pubKeys1[i] = validatorPubKeys[i];
+            sharesData1[i] = validatorSharesData[i];
+        }
+
+        uint256 amount = 1.6e18;
+
+        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(amount);
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+
+        p2pSsvProxyFactory.registerValidators{value: neededEth}(
+            allowedSsvOperatorOwners,
+            operatorIds,
+            pubKeys1,
+            sharesData1,
+            amount,
+            getCluster1(),
+
+            clientConfig,
+            referrerConfig
+        );
+
+        vm.stopPrank();
+
+        console.log("test_registerValidators_Whitelisted finished");
     }
 }
