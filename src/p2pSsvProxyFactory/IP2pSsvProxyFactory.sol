@@ -365,4 +365,10 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
     /// @param _tokenAmount SSV token amount
     /// @return needed amount of ETH to cover SSV fees
     function getNeededAmountOfEtherToCoverSsvFees(uint256 _tokenAmount) external view returns (uint256);
+
+    /// @notice Returns whether a given P2pSsvProxy instance has been deployed
+    /// @dev Used by SSVNetwork to whitelist P2pSsvProxy instances
+    /// @param _p2pSsvProxyInstance P2pSsvProxy instance address
+    /// @return true if deployed
+    function isWhitelisted(address _p2pSsvProxyInstance) external view returns (bool);
 }

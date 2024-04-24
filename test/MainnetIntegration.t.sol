@@ -347,6 +347,10 @@ contract MainnetIntegration is Test {
 
         vm.stopPrank();
 
+        address proxy_ = p2pSsvProxyFactory.predictP2pSsvProxyAddress(clientConfig);
+        bool isWhitelisted = p2pSsvProxyFactory.isWhitelisted(proxy_);
+        assertTrue(isWhitelisted);
+
         vm.roll(block.number + 5000);
 
         vm.startPrank(owner);
@@ -1440,6 +1444,9 @@ contract MainnetIntegration is Test {
         );
 
         vm.stopPrank();
+
+        bool isWhitelisted = p2pSsvProxyFactory.isWhitelisted(proxy_);
+        assertTrue(isWhitelisted);
 
         console.log("test_registerValidators_Whitelisted finished");
     }

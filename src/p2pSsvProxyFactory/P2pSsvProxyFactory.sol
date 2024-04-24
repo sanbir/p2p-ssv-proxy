@@ -166,6 +166,10 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     /// @dev Updated automatically during P2pSsvProxy instance deployment.
     mapping(address => address[]) private s_allClientP2pSsvProxies;
 
+    /// @notice a mapping of (P2pSsvProxy instance address → hasBeenDeployed flag).
+    /// @dev Updated automatically during P2pSsvProxy instance deployment.
+    mapping(address => bool) private s_deployedP2pSsvProxies;
+
     /// @notice a list of all ever deployed client P2pSsvProxy instances.
     /// @dev Updated automatically during P2pSsvProxy instance deployment.
     address[] private s_allP2pSsvProxies;
@@ -780,6 +784,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             // append new P2pSsvProxy address to all P2pSsvProxies array
             s_allP2pSsvProxies.push(p2pSsvProxyInstance);
 
+            s_deployedP2pSsvProxies[p2pSsvProxyInstance] = true;
+
             // emit event with the address of the newly created instance for the external listener
             emit P2pSsvProxyFactory__P2pSsvProxyCreated(
                 p2pSsvProxyInstance,
@@ -1028,6 +1034,11 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     /// @inheritdoc IP2pSsvProxyFactory
     function getMaxSsvTokenAmountPerValidator() external view returns (uint112) {
         return s_maxSsvTokenAmountPerValidator;
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
+    function isWhitelisted(address _p2pSsvProxyInstance) external view returns (bool) {
+        return s_deployedP2pSsvProxies[_p2pSsvProxyInstance];
     }
 
     /// @inheritdoc ERC165
