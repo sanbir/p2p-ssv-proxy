@@ -183,6 +183,33 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
         address _feeDistributorInstance
     ) external view returns (address);
 
+    /// @notice Computes the address of a P2pSsvProxy created by `_createP2pSsvProxy` function
+    /// @param _referenceFeeDistributor The address of the reference implementation of FeeDistributor used as the basis for clones
+    /// @param _clientConfig address and basis points (percent * 100) of the client
+    /// @param _referrerConfig address and basis points (percent * 100) of the referrer.
+    /// @return address client P2pSsvProxy instance that will be or has been deployed
+    function predictP2pSsvProxyAddress(
+        address _referenceFeeDistributor,
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) external view returns (address);
+
+    /// @notice Computes the address of a P2pSsvProxy for the default referenceFeeDistributor
+    /// @param _clientConfig address and basis points (percent * 100) of the client
+    /// @param _referrerConfig address and basis points (percent * 100) of the referrer.
+    /// @return address client P2pSsvProxy instance that will be or has been deployed
+    function predictP2pSsvProxyAddress(
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) external view returns (address);
+
+    /// @notice Computes the address of a P2pSsvProxy for the default referenceFeeDistributor and referrerConfig
+    /// @param _clientConfig address and basis points (percent * 100) of the client
+    /// @return address client P2pSsvProxy instance that will be or has been deployed
+    function predictP2pSsvProxyAddress(
+        FeeRecipient calldata _clientConfig
+    ) external view returns (address);
+
     /// @notice Deploy P2pSsvProxy instance if not deployed before
     /// @param _feeDistributorInstance The address of FeeDistributor instance
     /// @return p2pSsvProxyInstance client P2pSsvProxy instance that has been deployed

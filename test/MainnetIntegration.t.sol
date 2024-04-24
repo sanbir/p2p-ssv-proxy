@@ -682,6 +682,34 @@ contract MainnetIntegration is Test {
             assertEq(isClientSelectorAllowedFromFactoryAfter, false);
         }
 
+        {
+            address feeDistributorFactory_ = p2pSsvProxyFactory.getFeeDistributorFactory();
+            address referenceFeeDistributor_ = p2pSsvProxyFactory.getReferenceFeeDistributor();
+            address feeDistributorInstance = IFeeDistributorFactory(feeDistributorFactory_).predictFeeDistributorAddress(
+                referenceFeeDistributor_,
+                clientConfig,
+                referrerConfig
+            );
+
+            address proxy_1 = p2pSsvProxyFactory.predictP2pSsvProxyAddress(feeDistributorInstance);
+            address proxy_2 = p2pSsvProxyFactory.predictP2pSsvProxyAddress(
+                referenceFeeDistributor_,
+                clientConfig,
+                referrerConfig
+            );
+            address proxy_3 = p2pSsvProxyFactory.predictP2pSsvProxyAddress(
+                clientConfig,
+                referrerConfig
+            );
+            address proxy_4 = p2pSsvProxyFactory.predictP2pSsvProxyAddress(
+                clientConfig
+            );
+
+            assertEq(proxy_1, proxy_2);
+            assertEq(proxy_1, proxy_3);
+            assertEq(proxy_1, proxy_4);
+        }
+
         console.log("test_viewFunctions finsihed");
     }
 
@@ -1363,11 +1391,20 @@ contract MainnetIntegration is Test {
     function test_registerValidators_Whitelisted() public {
         console.log("test_registerValidators_Whitelisted started");
 
+        address feeDistributorFactory_ = p2pSsvProxyFactory.getFeeDistributorFactory();
+        address referenceFeeDistributor_ = p2pSsvProxyFactory.getReferenceFeeDistributor();
+        address feeDistributorInstance_ = IFeeDistributorFactory(feeDistributorFactory_).predictFeeDistributorAddress(
+            referenceFeeDistributor_,
+            clientConfig,
+            referrerConfig
+        );
+        address proxy_ = p2pSsvProxyFactory.predictP2pSsvProxyAddress(feeDistributorInstance_);
+
         for (uint256 i = 0; i < allowedSsvOperatorOwners.length; i++) {
-            address operator = allowedSsvOperatorOwners[i];
-            vm.startPrank(operator);
+            vm.startPrank(allowedSsvOperatorOwners[i]);
 
             ISSVOperators(ssvNetworkAddress).reduceOperatorFee(operatorIds[i], 0);
+            ISSVOperators(ssvNetworkAddress).setOperatorWhitelist(operatorIds[i], proxy_);
 
             vm.stopPrank();
         }

@@ -532,6 +532,48 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
+    function predictP2pSsvProxyAddress(
+        address _referenceFeeDistributor,
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) external view returns (address) {
+        address feeDistributorInstance = i_feeDistributorFactory.predictFeeDistributorAddress(
+            _referenceFeeDistributor,
+            _clientConfig,
+            _referrerConfig
+        );
+        return predictP2pSsvProxyAddress(feeDistributorInstance);
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
+    function predictP2pSsvProxyAddress(
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) external view returns (address) {
+        address feeDistributorInstance = i_feeDistributorFactory.predictFeeDistributorAddress(
+            s_referenceFeeDistributor,
+            _clientConfig,
+            _referrerConfig
+        );
+        return predictP2pSsvProxyAddress(feeDistributorInstance);
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
+    function predictP2pSsvProxyAddress(
+        FeeRecipient calldata _clientConfig
+    ) external view returns (address) {
+        address feeDistributorInstance = i_feeDistributorFactory.predictFeeDistributorAddress(
+            s_referenceFeeDistributor,
+            _clientConfig,
+            FeeRecipient({
+                recipient: payable(address(0)),
+                basisPoints: 0
+            })
+        );
+        return predictP2pSsvProxyAddress(feeDistributorInstance);
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
     function createP2pSsvProxy(
         address _feeDistributorInstance
     ) external onlyOperatorOrOwner returns(address p2pSsvProxyInstance) {
