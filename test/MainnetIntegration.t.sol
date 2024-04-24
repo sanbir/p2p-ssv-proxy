@@ -390,6 +390,49 @@ contract MainnetIntegration is Test {
         console.log("test_depositEthAndRegisterValidators_Mainnet finsihed");
     }
 
+    function test_depositEthAndRegisterValidators_Mainnet_Old() public {
+        console.log("test_depositEthAndRegisterValidators_Mainnet_Old started");
+
+        P2pSsvProxyFactory p2pSsvProxyFactory_OLD = P2pSsvProxyFactory(0x10F4ec919E3e692cB79301E58a7055C783630Dfc);
+
+        address feeDistributorFactory_ = p2pSsvProxyFactory_OLD.getFeeDistributorFactory();
+        address referenceFeeDistributor_ = p2pSsvProxyFactory_OLD.getReferenceFeeDistributor();
+        address feeDistributorInstance_ = IFeeDistributorFactory(feeDistributorFactory_).predictFeeDistributorAddress(
+            referenceFeeDistributor_,
+            clientConfig,
+            referrerConfig
+        );
+        address proxy_ = p2pSsvProxyFactory_OLD.predictP2pSsvProxyAddress(feeDistributorInstance_);
+
+        for (uint256 i = 0; i < allowedSsvOperatorOwners.length; i++) {
+            vm.startPrank(allowedSsvOperatorOwners[i]);
+
+            ISSVOperators(ssvNetworkAddress).setOperatorWhitelist(operatorIds[i], proxy_);
+            ISSVOperators(ssvNetworkAddress).reduceOperatorFee(operatorIds[i], 0);
+
+            vm.stopPrank();
+        }
+
+        vm.deal(client, 1000 ether);
+        vm.startPrank(client);
+
+        DepositData memory depositData1DifferentLength = getDepositData1DifferentLength();
+        DepositData memory depositData1 = getDepositData1();
+        SsvPayload memory ssvPayload1 = getSsvPayload1();
+
+        p2pSsvProxyFactory_OLD.depositEthAndRegisterValidators{value: 160 ether}(
+            depositData1,
+            withdrawalCredentialsAddress,
+            ssvPayload1,
+            clientConfig,
+            referrerConfig
+        );
+
+        vm.stopPrank();
+
+        console.log("test_depositEthAndRegisterValidators_Mainnet_Old finsihed");
+    }
+
     function test_depositEthAndRegisterValidators_via_bulkRegisterValidators() public {
         console.log("test_depositEthAndRegisterValidators_via_bulkRegisterValidators started");
 
