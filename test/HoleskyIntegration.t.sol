@@ -45,10 +45,10 @@ contract HoleskyIntegration is Test {
 
         IChangeOperator(address(feeDistributorFactory)).changeOperator(address(p2pSsvProxyFactory));
 
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(326), 315,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[0]);
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(236),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[1]);
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(306),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[2]);
-        p2pSsvProxyFactory.setSsvOperatorIds([uint64(400),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(326), 315,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[0]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(236),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[1]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(306),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[2]);
+        p2pSsvProxyFactory.setSsvOperatorIds([uint64(400),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], allowedSsvOperatorOwners[3]);
 
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(7539000000000000);
         p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(30 ether);
