@@ -7,10 +7,11 @@ import "../@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../structs/P2pStructs.sol";
 import "../constants/P2pConstants.sol";
 import "../interfaces/ssv/ISSVNetwork.sol";
+import "../interfaces/ssv/ISSVWhitelistingContract.sol";
 import "../access/IOwnableWithOperator.sol";
 
 /// @dev External interface of P2pSsvProxyFactory
-interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
+interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator, IERC165 {
 
     /// @notice Emits when batch registration of validator with SSV is completed
     /// @param _proxy address of P2pSsvProxy that was used for registration and became the cluster owner
@@ -365,10 +366,4 @@ interface IP2pSsvProxyFactory is IOwnableWithOperator, IERC165 {
     /// @param _tokenAmount SSV token amount
     /// @return needed amount of ETH to cover SSV fees
     function getNeededAmountOfEtherToCoverSsvFees(uint256 _tokenAmount) external view returns (uint256);
-
-    /// @notice Returns whether a given P2pSsvProxy instance has been deployed
-    /// @dev Used by SSVNetwork to whitelist P2pSsvProxy instances
-    /// @param _p2pSsvProxyInstance P2pSsvProxy instance address
-    /// @return true if deployed
-    function isWhitelisted(address _p2pSsvProxyInstance) external view returns (bool);
 }

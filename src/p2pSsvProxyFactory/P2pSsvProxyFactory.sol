@@ -1036,9 +1036,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         return s_maxSsvTokenAmountPerValidator;
     }
 
-    /// @inheritdoc IP2pSsvProxyFactory
-    function isWhitelisted(address _p2pSsvProxyInstance) external view returns (bool) {
-        return s_deployedP2pSsvProxies[_p2pSsvProxyInstance];
+    /// @inheritdoc ISSVWhitelistingContract
+    function isWhitelisted(address account, uint256 operatorId) external view returns (bool) {
+        return s_deployedP2pSsvProxies[account];
     }
 
     /// @inheritdoc ERC165

@@ -9,12 +9,16 @@ import "forge-std/console.sol";
 import "forge-std/console2.sol";
 
 import "../src/interfaces/ssv/ISSVClusters.sol";
+import "../src/interfaces/ssv/ISSVOperators.sol";
+
 import "../src/p2pSsvProxyFactory/P2pSsvProxyFactory.sol";
+import "../src/p2pSsvProxy/P2pSsvProxy.sol";
+import "../src/access/OwnableBase.sol";
 import "../src/structs/P2pStructs.sol";
+
 import "../src/mocks/IChangeOperator.sol";
 import "../src/mocks/IMockSsvNetwork.sol";
 import "../src/mocks/IMockSsvNetworkViews.sol";
-import "../src/interfaces/ssv/ISSVOperators.sol";
 
 contract MainnetIntegration is Test {
     address public constant ssvOwner = 0xb35096b074fdb9bBac63E3AdaE0Bbde512B2E6b6;
@@ -348,7 +352,7 @@ contract MainnetIntegration is Test {
         vm.stopPrank();
 
         address proxy_ = p2pSsvProxyFactory.predictP2pSsvProxyAddress(clientConfig);
-        bool isWhitelisted = p2pSsvProxyFactory.isWhitelisted(proxy_);
+        bool isWhitelisted = p2pSsvProxyFactory.isWhitelisted(proxy_, 42);
         assertTrue(isWhitelisted);
 
         vm.roll(block.number + 5000);
@@ -1488,7 +1492,7 @@ contract MainnetIntegration is Test {
 
         vm.stopPrank();
 
-        bool isWhitelisted = p2pSsvProxyFactory.isWhitelisted(proxy_);
+        bool isWhitelisted = p2pSsvProxyFactory.isWhitelisted(proxy_, 42);
         assertTrue(isWhitelisted);
 
         console.log("test_registerValidators_Whitelisted finished");
