@@ -262,6 +262,15 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy);
 
+    /// @notice Deposit unlimited amount of ETH for SSV staking
+    /// @param _clientConfig address and basis points (percent * 100) of the client (for FeeDistributor)
+    /// @param _referrerConfig address and basis points (percent * 100) of the referrer (for FeeDistributor)
+    /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
+    function depositEth(
+        FeeRecipient calldata _clientConfig,
+        FeeRecipient calldata _referrerConfig
+    ) external payable returns (address p2pSsvProxy);
+
     /// @notice Register validators with SSV (up to 60, calldata size is the limit) without ETH deposits
     /// @param _ssvPayload a stuct with data necessary for SSV registration (see `SsvPayload` struct for details)
     /// @param _clientConfig address and basis points (percent * 100) of the client (for FeeDistributor)
@@ -294,6 +303,26 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy);
+
+    /// @notice Register validators with SSV (up to 60, calldata size is the limit) without ETH deposits
+    /// @dev Callable by P2P only.
+    /// @param _operatorOwners SSV operator owner addresses
+    /// @param _operatorIds SSV operator IDs
+    /// @param _publicKeys validator public keys
+    /// @param _sharesData encrypted shares related to the validator
+    /// @param _amount amount of ERC-20 SSV tokens to deposit into the cluster
+    /// @param _cluster SSV cluster
+    /// @param _feeDistributorInstance client FeeDistributor instance
+    /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
+    function registerValidators(
+        address[] calldata _operatorOwners,
+        uint64[] calldata _operatorIds,
+        bytes[] calldata _publicKeys,
+        bytes[] calldata _sharesData,
+        uint256 _amount,
+        ISSVNetwork.Cluster calldata _cluster,
+        address _feeDistributorInstance
+    ) external returns (address p2pSsvProxy);
 
     /// @notice Deposit SSV tokens from P2pSsvProxyFactory to SSV cluster
     /// @dev Can only be called by P2pSsvProxyFactory owner

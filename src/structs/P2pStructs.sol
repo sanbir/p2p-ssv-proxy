@@ -51,3 +51,17 @@ struct SsvPayload {
     uint256 tokenAmount;
     bytes32 ssvSlot0;
 }
+
+/// @dev status of the client deposit
+/// @member None default status indicating that no ETH is waiting to be forwarded to Beacon DepositContract
+/// @member EthAdded client added ETH
+/// @member BeaconDepositInProgress P2P has forwarded some (but not all) ETH to Beacon DepositContract
+/// If all ETH has been forwarded, the status will be None.
+/// @member ServiceRejected P2P has rejected the service for a given FeeDistributor instance
+// The client can get a refund immediately.
+enum ClientDepositStatus {
+    None,
+    EthAdded,
+    BeaconDepositInProgress,
+    ServiceRejected
+}
