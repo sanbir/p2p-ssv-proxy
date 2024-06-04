@@ -13,13 +13,18 @@ contract Deploy is Script {
         P2pSsvProxyFactory,
         P2pSsvProxy
     ) {
+        address p2pOrgUnlimitedEthDepositor = vm.envAddress("P2P_ORG_UNLIMITED_ETH_DEPOSITOR");
         address feeDistributorFactory = vm.envAddress("FEE_DISTRIBUTOR_FACTORY");
         address referenceFeeDistributor = vm.envAddress("REFERENCE_FEE_DISTRIBUTOR");
 
         uint256 deployerKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerKey);
 
-        P2pSsvProxyFactory p2pSsvProxyFactory = new P2pSsvProxyFactory(feeDistributorFactory, referenceFeeDistributor);
+        P2pSsvProxyFactory p2pSsvProxyFactory = new P2pSsvProxyFactory(
+            p2pOrgUnlimitedEthDepositor,
+            feeDistributorFactory,
+            referenceFeeDistributor
+        );
         P2pSsvProxy referenceP2pSsvProxy = new P2pSsvProxy(address(p2pSsvProxyFactory));
         p2pSsvProxyFactory.setReferenceP2pSsvProxy(address(referenceP2pSsvProxy));
 

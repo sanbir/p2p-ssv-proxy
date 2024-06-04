@@ -33,9 +33,10 @@ contract MainnetIntegration is Test {
     P2pSsvProxyFactory public p2pSsvProxyFactory;
     address payable public constant client = payable(address(0x62a90760c7ce5CBaDbb64188ad075e9A52518D41));
     address public constant withdrawalCredentialsAddress = 0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
-    
-    IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0x86a9f3e908b4658A1327952Eb1eC297a4212E1bb);
-    address public constant referenceFeeDistributor = 0x7109DeEb07aa9Eed1e2613F88b2f3E1e6C05163f;
+
+    IP2pOrgUnlimitedEthDepositor public constant p2pOrgUnlimitedEthDepositor = IP2pOrgUnlimitedEthDepositor(0x109D1091Fa5fdc65720f7c623590A15B43265E43);
+    IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0xf6B1a21282CA77a02160EC6A37f7A008B231E0dF);
+    address public constant referenceFeeDistributor = 0xCA2a3d2267Cf1309B21d08a16BE414AC5455796F;
     address public referenceP2pSsvProxy;
     ISSVClusters.Cluster public clusterAfter1stRegistation;
 
@@ -73,7 +74,11 @@ contract MainnetIntegration is Test {
 
         vm.startPrank(owner);
 
-        p2pSsvProxyFactory = new P2pSsvProxyFactory(address(feeDistributorFactory), referenceFeeDistributor);
+        p2pSsvProxyFactory = new P2pSsvProxyFactory(
+            address(p2pOrgUnlimitedEthDepositor),
+            address(feeDistributorFactory),
+            referenceFeeDistributor
+        );
         referenceP2pSsvProxy = address(new P2pSsvProxy(address(p2pSsvProxyFactory)));
         p2pSsvProxyFactory.setReferenceP2pSsvProxy(referenceP2pSsvProxy);
 
@@ -1453,5 +1458,18 @@ contract MainnetIntegration is Test {
         assertTrue(isWhitelisted);
 
         console.log("test_registerValidators_Whitelisted finished");
+    }
+
+    function test_depositEth() public {
+        console.log("test_depositEth started");
+
+        vm.deal(client, 100000 ether);
+        vm.startPrank(client);
+
+        p2pSsvProxyFactory.depositEth{value: 42 ether}(clientConfig, referrerConfig);
+
+        vm.stopPrank();
+
+        console.log("test_depositEth finished");
     }
 }

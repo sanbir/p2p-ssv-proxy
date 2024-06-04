@@ -102,6 +102,18 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
         address indexed _ssvOperatorOwner
     );
 
+    /// @notice Emits when client deposited their ETH for SSV staking
+    /// @param _sender address who sent ETH
+    /// @param _p2pSsvProxy address of the client instance of P2pSsvProxy
+    /// @param _feeDistributorInstance address of the client instance of FeeDistributor
+    /// @param _ethAmountInWei amount of deposited ETH in wei
+    event P2pSsvProxyFactory__EthForSsvStakingDeposited(
+        address indexed _sender,
+        address indexed _p2pSsvProxy,
+        address indexed _feeDistributorInstance,
+        uint256 _ethAmountInWei
+    );
+
     /// @notice Set Exchange rate between SSV and ETH set by P2P.
     /// @dev (If 1 SSV = 0.007539 ETH, it should be 0.007539 * 10^18 = 7539000000000000).
     /// @param _ssvPerEthExchangeRateDividedByWei Exchange rate
@@ -306,7 +318,6 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
 
     /// @notice Register validators with SSV (up to 60, calldata size is the limit) without ETH deposits
     /// @dev Callable by P2P only.
-    /// @param _operatorOwners SSV operator owner addresses
     /// @param _operatorIds SSV operator IDs
     /// @param _publicKeys validator public keys
     /// @param _sharesData encrypted shares related to the validator
@@ -315,7 +326,6 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
     /// @param _feeDistributorInstance client FeeDistributor instance
     /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
     function registerValidators(
-        address[] calldata _operatorOwners,
         uint64[] calldata _operatorIds,
         bytes[] calldata _publicKeys,
         bytes[] calldata _sharesData,

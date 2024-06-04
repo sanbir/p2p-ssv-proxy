@@ -131,7 +131,7 @@ error P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength(
 /// @notice P2pSsvProxy should have already been deployed for the given FeeDistributor instance
 /// @param _feeDistributorInstance client FeeDistributor instance
 error P2pSsvProxyFactory__P2pSsvProxyDoesNotExist(
-    uint256 _feeDistributorInstance
+    address _feeDistributorInstance
 );
 
 /// @title Entry point for SSV validator registration
@@ -658,13 +658,20 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy) {
-        address feeDistributorInstance = i_p2pOrgUnlimitedEthDepositor.addEth(
+        address feeDistributorInstance = i_p2pOrgUnlimitedEthDepositor.addEth{value: msg.value}(
             s_referenceFeeDistributor,
             _clientConfig,
             _referrerConfig
         );
 
         p2pSsvProxy = _createP2pSsvProxy(feeDistributorInstance);
+
+        emit P2pSsvProxyFactory__EthForSsvStakingDeposited(
+            msg.sender,
+            p2pSsvProxy,
+            feeDistributorInstance,
+            msg.value
+        );
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
@@ -706,7 +713,6 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     /// @inheritdoc IP2pSsvProxyFactory
     function registerValidators(
-        address[] calldata _operatorOwners,
         uint64[] calldata _operatorIds,
         bytes[] calldata _publicKeys,
         bytes[] calldata _sharesData,
