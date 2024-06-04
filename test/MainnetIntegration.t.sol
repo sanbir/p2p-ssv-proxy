@@ -52,6 +52,7 @@ contract MainnetIntegration is Test {
 
     uint112 public constant SsvPerEthExchangeRateDividedByWei = 7539000000000000;
     uint112 public constant MaxSsvTokenAmountPerValidator = 30 ether;
+    uint40 constant TIMEOUT = 1 days;
 
     event ValidatorAdded(address indexed owner, uint64[] operatorIds, bytes publicKey, bytes shares, ISSVClusters.Cluster cluster);
 
@@ -1465,7 +1466,8 @@ contract MainnetIntegration is Test {
     function test_makeBeaconDepositsAndRegisterValidators() public {
         console.log("test_makeBeaconDepositsAndRegisterValidators started");
 
-        uint256 clientDeposit = 7 * 32 ether + 13 ether;
+        uint256 nonDepositable = 13 ether;
+        uint256 clientDeposit = 7 * 32 ether + nonDepositable;
 
         FeeRecipient memory clientConfig1 = FeeRecipient({
             recipient: payable(withdrawalCredentialsAddress),
@@ -1485,6 +1487,13 @@ contract MainnetIntegration is Test {
             pubKeys1[i] = validatorPubKeys[i];
             sharesData1[i] = validatorSharesData[i];
         }
+        DepositData memory depositData2 = getDepositData2();
+        bytes[] memory pubKeys2 = new bytes[](2);
+        bytes[] memory sharesData2 = new bytes[](2);
+        for (uint256 i = 0; i < 2; i++) {
+            pubKeys2[i] = validatorPubKeys[i + 5];
+            sharesData2[i] = validatorSharesData[i + 5];
+        }
 
         vm.startPrank(operator);
         p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
@@ -1498,7 +1507,30 @@ contract MainnetIntegration is Test {
 
             feeDistributorInstance
         );
+        p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            depositData2,
+
+            operatorIds,
+            pubKeys2,
+            sharesData2,
+            getTokenAmount1(),
+            clusterAfter1stRegistation,
+
+            feeDistributorInstance
+        );
         vm.stopPrank();
+
+        vm.warp(block.timestamp + TIMEOUT + 1);
+
+        uint256 balanceBefore = withdrawalCredentialsAddress.balance;
+
+        vm.startPrank(withdrawalCredentialsAddress);
+        p2pOrgUnlimitedEthDepositor.refund(feeDistributorInstance);
+        vm.stopPrank();
+
+        uint256 balanceAfter = withdrawalCredentialsAddress.balance;
+
+        assertEqUint(balanceAfter - balanceBefore, nonDepositable);
 
         console.log("test_makeBeaconDepositsAndRegisterValidators finished");
     }
