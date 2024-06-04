@@ -106,6 +106,8 @@ contract MainnetIntegration is Test {
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
         p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(MaxSsvTokenAmountPerValidator);
 
+        p2pSsvProxyFactory.changeOperator(operator);
+
         vm.stopPrank();
 
         deal(address(ssvToken), address(p2pSsvProxyFactory), 50000 ether);
@@ -1460,16 +1462,44 @@ contract MainnetIntegration is Test {
         console.log("test_registerValidators_Whitelisted finished");
     }
 
-    function test_depositEth() public {
-        console.log("test_depositEth started");
+    function test_makeBeaconDepositsAndRegisterValidators() public {
+        console.log("test_makeBeaconDepositsAndRegisterValidators started");
+
+        uint256 clientDeposit = 7 * 32 ether + 13 ether;
+
+        FeeRecipient memory clientConfig1 = FeeRecipient({
+            recipient: payable(withdrawalCredentialsAddress),
+            basisPoints: 9500
+        });
 
         vm.deal(client, 100000 ether);
         vm.startPrank(client);
-
-        p2pSsvProxyFactory.depositEth{value: 42 ether}(clientConfig, referrerConfig);
-
+        p2pSsvProxyFactory.addEth{value: clientDeposit}(clientConfig1, referrerConfig);
         vm.stopPrank();
 
-        console.log("test_depositEth finished");
+        address feeDistributorInstance = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, clientConfig1, referrerConfig);
+        DepositData memory depositData1 = getDepositData1();
+        bytes[] memory pubKeys1 = new bytes[](5);
+        bytes[] memory sharesData1 = new bytes[](5);
+        for (uint256 i = 0; i < 5; i++) {
+            pubKeys1[i] = validatorPubKeys[i];
+            sharesData1[i] = validatorSharesData[i];
+        }
+
+        vm.startPrank(operator);
+        p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            depositData1,
+
+            operatorIds,
+            pubKeys1,
+            sharesData1,
+            getTokenAmount1(),
+            getCluster1(),
+
+            feeDistributorInstance
+        );
+        vm.stopPrank();
+
+        console.log("test_makeBeaconDepositsAndRegisterValidators finished");
     }
 }

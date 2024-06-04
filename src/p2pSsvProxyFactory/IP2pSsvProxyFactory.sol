@@ -275,10 +275,11 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
     ) external payable returns (address p2pSsvProxy);
 
     /// @notice Deposit unlimited amount of ETH for SSV staking
+    /// @dev Callable by clients
     /// @param _clientConfig address and basis points (percent * 100) of the client (for FeeDistributor)
     /// @param _referrerConfig address and basis points (percent * 100) of the referrer (for FeeDistributor)
     /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
-    function depositEth(
+    function addEth(
         FeeRecipient calldata _clientConfig,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy);
@@ -316,8 +317,9 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
         FeeRecipient calldata _referrerConfig
     ) external payable returns (address p2pSsvProxy);
 
-    /// @notice Register validators with SSV (up to 60, calldata size is the limit) without ETH deposits
+    /// @notice Send ETH to ETH2 DepositContract on behalf of the client and register validators with SSV (up to 60, calldata size is the limit)
     /// @dev Callable by P2P only.
+    /// @param _depositData signatures and depositDataRoots from Beacon deposit data
     /// @param _operatorIds SSV operator IDs
     /// @param _publicKeys validator public keys
     /// @param _sharesData encrypted shares related to the validator
@@ -325,7 +327,8 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
     /// @param _cluster SSV cluster
     /// @param _feeDistributorInstance client FeeDistributor instance
     /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
-    function registerValidators(
+    function makeBeaconDepositsAndRegisterValidators(
+        DepositData calldata _depositData,
         uint64[] calldata _operatorIds,
         bytes[] calldata _publicKeys,
         bytes[] calldata _sharesData,
