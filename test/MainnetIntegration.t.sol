@@ -107,8 +107,6 @@ contract MainnetIntegration is Test {
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
         p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(MaxSsvTokenAmountPerValidator);
 
-        p2pSsvProxyFactory.changeOperator(operator);
-
         vm.stopPrank();
 
         deal(address(ssvToken), address(p2pSsvProxyFactory), 50000 ether);
@@ -1473,6 +1471,10 @@ contract MainnetIntegration is Test {
             recipient: payable(withdrawalCredentialsAddress),
             basisPoints: 9500
         });
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.changeOperator(operator);
+        vm.stopPrank();
 
         vm.deal(client, 100000 ether);
         vm.startPrank(client);
