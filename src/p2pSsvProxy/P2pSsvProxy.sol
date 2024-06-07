@@ -163,7 +163,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         if (success) {
             emit P2pSsvProxy__SuccessfullyCalledViaFallback(caller, selector);
 
-            assembly {
+            assembly ("memory-safe") {
                 return(add(data, 0x20), mload(data))
             }
         } else {
@@ -181,7 +181,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         if (success) {
             emit P2pSsvProxy__SuccessfullyCalledExternalContract(_contract, bytes4(_calldata));
 
-            assembly {
+            assembly ("memory-safe") {
                 return(add(data, 0x20), mload(data))
             }
         } else {
