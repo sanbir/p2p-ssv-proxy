@@ -1536,4 +1536,41 @@ contract MainnetIntegration is Test {
 
         console.log("test_makeBeaconDepositsAndRegisterValidators finished");
     }
+
+    function test_callAnyContract() public {
+        console.log("test_callAnyContract started");
+
+        vm.startPrank(owner);
+        P2pSsvProxy p2pSsvProxyInstance = P2pSsvProxy(p2pSsvProxyFactory.createP2pSsvProxy(referenceFeeDistributor));
+        vm.stopPrank();
+
+        deal(address(ssvToken), address(p2pSsvProxyInstance), 50 ether);
+        uint256 amount = 42 ether;
+
+        address ssvTokenAddress = address(ssvToken);
+        bytes memory contractCalldata = abi.encodeWithSelector(
+            IERC20.transfer.selector,
+            owner,
+            amount
+        );
+
+        vm.startPrank(nobody);
+        vm.expectRevert(abi.encodeWithSelector(
+            OwnableBase__CallerNotOwner.selector, nobody, owner
+        ));
+        p2pSsvProxyInstance.callAnyContract(ssvTokenAddress, contractCalldata);
+        vm.stopPrank();
+
+        uint256 ssvTokenBalanceBefore = ssvToken.balanceOf(owner);
+
+        vm.startPrank(owner);
+        p2pSsvProxyInstance.callAnyContract(ssvTokenAddress, contractCalldata);
+        vm.stopPrank();
+
+        uint256 ssvTokenBalanceAfter = ssvToken.balanceOf(owner);
+
+        assertEq(ssvTokenBalanceAfter - ssvTokenBalanceBefore, amount);
+
+        console.log("test_callAnyContract finished");
+    }
 }

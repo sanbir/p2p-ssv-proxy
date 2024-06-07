@@ -25,11 +25,29 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
         bytes4 indexed _selector
     );
 
+    /// @notice Emits when an arbitrary external contract has been called by owner via P2pSsvProxy
+    /// @param _contract external contract address
+    /// @param _selector selector of the called function
+    event P2pSsvProxy__SuccessfullyCalledExternalContract(
+        address indexed _contract,
+        bytes4 indexed _selector
+    );
+
     /// @notice Initialize the P2pSsvProxy instance
     /// @dev Should only be called by P2pSsvProxyFactory
     /// @param _feeDistributor FeeDistributor instance that determines the identity of this P2pSsvProxy instance
     function initialize(
         address _feeDistributor
+    ) external;
+
+    /// @notice Call an arbitrary external contract with P2pSsvProxy as a msg.sender
+    /// @dev Should be called by owner only
+    /// @dev This function can help e.g. in claiming airdrops
+    /// @param _contract external contract address
+    /// @param _calldata calldata for the external contract
+    function callAnyContract(
+        address _contract,
+        bytes calldata _calldata
     ) external;
 
     /// @notice Register a batch of validators with SSV

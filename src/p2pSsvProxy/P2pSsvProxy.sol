@@ -173,6 +173,24 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
     }
 
     /// @inheritdoc IP2pSsvProxy
+    function callAnyContract(
+        address _contract,
+        bytes calldata _calldata
+    ) external onlyOwner {
+        (bool success, bytes memory data) = address(_contract).call(_calldata);
+        if (success) {
+            emit P2pSsvProxy__SuccessfullyCalledExternalContract(_contract, bytes4(_calldata));
+
+            assembly {
+                return(add(data, 0x20), mload(data))
+            }
+        } else {
+            // Decode the reason from the error data returned from the call and revert with it.
+            revert(string(data));
+        }
+    }
+
+    /// @inheritdoc IP2pSsvProxy
     function registerValidators(
         SsvPayload calldata _ssvPayload
     ) external onlyP2pSsvProxyFactory {
