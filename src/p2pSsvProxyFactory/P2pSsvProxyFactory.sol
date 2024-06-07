@@ -758,6 +758,54 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     }
 
     /// @inheritdoc IP2pSsvProxyFactory
+    function makeBeaconDepositsAndRegisterValidators(
+        DepositData calldata _depositData,
+        uint64[] calldata _operatorIds,
+        bytes[] calldata _publicKeys,
+        bytes[] calldata _sharesData,
+        uint256 _amount,
+        ISSVNetwork.Cluster calldata _cluster,
+        address _feeDistributorInstance,
+        uint256 _ethAmountPerValidator
+    ) external onlyOperatorOrOwner returns (address p2pSsvProxy) {
+        p2pSsvProxy = predictP2pSsvProxyAddress(_feeDistributorInstance);
+        if (p2pSsvProxy.code.length == 0) {
+            revert P2pSsvProxyFactory__P2pSsvProxyDoesNotExist(_feeDistributorInstance);
+        }
+
+        uint256 validatorCount = _publicKeys.length;
+        _checkTokenAmount(_amount, validatorCount);
+
+        if (_depositData.signatures.length != validatorCount || _depositData.depositDataRoots.length != validatorCount) {
+            revert P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength(
+                validatorCount,
+                _depositData.signatures.length,
+                _depositData.depositDataRoots.length
+            );
+        }
+
+        i_p2pOrgUnlimitedEthDepositor.makeBeaconDeposit(
+            _feeDistributorInstance,
+            _publicKeys,
+            _depositData.signatures,
+            _depositData.depositDataRoots,
+            _ethAmountPerValidator
+        );
+
+        i_ssvToken.transfer(address(p2pSsvProxy), _amount);
+
+        P2pSsvProxy(p2pSsvProxy).bulkRegisterValidators(
+            _publicKeys,
+            _operatorIds,
+            _sharesData,
+            _amount,
+            _cluster
+        );
+
+        emit P2pSsvProxyFactory__RegistrationCompleted(p2pSsvProxy);
+    }
+
+    /// @inheritdoc IP2pSsvProxyFactory
     function depositToSSV(
         address _clusterOwner,
         uint256 _tokenAmount,

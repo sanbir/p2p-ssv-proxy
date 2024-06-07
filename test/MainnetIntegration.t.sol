@@ -48,6 +48,7 @@ contract MainnetIntegration is Test {
     address[] allowedSsvOperatorOwners;
 
     bytes[] validatorPubKeys;
+    bytes[] validatorPubKeys_42eth;
     bytes[] validatorSharesData;
 
     uint112 public constant SsvPerEthExchangeRateDividedByWei = 7539000000000000;
@@ -69,6 +70,8 @@ contract MainnetIntegration is Test {
     event FeeRecipientAddressUpdated(address indexed owner, address recipientAddress);
 
     event ValidatorExited(address indexed owner, uint64[] operatorIds, bytes publicKey);
+
+    error P2pOrgUnlimitedEthDepositor__Eip7251NotEnabledYet();
 
     function setUp() public {
         vm.createSelectFork("mainnet", 20009782);
@@ -138,6 +141,15 @@ contract MainnetIntegration is Test {
         validatorPubKeys[4] = bytes(hex'95dc732567172754d9a1764b0ce4aefba1c25d82983d964bafd26e8776c8b8197695b569b00321fa581eb70d528bca57');
         validatorPubKeys[5] = bytes(hex'92269be7b88c417f46aafd18943783990df0952c9858bd3147815e31f48d1be5f559387b696231f98fcc5ca2b3ff354e');
         validatorPubKeys[6] = bytes(hex'a413b93c25f77d27c5edab2b131d06bc90215c3eb2761309fdac35b0c76e12dccf45788a7ca0228b591cafb8626ab01a');
+
+        validatorPubKeys_42eth = new bytes[](7);
+        validatorPubKeys_42eth[0] = bytes(hex'a9ff619fbfedc3178cd401526b8320590903f8278c00ab1bf791b836cce92f2afa7c884dca2684a0a835a588e8661fa7');
+        validatorPubKeys_42eth[1] = bytes(hex'ab7fa41fbf3e05cc29028140a2a56909f35e6f83766799182d6fa80e85a133907387455ecff841358392c4bfaa5c8329');
+        validatorPubKeys_42eth[2] = bytes(hex'b88a4490baabd8d0e23ea0cc3ac81f95986272f0a355a2d180d85b67dfc99a749b69eae4138505aa4bc06b24cbde9fa0');
+        validatorPubKeys_42eth[3] = bytes(hex'99f25ba85bc78d39e0ea79185fb75b19b51751fb01dd961ec31e15378b050ed6b8d896e2a7c3bb2cd789aef82674a90f');
+        validatorPubKeys_42eth[4] = bytes(hex'833ac26a630899fd5e2e1f0aef225072eab71ae346a8968d79f091a6ecf33ffeba0d2221419fe2674b15f79e68fc6f52');
+        validatorPubKeys_42eth[5] = bytes(hex'8d6984fdade19e2a3bd64bbb83f280dd4701366ecdf47ef49e3c57ef0838327102c9e3af37f87be33b92a278b4a7ee04');
+        validatorPubKeys_42eth[6] = bytes(hex'944a91ae380a0ece1a41a9cf22729d4af45373308400b2b178f56eaa9322d55b85bd97bd4d82aec8fb8b0fe4152a0ab0');
 
         validatorSharesData = new bytes[](7);
         validatorSharesData[0] = bytes(hex'9714c5518407c3efb9cd40325ec39ca98fa10eb77012d47ce70a0518d2655d59d87df84fd84f8a063d0738bfd1ce002116d110e43ce18c70490fc561fca546bc6097030e5e533fd1c9002cd6785f7427d5b483d77f13189e71241e44e1b84d9b8e62a349a1fc9e6257aac8e2ad30073409a6345a9c002a4c7f2e27db41560bd735eed89ad073229a4dd9355dee558bd5a70ac0e7396e526205cb47014514f475065bb5b6e8ffb214f2a6da2ae4b7198ce069a6cc4fc9852d973c94fb3f0dfd63850649abef689d3dce185fae59232ba953fa3b6b3306782ed0a877a8c1e4979c62e1f0dee8ef2dcf237cd5df5340b951a4c32a3e2783ccdbb8b277c452fdbc2b186370c42631fe80b8cd115c48a2ce9f27c6791c03d48716673d6a3293ef989840a01829d5e504e22e16559516c6c6f4386d6fccdf83b0b1e10abcff06a5c964d87a616731ad7d543b6cfd3dcaeb4795ac50cbc1115d4d17c77d7119ab817a4952cf4aad389dace806e9fd7568c365ea96c02a9256e843846e96a070291d387f41e4a056d22c5b9286a0124e4330be9581818954b41a45a107f84e55f4f0e2799afd57517681db4fd7bd8bc4cedd4cbd19f1b2648fc34774396d7ec836cce3de792cffa21472fd806d331227ec21411ae4cb5a47558d383804cedabfce4e7ef49218255a1688ac8e2ef5aa0f43782655aa6002002a19d28ef90930d374006b3b9f44f09ae999223488e735551bf76e684e61966bf32e6dcbc6b3fa056a79692660af6f21ac806613e9a8586bf381b858598c30862d88b7f50a7805caf7b8c54ad5c08f8a2ca2f12e0de97b9c8c3dea41f61b90917b5cd0fe9a5fd7e6b367605aced36e6febac6900c05247a5d7a8df947458d75e8ec5cc907b86143b0574161fd2cd0fb7e3493cd5647a058820795b9fb236931e6efc89352b6e18c4fd3b61f73c5a80da892e20b5a28fe2cda5d48792c43c38ae3e51d6ad4141424019b54e4cb265e313fb737eb3c26796cee15f43ca3e19bffd7acec585e4190eba707f4bb187ff48ea0a3fa5392d182cc51f64cf1081e58948c030ec96cc688e00a84f1afd343b95c0a741c980655c02b6ffb049429d577e66204affac29e01d0ef9f6fd7047885814a84d8caa50af6fd9d5ccc10e31e0709dd9d66d84283a45ba6de07ebc96e66a04e5d7ed0714a0b3f2a3edaef9c73b9d24951f783e70b29073c49c4f5d099c5bdd10277eeacf765e3f3704e6812353fb263564aefb090f60598ea233273c977ffce4d9d4a047583d9bb076bc1d714eab9dda1e127c73938ec86c170466d454b2f7137b24e766955d2fa161257fc5f81f6c2ee5dc76d46f55f1d4a5fdf3c7f08d8fb5534c5bc50e5951abd272dcdf6ea32bba502872c1b15ff23254616b54b010975967526518c974bb00c2c161f89108178a50681548701e92f4e34b710a0ca914b9ed7f0b2c331a9e05bdcfd0cf6a8991b3cbdb24f9a2bf2fecda942098028196e59ed734f6cef9d1bfb5cf1d34bffb49f889f5a2a37072d2f847f34399dbd1084cea125e4bdad9357bde121927a795b3363c88a3163a231dd1be2e2f20515023f4933f0b450a6d78eeb3f7ae51c0be790a2247bc24de986277e5d88692e7dcd2ffad8d3d7c9e430e0a7b543b4359fa12d4bacd1c87c19628cd1a5d004e06c251ccd389ad781b35f125b79fb8a5406fbccb101c4baded43dc9bd67c0b91d0dae3f7b8014f6798eddb459159ec2c2794c73b82b548268f73728ca7c666c377ac756fa47d4f8cb6756081fd75ffa1c530a8808d34345750eec6bc3e91372cd266220bf6cf306b7f18372e842cac2f21eb1c8170697339418ac26823752a');
@@ -264,6 +276,27 @@ contract MainnetIntegration is Test {
         });
     }
 
+    function getDepositData1_42eth() private pure returns(DepositData memory) {
+        bytes[] memory signatures = new bytes[](5);
+        signatures[0] = bytes(hex'83a932e672d9f3fcda1cf2c8ef81cbcef7c42e0426aa20e29b1bb1e25759a43e7f10c4cc929f52b3ce89189422328d1d1135b83a7fed90fcacfea9652dbfd0761a0dd321a51a9410f154e23694889729eadc231eff468a71fab1c18cdf674fe9');
+        signatures[1] = bytes(hex'b361c7e742c5e062326802273bfafe2b82a7075ce21fb47c112ff666f1d62bf3dd049da381f938ab169aa07c3667faf30462ed43274366141fabf5bb1f8db6d7b6c44f4fde1921aff3718cfc51b04d2cad3005ac47f00885859fe1752e7c4888');
+        signatures[2] = bytes(hex'80cc25f6a497e4309edf7e775b6fdaa6a8ce67f612e8f473e7278df01bd1fb5af849bda10542eb7be59004335c5fcade104ae246d5427e1518a4469e1385beac2f05800d3240ab708ea12a38ded8d988d857c05f96865680554fbf31d1d48acd');
+        signatures[3] = bytes(hex'8eabe180045a15d7b0d6a0616817e0c2148efd5aa3361fed48a9e00a8e805e0ad90485b304da16db48188c450a32ade20fd9383bd52b3d875ef9b4da38bf1e527107cf5658c720710190553e3ec6325d4c6d67390f1d25dd8b3d60f2d7b52411');
+        signatures[4] = bytes(hex'8eaa489d1bcf80620350387e9dd66ba1d0e5ede46ceede000ceff3284b1f3a39d99a178ed339ebd564a3fd7dcf8d367216893251f6960c0c65cbdc9f198e2f48b938e546e39df4cba7cc11776814d4e0100e130b8446050ed04e87d473d42149');
+
+        bytes32[] memory depositDataRoots = new bytes32[](5);
+        depositDataRoots[0] = bytes32(hex'1dbe9ba0be5e6abb34bc39473898a61ba71c5f239dcc9dd303bc513b8a87044f');
+        depositDataRoots[1] = bytes32(hex'abbb84072feb98b7f9645d7fda29a021a725e0faf3b9aa50d5cd8d5c701be95d');
+        depositDataRoots[2] = bytes32(hex'0919b7daea390d11b9d8854004777b36ea966c45e6db63269eade3e8441c99b9');
+        depositDataRoots[3] = bytes32(hex'5cb3442c055cf4481efd3ea7b4af7a4c1c8626c1c4cfdd4f032837c5a3e57f10');
+        depositDataRoots[4] = bytes32(hex'f633c7a69984f42e8e5b6d60d21e2c0246ef61a752ba4f582028a8875d331928');
+
+        return DepositData({
+            signatures: signatures,
+            depositDataRoots: depositDataRoots
+        });
+    }
+
     function getDepositData1DifferentLength() private pure returns(DepositData memory) {
         bytes[] memory signatures = new bytes[](4);
         signatures[0] = bytes(hex'b30e5adc7e414df9895082fc262142f4f238e768f76937a79c34dfae4417a44c9271d81118a97d933d033c7fa52f91f00cf52c016dd493eccfc694ab708e9c33b289da7c4c4d2d1357b89340bbaf7256b50cf69e6c8a18db37dc24eafe5b7c26');
@@ -305,6 +338,21 @@ contract MainnetIntegration is Test {
         bytes32[] memory depositDataRoots = new bytes32[](2);
         depositDataRoots[0] = bytes32(hex'20187410c9727808d2eafe0bea417c04c65917236ed424f21c8daa1f2b494f98');
         depositDataRoots[1] = bytes32(hex'8c75013ba6f48bd1c635c25d8e6e1f3ca04a8f30ae77d91dc53f49df518de687');
+
+        return DepositData({
+            signatures: signatures,
+            depositDataRoots: depositDataRoots
+        });
+    }
+
+    function getDepositData2_42eth() private pure returns(DepositData memory) {
+        bytes[] memory signatures = new bytes[](2);
+        signatures[0] = bytes(hex'8cc040fb9e11bac6cfd3c646221e8402630852bc0f652942b6571d287f15bebc1e35c00ac7da4089ab24c4de9bdf534e0776b968a0509af20fd7625cf4b9649de1f47f2d715e9dcac9b53a964458c2e61e9fd721eece94c2cc89e9eee59f1b7e');
+        signatures[1] = bytes(hex'969decd4696ee36493dceb1365fe6a8bf5046226c3f6a8e687e31322536676db95666af806fd3b275fcaf5ec7c9f5046106d8766c52928f07974d1e975451e34b82928514817e1487de7a71f4c20ee1bdc247993e4c10391c2bea28267e1ec3c');
+
+        bytes32[] memory depositDataRoots = new bytes32[](2);
+        depositDataRoots[0] = bytes32(hex'5217680bead75f1753bd0f38a82b8c70bfa6e60e3fcb5b32c2acd7848cba614d');
+        depositDataRoots[1] = bytes32(hex'5cb1ddaae83d0d789542e77277df8f52e081464e632999b5869c1b33663b7c64');
 
         return DepositData({
             signatures: signatures,
@@ -1535,6 +1583,105 @@ contract MainnetIntegration is Test {
         assertEqUint(balanceAfter - balanceBefore, nonDepositable);
 
         console.log("test_makeBeaconDepositsAndRegisterValidators finished");
+    }
+
+    function test_makeBeaconDepositsAndRegisterValidators_higherMEB() public {
+        console.log("test_makeBeaconDepositsAndRegisterValidators_higherMEB started");
+
+        uint256 depositAmount = 42 ether;
+        uint256 nonDepositable = 13 ether;
+        uint256 clientDeposit = 7 * depositAmount + nonDepositable;
+
+        FeeRecipient memory clientConfig1 = FeeRecipient({
+            recipient: payable(withdrawalCredentialsAddress),
+            basisPoints: 9500
+        });
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.changeOperator(operator);
+        vm.stopPrank();
+
+        vm.deal(client, 100000 ether);
+        vm.startPrank(client);
+        p2pSsvProxyFactory.addEth{value: clientDeposit}(clientConfig1, referrerConfig);
+        vm.stopPrank();
+
+        address feeDistributorInstance = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, clientConfig1, referrerConfig);
+        DepositData memory depositData1 = getDepositData1_42eth();
+        bytes[] memory pubKeys1 = new bytes[](5);
+        bytes[] memory sharesData1 = new bytes[](5);
+        for (uint256 i = 0; i < 5; i++) {
+            pubKeys1[i] = validatorPubKeys_42eth[i];
+            sharesData1[i] = validatorSharesData[i];
+        }
+        DepositData memory depositData2 = getDepositData2_42eth();
+        bytes[] memory pubKeys2 = new bytes[](2);
+        bytes[] memory sharesData2 = new bytes[](2);
+        for (uint256 i = 0; i < 2; i++) {
+            pubKeys2[i] = validatorPubKeys_42eth[i + 5];
+            sharesData2[i] = validatorSharesData[i + 5];
+        }
+
+        vm.startPrank(operator);
+        vm.expectRevert(P2pOrgUnlimitedEthDepositor__Eip7251NotEnabledYet.selector);
+        p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            depositData1,
+
+            operatorIds,
+            pubKeys1,
+            sharesData1,
+            getTokenAmount1(),
+            getCluster1(),
+
+            feeDistributorInstance,
+            depositAmount
+        );
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+        p2pOrgUnlimitedEthDepositor.enableEip7251();
+        vm.stopPrank();
+
+        vm.startPrank(operator);
+        p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            depositData1,
+
+            operatorIds,
+            pubKeys1,
+            sharesData1,
+            getTokenAmount1(),
+            getCluster1(),
+
+            feeDistributorInstance,
+            depositAmount
+        );
+        p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            depositData2,
+
+            operatorIds,
+            pubKeys2,
+            sharesData2,
+            getTokenAmount1(),
+            clusterAfter1stRegistation,
+
+            feeDistributorInstance,
+            depositAmount
+        );
+        vm.stopPrank();
+
+        vm.warp(block.timestamp + TIMEOUT + 1);
+
+        uint256 balanceBefore = withdrawalCredentialsAddress.balance;
+
+        vm.startPrank(withdrawalCredentialsAddress);
+        p2pOrgUnlimitedEthDepositor.refund(feeDistributorInstance);
+        vm.stopPrank();
+
+        uint256 balanceAfter = withdrawalCredentialsAddress.balance;
+
+        assertEqUint(balanceAfter - balanceBefore, nonDepositable);
+
+        console.log("test_makeBeaconDepositsAndRegisterValidators_higherMEB finished");
     }
 
     function test_callAnyContract() public {

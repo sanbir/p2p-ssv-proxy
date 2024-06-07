@@ -337,6 +337,29 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
         address _feeDistributorInstance
     ) external returns (address p2pSsvProxy);
 
+    /// @notice Send ETH to ETH2 DepositContract on behalf of the client and register validators with SSV (up to 60, calldata size is the limit)
+    /// @dev Callable by P2P only.
+    /// @dev Should be called after Pectra hardfork
+    /// @param _depositData signatures and depositDataRoots from Beacon deposit data
+    /// @param _operatorIds SSV operator IDs
+    /// @param _publicKeys validator public keys
+    /// @param _sharesData encrypted shares related to the validator
+    /// @param _amount amount of ERC-20 SSV tokens to deposit into the cluster
+    /// @param _cluster SSV cluster
+    /// @param _feeDistributorInstance client FeeDistributor instance
+    /// @param _ethAmountPerValidator amount of ETH to deposit per 1 validator (should be >= 32 and <= 2048)
+    /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
+    function makeBeaconDepositsAndRegisterValidators(
+        DepositData calldata _depositData,
+        uint64[] calldata _operatorIds,
+        bytes[] calldata _publicKeys,
+        bytes[] calldata _sharesData,
+        uint256 _amount,
+        ISSVNetwork.Cluster calldata _cluster,
+        address _feeDistributorInstance,
+        uint256 _ethAmountPerValidator
+    ) external returns (address p2pSsvProxy);
+
     /// @notice Deposit SSV tokens from P2pSsvProxyFactory to SSV cluster
     /// @dev Can only be called by P2pSsvProxyFactory owner
     /// @param _clusterOwner SSV cluster owner (usually, P2pSsvProxy instance)
