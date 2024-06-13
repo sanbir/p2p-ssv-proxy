@@ -33,6 +33,7 @@ contract HoleskyIntegration is Test {
     address payable public constant client = payable(address(0x62a90760c7ce5CBaDbb64188ad075e9A52518D41));
     address public constant withdrawalCredentialsAddress = 0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
     bytes32 public constant withdrawalCredentials = 0x010000000000000000000000548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
+    bytes32 public constant withdrawalCredentials_02 = 0x020000000000000000000000548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
 
     IP2pOrgUnlimitedEthDepositor public constant p2pOrgUnlimitedEthDepositor = IP2pOrgUnlimitedEthDepositor(0x0666B89c174CFCDa8E303EdC710424C9a8733E7A);
     IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0x86F4975b738185e65e94DEe60304f5a896b8EACc);
@@ -48,6 +49,7 @@ contract HoleskyIntegration is Test {
     address[] allowedSsvOperatorOwners;
 
     bytes[] validatorPubKeys;
+    bytes[] validatorPubKeys_42eth;
     bytes[] validatorSharesData;
 
     uint112 public constant SsvPerEthExchangeRateDividedByWei = 7539000000000000;
@@ -70,6 +72,8 @@ contract HoleskyIntegration is Test {
     event FeeRecipientAddressUpdated(address indexed owner, address recipientAddress);
 
     event ValidatorExited(address indexed owner, uint64[] operatorIds, bytes publicKey);
+
+    error P2pOrgUnlimitedEthDepositor__Eip7251NotEnabledYet();
 
     function setUp() public {
         vm.createSelectFork("holesky", 1726649);
@@ -140,6 +144,15 @@ contract HoleskyIntegration is Test {
         validatorPubKeys[5] = bytes(hex'92269be7b88c417f46aafd18943783990df0952c9858bd3147815e31f48d1be5f559387b696231f98fcc5ca2b3ff354e');
         validatorPubKeys[6] = bytes(hex'a413b93c25f77d27c5edab2b131d06bc90215c3eb2761309fdac35b0c76e12dccf45788a7ca0228b591cafb8626ab01a');
 
+        validatorPubKeys_42eth = new bytes[](7);
+        validatorPubKeys_42eth[0] = bytes(hex'a9ff619fbfedc3178cd401526b8320590903f8278c00ab1bf791b836cce92f2afa7c884dca2684a0a835a588e8661fa7');
+        validatorPubKeys_42eth[1] = bytes(hex'ab7fa41fbf3e05cc29028140a2a56909f35e6f83766799182d6fa80e85a133907387455ecff841358392c4bfaa5c8329');
+        validatorPubKeys_42eth[2] = bytes(hex'b88a4490baabd8d0e23ea0cc3ac81f95986272f0a355a2d180d85b67dfc99a749b69eae4138505aa4bc06b24cbde9fa0');
+        validatorPubKeys_42eth[3] = bytes(hex'99f25ba85bc78d39e0ea79185fb75b19b51751fb01dd961ec31e15378b050ed6b8d896e2a7c3bb2cd789aef82674a90f');
+        validatorPubKeys_42eth[4] = bytes(hex'833ac26a630899fd5e2e1f0aef225072eab71ae346a8968d79f091a6ecf33ffeba0d2221419fe2674b15f79e68fc6f52');
+        validatorPubKeys_42eth[5] = bytes(hex'8d6984fdade19e2a3bd64bbb83f280dd4701366ecdf47ef49e3c57ef0838327102c9e3af37f87be33b92a278b4a7ee04');
+        validatorPubKeys_42eth[6] = bytes(hex'944a91ae380a0ece1a41a9cf22729d4af45373308400b2b178f56eaa9322d55b85bd97bd4d82aec8fb8b0fe4152a0ab0');
+
         validatorSharesData = new bytes[](7);
         validatorSharesData[0] = bytes(hex'9714c5518407c3efb9cd40325ec39ca98fa10eb77012d47ce70a0518d2655d59d87df84fd84f8a063d0738bfd1ce002116d110e43ce18c70490fc561fca546bc6097030e5e533fd1c9002cd6785f7427d5b483d77f13189e71241e44e1b84d9b8e62a349a1fc9e6257aac8e2ad30073409a6345a9c002a4c7f2e27db41560bd735eed89ad073229a4dd9355dee558bd5a70ac0e7396e526205cb47014514f475065bb5b6e8ffb214f2a6da2ae4b7198ce069a6cc4fc9852d973c94fb3f0dfd63850649abef689d3dce185fae59232ba953fa3b6b3306782ed0a877a8c1e4979c62e1f0dee8ef2dcf237cd5df5340b951a4c32a3e2783ccdbb8b277c452fdbc2b186370c42631fe80b8cd115c48a2ce9f27c6791c03d48716673d6a3293ef989840a01829d5e504e22e16559516c6c6f4386d6fccdf83b0b1e10abcff06a5c964d87a616731ad7d543b6cfd3dcaeb4795ac50cbc1115d4d17c77d7119ab817a4952cf4aad389dace806e9fd7568c365ea96c02a9256e843846e96a070291d387f41e4a056d22c5b9286a0124e4330be9581818954b41a45a107f84e55f4f0e2799afd57517681db4fd7bd8bc4cedd4cbd19f1b2648fc34774396d7ec836cce3de792cffa21472fd806d331227ec21411ae4cb5a47558d383804cedabfce4e7ef49218255a1688ac8e2ef5aa0f43782655aa6002002a19d28ef90930d374006b3b9f44f09ae999223488e735551bf76e684e61966bf32e6dcbc6b3fa056a79692660af6f21ac806613e9a8586bf381b858598c30862d88b7f50a7805caf7b8c54ad5c08f8a2ca2f12e0de97b9c8c3dea41f61b90917b5cd0fe9a5fd7e6b367605aced36e6febac6900c05247a5d7a8df947458d75e8ec5cc907b86143b0574161fd2cd0fb7e3493cd5647a058820795b9fb236931e6efc89352b6e18c4fd3b61f73c5a80da892e20b5a28fe2cda5d48792c43c38ae3e51d6ad4141424019b54e4cb265e313fb737eb3c26796cee15f43ca3e19bffd7acec585e4190eba707f4bb187ff48ea0a3fa5392d182cc51f64cf1081e58948c030ec96cc688e00a84f1afd343b95c0a741c980655c02b6ffb049429d577e66204affac29e01d0ef9f6fd7047885814a84d8caa50af6fd9d5ccc10e31e0709dd9d66d84283a45ba6de07ebc96e66a04e5d7ed0714a0b3f2a3edaef9c73b9d24951f783e70b29073c49c4f5d099c5bdd10277eeacf765e3f3704e6812353fb263564aefb090f60598ea233273c977ffce4d9d4a047583d9bb076bc1d714eab9dda1e127c73938ec86c170466d454b2f7137b24e766955d2fa161257fc5f81f6c2ee5dc76d46f55f1d4a5fdf3c7f08d8fb5534c5bc50e5951abd272dcdf6ea32bba502872c1b15ff23254616b54b010975967526518c974bb00c2c161f89108178a50681548701e92f4e34b710a0ca914b9ed7f0b2c331a9e05bdcfd0cf6a8991b3cbdb24f9a2bf2fecda942098028196e59ed734f6cef9d1bfb5cf1d34bffb49f889f5a2a37072d2f847f34399dbd1084cea125e4bdad9357bde121927a795b3363c88a3163a231dd1be2e2f20515023f4933f0b450a6d78eeb3f7ae51c0be790a2247bc24de986277e5d88692e7dcd2ffad8d3d7c9e430e0a7b543b4359fa12d4bacd1c87c19628cd1a5d004e06c251ccd389ad781b35f125b79fb8a5406fbccb101c4baded43dc9bd67c0b91d0dae3f7b8014f6798eddb459159ec2c2794c73b82b548268f73728ca7c666c377ac756fa47d4f8cb6756081fd75ffa1c530a8808d34345750eec6bc3e91372cd266220bf6cf306b7f18372e842cac2f21eb1c8170697339418ac26823752a');
         validatorSharesData[1] = bytes(hex'88c88288862cf952bf388be0ca28646dc25ce1db6ddea6a57fd474c7ea249a80d077e813b4680c9249d48d20d37a3d8e035495f045c49d39fc5869b5e5363724a2b49a6c8d3dec824b28f6dbd40a0ece2287ff4cb670ed2d6f6b8bc7dd868c19b3cee94970c09e9cf302d5cb691ac2cfb049f4b24d85232ef7ca048e387761e3407e1507f9503f9ee8bb59cce50cd1228ab8a52ba343d6c84b18da712abb236f6b4861495c63f5204728f13db8afa6cd25059c3559450f3fd5940a0ae0f5c8d3a855bfdc2683e8acb0df3ed8ed3b161c033d2df8340073e377166fbbd5903cceebc23ae5eee25e800e7d12073e335fbda709991559fd8b41528da8a6249256a416defbf37406003757e83b71845b872d24acb22193b736eca3e169ddbc853d938fe15077e84f28067bfb9ed970c33e33910ad93196336735cede9dc4d310bf0d6792318bbe3832f9636ecff3bfe72ef2bc1f23fabf3c420336a4fc65bf690696a9e56bba1ceab4f2e3debcd8384f5558ea25b3c78900d6d3f2da23649f635245e2d0ec6fb69c15068fe0580dd92b472796caaf00a8108ef91c630db1220c0680f229d25a35444d1f42442a563ac77c4b837104355425d5fdb894a2009f0f89987cff9ec8e8ad72537668ba0f9d13d916852ded2cc8ac3d0da3e15b73cef302802917c593b6d0c231a1dd95e9e44d502f65423c7511d3ec3a54904dd83e27a7f331877ca0b4e8a7ed6b8355ae66a829ab890aa0e8ba7244e9e2a840451f6442b04f89a615285d718f82fa56ff1e69f85befac2d7226ef55c9ef42d9552cf4d832f5e7299ed0390db1937294e47d8f437f4eeaf33c22c66f202941378f75f34a49f5fce3d6b0aa4f7c90bb9276b4aa2a6733c015eee5cf0c3e13ff85782e7312157b22f57950bfff2a7b24b7f3436b2489b4a9c426c4abc3cb0c906618fc3781a6b9882f62e8e60f1e16b35d2c7abe71e6f07a18358c2ab722e35c7ddf7e6bac0301d2d89cb56fdca4b320b6772aead25b9e7bb79bea7baa76bf15d88e09cc95f6a585b0147abb9dea0ff50aea5a3ae76053c888adb06339bc39ff1a36dcdbb59436807ce9cb3c0bab96109960342d72c377f2f88dfe7399d8878e39d8b8b85bd76d7bbff63f359f645f97915e34ebeef91277e26e357a243c3bda1623b3ab7df30446575cdca20d9798e760a9ef418221e9188f5c047d59f59e529fd3f8ebc91666ea669d1b7b9efabc88a0e77cbbcbe0116c1ba3c76c5c5b3b3709f10ad888f59ecf8ae961bb9c0b90c938c5c5decea67a68f19cde29eb6048a0d366c9a476528fad29d8874700e760ac3768bc3ad9ff043b5e8e3617895b5d91394a2567c9104c9aeb385a0b0d61c08f9e9b1de0d19cb0a894b433bc7cf7475d370e2da6e5dae6fca2ee9850a2e4670876675d3c8064a6ec58c92d571c10d169e37d0ac6a311dc77d06b9dff30b881660cbfd976a6e2f3a6a8b6b0391b44d53f1068a571674bda28d81b4117e8399cd721e5eb08ffcde1e3b3614be5f94102a9a967b9add0c70dc85ea34fa7b3bed18b7ab3cc1f04f22a9030af7a185363b04daf79f347cf9355e61e5ba3fd3883091c9c4cfaab449691f15b8008b4a594aba31ac8147184f2b967c8d609e1116d3e1ab346512c9a3b06afd386e1bbdc28c75a8f8e407a4c3332ce39f817e8b8629e2fad9500488f930aa7cef618953185bf8135eb22af9f53fab4f84769fc0a0a77a07b4ecd5f04f01d7da83e1a420349fc624806b8fd8a9fc8878e1405a03e00b120b9e0646b300b02342e87bec6483b5ad1187f52bd1eeb8c49585a8bb921d8c8f9e925ebe57fcf88e45bdb17fde57b8f3c4cd7830c1246');
@@ -148,6 +161,42 @@ contract HoleskyIntegration is Test {
         validatorSharesData[4] = bytes(hex'a9aee828686da28649403ffc4e6b832e6101461b7bd162e9227576c8055f63a20a47aa76e85778af4f5ad49d073ab0901075bc5a954758fd0f426def03b27f66f7eab914cf0be83fa6836354681f602d2122443cfb7894559c9980ff4da281c883fe2f0a48d237b71604cd97ebcd2d82c0bb38311dc978bde7567ae9891df2a5138a1cbefcc5febaf29c58fabc4e4c3380240e87e15bed70f4a66f795163aab9d8600f08dca619d530194ac7163702718570a5e7611490d45b07c569a117f469ab8195e1a94bddb74fc9a94e50b9115e5351be3e6b362d1a662c20bc52ef2ba8371b5df0c460fd0887aa462a41bdc558a0ae92f534ea3ef55ee22a59b66dbb07e1f937b96e635e92271ac8615031e05e5a37f6a3c51cd9e3fb194b572a06abab86c492ca5c4ed7fdfc5c1e0df1099e9ef0bccfef9339d77b2c0d23097e81319c3534546045aaf8c345b435aaadb4f000b565fab9e18f6aa7c0d368fb47ea4c5a7da81154c171577e9baba130690e9e082b32e593f76d34513827f4be1e0acbfcb23ab20cabcb990b4392de0ab735ba0e266887ddf1f6e4926036be5e61d76a6786dfc0d5997294f816161d0938f7e1ea44ca0cecf043c9bb9738aa64518590c84bc06bc6680d8aa5a684aa29628cdcdfc36bb451f9508679cae7f2fc2e0882e4b68fccc90e31c1c3ffc712b20c0b097c125b91511cabb49f59fff86150ed6013d5ef19f3fde42c8acdeef51adc79c31cc7cd56cd5dda395bb1514331a2517ea35a55d9b51190a83d6bed720b5a8ba0ed07a4b32f5a44fe87425d6f9a9b98939d258b932ae502a994edbe5cac2c074e61f624cfa50d8854ed67f2dbaf71561977365dd4793bd4f95d6fc795faab13ade0a7c77141fac38ad3e288cc0bee4bbdf3737b7e254732bca1936bac02b6c7c9ecbb88df420a27cdd6bc28764c158c4b11b1ee3b619a318f9258598412f6065dcb246fea89566f564a37e136da70097a72536035e3cbbe75a0be4097abae62b05ffae73efc9fc3020509166edd0b286a5903911c8d837eb8bfe26a43092e07653ee01b54b6555f3d782aa5ce204f221775f0bb9163609e584f45e9bc9199e007a29d4f6413278f6b4255441c70f5f5f0073aaa1561ceab21aea7c17be2bcc124ffe54ab0eaef60db6e00f18d042cf6b9e959909cd3f29f7ced195db75243c5083e77d69f1bec9b8850efb4c15475bbcdc5d7f685ce805270385f4e58552dcf20d742d5cb287772143b1cccbe15f14500c72fd0d33d83f6b73cf8452c741768c7aed34384fa5e504617b58f354c4da7ac1960571878e365210e05e23ee9ba0829c27e8aaf49d24ac8d0ef104109b4ee7d5f2467de5d003a20607a3f590e13d5d6c22b9053a2c1cc613d7349cd6f99d756a88af95f75329867f9601559c57c2e55c2fca06c6cf936aa811683a72f82c98fb573dd1019b750f118e66fcee1fceeb68bb93528dfadd44b69e30d596e863efd65b08d28c3659a44e2aceecc7f0a20ee4fcd63c620a4d35f234b9c771c61027631b834b9dfc7e3628386b8ba7edeb5b0c20ebdda972324f994b2a5c7b2a8cccad761f6e7c6859a98192f32cb5fc240c51db24dfbff0e77fe97d52450405b6656602853bb43a2ddd7f5bbafa70d72045589b79f8575430054bf1cd29a8d3dc4d603b6b626fee39d1299c439ae388622399cc488a82df7fdfcbf54dae087877c1a813c5b8cbac5f55ce340871116ad9bb1d6dda3925e2e53b5e951aed96119325aa40babb844f71275ee08f1b1d635991a36b1bf5424cbbd092111c58788c7ffe046844a5871ec238a9087da2c9dceda8865651f3b91e44ca8cf26c1ed5ef0698490');
         validatorSharesData[5] = bytes(hex'97c1234209ecc63e907ad559a5193f8a17407caa089a721368b3b15a7ac56eb3413f3dd8de41607602348aa2081458260f5304ff30058e3556e2ac9fcdd28ca00b68b9afede51c193a59b47b25f19b5d5fd740f1bee56c7211b0332044cde0f0a40be54b20467d47866076b6eacbb41e5de0d217d1da09c74c5620004ed67a350d2589e1d2ea38c18aec55be0e27d4fbaf7a63a811c9d9bd1200f20a9dcd6ebb9ee0758c2c91069c4fc2e366e52fa0839db1fb9aeff05da2c2696e3efca3e75bacf1610d3fadbceb22b94686582f12a081125c86d840f8200b598e566e95e761fb3d924b990de6db5df929a869d308b1b0eab56138beb3a9cbe6e0d2c9bed730c40cee1a724ab7b238bc0f4128b9385b39568704c6ced503af40a00050a775da57a8cb23e29fd63b93cfdf0113af3c144fb3eabc27126016d0437749a17bc70967513814a987d93304e8747fdfdfe834ef75d0d62964f6e8bd9253184521e0d8e2849e3f856166a32e486b2c2d46f55a570619774858f23b7274fa99b56035ed56d9f3b9422956140a766e461bc5e2bc1ebf4ce3c290ab78f157a595ebe8f45e7c1ffd3df99bf7ba9e666b743174c4243287036c5c622edf19b4b1926f6e753b0eab8fc678db637903ec8cda7270aab39227c984b6cd9ba9cb2d8c79b35bcd5a4d5852dbba6a7b6eef20ff21594eddd506a5302545b711a84660904227dc882bcb9a28ae277da0712f6098e327dec373d0bd8782f9b3ee92ef4890c3f725ead77da085a3620b7199c4047fd417190c5d3ef73721d659b3a249c0b8d22c0fcb40b0594afbaf382ea25abb70c16ecc3173f1d22e1a0187066da7c9b24e20ce976628aa95570940ae7efd9ebdc7c1b6e2557a389107755e92116bce7edbac102378479b35cdf755f6daef4d9b738ec03675f738590f9f770f8ad2a5fdcfcc417542a084c5b5bbf19e919b547ce5359f3ad0d145ba421c8ad85163a8bc0eb4c7e98e982ee9f2dde3ef640d64c8c3895f8e580fc9a91416b843ec0f5dc2213960a8890c56af5b23f8cb02f116cd599cc6ba0efb023381047b7af2d765cecc2a8d4b46ac2b8a3ec302add152471fb684873399539dcb94e20c70beefc09566c86053c952ff3050731f039b21a0a40536fda7e2c68cab8bf40994bed6e306cd8e0a0b270862ffea6c92a1bf909733f36239237444bc5b56fc9e3e7b19769c794d34b6ace6e348b784212881f0f895c7f755903e4d1bdbce9a6a3d65caf6bbf899ec3053c3acdb231373a99e97d4dd0a78ab083a1373de6a4fefa7c1b2bc2015ad8eeefec8d671bf09846fea05936bc69adb6f4b52ceff7a100f85b0d01bf2fc001fdb492b5c12aaa5e9e8c32bda8d06fa2519d8059e1890e429088327142af945e7bd27ed82ea8ef14e956c0b803af18c489b6ab95ca81bf21d75a14be49a40fb95e9c7d505a21003a7747b963412635f45b95298a9d6a515216152a820887cb18114cc0108192f5673568f1781904d63c9ae03d27f5c212768f0fd6a831756bc56ccfe75df151159333e5a115b7c1439d489be7033c370a07393fa120c6bc614f9ed871711c65bb4617a2bc0a88b5af6d49d1b341e1ca5fc85d7b02622f60d08ef8736a97369f65642f54efd268017e17f3bc60fe458495b84477976853ff220903e8ce80f34d88990121394c22ff96a73b5792da507f97e5c4b801cb85c068fe45da43c551eda03eb76585c2fada4b758bb8a4edf5a518fe952712d2337ca7a2e4ca0e1b40ad77e931e95067f2cbfb215f87a21d26529131ea17551b649f81418c4a53bd8e3ecdef08ace9440937bfe8d2b2f628f4efbaa2eef245caa26bd2665cf83');
         validatorSharesData[6] = bytes(hex'acbb370c42c326f9cfca5904af936088305076f85a84c5c00c5c66a02c88377d05f012726e723e43acf0595fcfd5960d13c79309d552807f42809e00154b13531207991ddc37e892fa48d0d29ef3918840d44d3f8dfb3f3418e77592142fecf9adafcc7bfc0968f7dd74205cd54bd31e9c4111f71307c7da31f86bbc8e2f0f88f2ac403238f79a4733f6568f64815b15804908045038f43144d79408b764c71781f6091028dd0639ff74c49f7cfd2d36e427d2a917fd755ee308b967ec0ea90189f4794417df2da6ba6e37521018bbb1b022fd475da2c0f12e1f5dff1419dd4d11fff7e8d1c69e5cc7197dbe877f4b64b92bd144136eb09e6fcdcf836aa49687d29bcb8f2950f130f27e002570b68bbc7d8244762c5c66a36e6f67511cf74ddd32059bacbd17a8275863db176d7a9523a5e47f0d369c3fa91c31aaf60e4c8054fa0bdc7aada44bd3ee9087b9668d8ddf9acea624643a800d985fa6da590f71aa47b03758c8e63a350ffaeb36636f1ef3b0b7606bc944952edd99dc13ab2a899f300da9ab30cc9de7252a91c5822874c0c6ab510d32323a475ba19505121e68dd9cf018fea72c313b350264595f1c412823b62396f693eb662672f0fa8ac4b0cda432649838751d3e8626ddf007359c83d6b6779ab27fc4c4214f509dd350209cfcec81959de52d5f20379c52e4ad465e26358ae854196b57a724df54728c148307b1ce99325555c3dd981b9c8cfae510db924d68045cc88920d67c9cb231bd266e0356dce03c42efb87fbd5ccd667c732afff450b949dec75640085dc7ff309c9a90c3b3bfaa0dcb967b5d7efc10953fe6f24af9bd5a30b2c6fdd12dd8b76f197f698aa34cb3779b90471dfbef97642ec8508d1be3ee9c067e8ae61ea461af642b0b2508498d2718cdc4aace45f76d693273bc5bc469b0a2624e1f71dee3a777efb4e43a6d6c37ad242b25454a7b37cefdf8d7093b5aa2fc10f54a83925292c37796867343995bab2dd6b3a661b83624b45e2101222e5057bb7907fbe52ec39fbf66d1f14c176344fd5d8bd26c56b8440bdaa97d4b963ad1e02584b9d3199aa6f02f8062ba72d301f4d0eb4b2a8385682eee94aea5dd2be779512d229c0d0fef7d4f9dfa1fd82b98d25b09ab3f4623f54acf62b105f954b8507fde3c35b0589ed0a4b530c0ac6411a4104b93847c40bd06d9354c582d2407192b19d6eda61573343317c290519fc6fa699682884eb95215fd580c0dc82e8007d29b42248e5b6cce9ce0b4396d38cf23b8b39a23a36f49ae9aad146d9a650bec7c92ecca13a00debcdd611c3bcd06640b8c9982af47fc8a2894a00ac5c22343b0aa4c04ef65036680a8fa24d6ad164a0a86b032961c4f4ca7bd77b5674a48ddf167380e71537dcf250f86d43512675275ec69c64bea43d2b2f94e1cb9990f669595ba2594a805a447b0fe1f7a166d87a6198890cb6074008baebc09e99523399c069ef7b22ed5e6f156c5c219acaae2ad1c6046f9ca920660fc6172c2447ad4f05cfbe2579f39e8ceab11598eb7d0cd4ee5cd7c4c1506634aa169029dfc7fd235465dae70bcb09cfd7a8b28bd8f29a0c238867c81f35c5cfaaf33b58f61532782adc6db3e46ed8d89959bba349c911e243ae3d3599e9583a9083c99e20522180b7d1aa7c8e0053a09c9896c1e58634682583c456cf1c0cb59f1b515019dc2255f54bf65ad319e143a94aadcefd63dc6a1c49dc37e33e5a0e223df27414a2ccc224eddff93b18eb71450764000d8dbc9470570cf61bd3666432d86664f0b44d2d9b0cacbeac92b6b5482506a5b1718b9d4358efe22e66b00fbc9e34202c002d16be66c741303e3f');
+    }
+
+    function getDepositData1_42eth() private pure returns(DepositData memory) {
+        bytes[] memory signatures = new bytes[](5);
+        signatures[0] = bytes(hex'83a932e672d9f3fcda1cf2c8ef81cbcef7c42e0426aa20e29b1bb1e25759a43e7f10c4cc929f52b3ce89189422328d1d1135b83a7fed90fcacfea9652dbfd0761a0dd321a51a9410f154e23694889729eadc231eff468a71fab1c18cdf674fe9');
+        signatures[1] = bytes(hex'b361c7e742c5e062326802273bfafe2b82a7075ce21fb47c112ff666f1d62bf3dd049da381f938ab169aa07c3667faf30462ed43274366141fabf5bb1f8db6d7b6c44f4fde1921aff3718cfc51b04d2cad3005ac47f00885859fe1752e7c4888');
+        signatures[2] = bytes(hex'80cc25f6a497e4309edf7e775b6fdaa6a8ce67f612e8f473e7278df01bd1fb5af849bda10542eb7be59004335c5fcade104ae246d5427e1518a4469e1385beac2f05800d3240ab708ea12a38ded8d988d857c05f96865680554fbf31d1d48acd');
+        signatures[3] = bytes(hex'8eabe180045a15d7b0d6a0616817e0c2148efd5aa3361fed48a9e00a8e805e0ad90485b304da16db48188c450a32ade20fd9383bd52b3d875ef9b4da38bf1e527107cf5658c720710190553e3ec6325d4c6d67390f1d25dd8b3d60f2d7b52411');
+        signatures[4] = bytes(hex'8eaa489d1bcf80620350387e9dd66ba1d0e5ede46ceede000ceff3284b1f3a39d99a178ed339ebd564a3fd7dcf8d367216893251f6960c0c65cbdc9f198e2f48b938e546e39df4cba7cc11776814d4e0100e130b8446050ed04e87d473d42149');
+
+        bytes32[] memory depositDataRoots = new bytes32[](5);
+        depositDataRoots[0] = bytes32(hex'1dbe9ba0be5e6abb34bc39473898a61ba71c5f239dcc9dd303bc513b8a87044f');
+        depositDataRoots[1] = bytes32(hex'abbb84072feb98b7f9645d7fda29a021a725e0faf3b9aa50d5cd8d5c701be95d');
+        depositDataRoots[2] = bytes32(hex'0919b7daea390d11b9d8854004777b36ea966c45e6db63269eade3e8441c99b9');
+        depositDataRoots[3] = bytes32(hex'5cb3442c055cf4481efd3ea7b4af7a4c1c8626c1c4cfdd4f032837c5a3e57f10');
+        depositDataRoots[4] = bytes32(hex'f633c7a69984f42e8e5b6d60d21e2c0246ef61a752ba4f582028a8875d331928');
+
+        return DepositData({
+            signatures: signatures,
+            depositDataRoots: depositDataRoots
+        });
+    }
+
+    function getDepositData2_42eth() private pure returns(DepositData memory) {
+        bytes[] memory signatures = new bytes[](2);
+        signatures[0] = bytes(hex'8cc040fb9e11bac6cfd3c646221e8402630852bc0f652942b6571d287f15bebc1e35c00ac7da4089ab24c4de9bdf534e0776b968a0509af20fd7625cf4b9649de1f47f2d715e9dcac9b53a964458c2e61e9fd721eece94c2cc89e9eee59f1b7e');
+        signatures[1] = bytes(hex'969decd4696ee36493dceb1365fe6a8bf5046226c3f6a8e687e31322536676db95666af806fd3b275fcaf5ec7c9f5046106d8766c52928f07974d1e975451e34b82928514817e1487de7a71f4c20ee1bdc247993e4c10391c2bea28267e1ec3c');
+
+        bytes32[] memory depositDataRoots = new bytes32[](2);
+        depositDataRoots[0] = bytes32(hex'5217680bead75f1753bd0f38a82b8c70bfa6e60e3fcb5b32c2acd7848cba614d');
+        depositDataRoots[1] = bytes32(hex'5cb1ddaae83d0d789542e77277df8f52e081464e632999b5869c1b33663b7c64');
+
+        return DepositData({
+            signatures: signatures,
+            depositDataRoots: depositDataRoots
+        });
     }
 
     function getSnapshot(uint64 operatorId) private view returns(bytes32 snapshot) {
@@ -1454,5 +1503,148 @@ contract HoleskyIntegration is Test {
         assertEqUint(balanceAfter - balanceBefore, nonDepositable);
 
         console.log("test_makeBeaconDepositsAndRegisterValidators finished");
+    }
+
+    function test_makeBeaconDepositsAndRegisterValidators_higherMEB_Holesky() public {
+        console.log("test_makeBeaconDepositsAndRegisterValidators_higherMEB started");
+
+        uint96 depositAmount = 42 ether;
+        uint256 nonDepositable = 13 ether;
+        uint256 clientDeposit = 7 * depositAmount + nonDepositable;
+
+        FeeRecipient memory clientConfig1 = FeeRecipient({
+            recipient: payable(withdrawalCredentialsAddress),
+            basisPoints: 9500
+        });
+
+        vm.startPrank(owner);
+        p2pSsvProxyFactory.changeOperator(operator);
+        vm.stopPrank();
+
+        vm.deal(client, 100000 ether);
+        vm.startPrank(client);
+        vm.expectRevert(P2pOrgUnlimitedEthDepositor__Eip7251NotEnabledYet.selector);
+        p2pSsvProxyFactory.addEth{value: clientDeposit}(
+            withdrawalCredentials_02,
+            depositAmount,
+            clientConfig1,
+            referrerConfig,
+            ""
+        );
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+        p2pOrgUnlimitedEthDepositor.enableEip7251();
+        vm.stopPrank();
+
+        vm.startPrank(client);
+        p2pSsvProxyFactory.addEth{value: clientDeposit}(
+            withdrawalCredentials_02,
+            depositAmount,
+            clientConfig1,
+            referrerConfig,
+            ""
+        );
+        vm.stopPrank();
+
+        address feeDistributorInstance = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, clientConfig1, referrerConfig);
+        DepositData memory depositData1 = getDepositData1_42eth();
+        bytes[] memory pubKeys1 = new bytes[](5);
+        bytes[] memory sharesData1 = new bytes[](5);
+        for (uint256 i = 0; i < 5; i++) {
+            pubKeys1[i] = validatorPubKeys_42eth[i];
+            sharesData1[i] = validatorSharesData[i];
+        }
+        DepositData memory depositData2 = getDepositData2_42eth();
+        bytes[] memory pubKeys2 = new bytes[](2);
+        bytes[] memory sharesData2 = new bytes[](2);
+        for (uint256 i = 0; i < 2; i++) {
+            pubKeys2[i] = validatorPubKeys_42eth[i + 5];
+            sharesData2[i] = validatorSharesData[i + 5];
+        }
+
+        vm.startPrank(operator);
+        p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            withdrawalCredentials_02,
+            depositAmount,
+            feeDistributorInstance,
+
+            depositData1,
+
+            operatorIds,
+            pubKeys1,
+            sharesData1,
+            getTokenAmount1(),
+            getCluster1()
+        );
+        p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            withdrawalCredentials_02,
+            depositAmount,
+            feeDistributorInstance,
+
+            depositData2,
+
+            operatorIds,
+            pubKeys2,
+            sharesData2,
+            getTokenAmount1(),
+            clusterAfter1stRegistation
+        );
+        vm.stopPrank();
+
+        vm.warp(block.timestamp + TIMEOUT + 1);
+
+        uint256 balanceBefore = withdrawalCredentialsAddress.balance;
+
+        vm.startPrank(withdrawalCredentialsAddress);
+        p2pOrgUnlimitedEthDepositor.refund(
+            withdrawalCredentials_02,
+            depositAmount,
+            feeDistributorInstance
+        );
+        vm.stopPrank();
+
+        uint256 balanceAfter = withdrawalCredentialsAddress.balance;
+
+        assertEqUint(balanceAfter - balanceBefore, nonDepositable);
+
+        console.log("test_makeBeaconDepositsAndRegisterValidators_higherMEB finished");
+    }
+
+    function test_callAnyContract_Holesky() public {
+        console.log("test_callAnyContract started");
+
+        vm.startPrank(owner);
+        P2pSsvProxy p2pSsvProxyInstance = P2pSsvProxy(p2pSsvProxyFactory.createP2pSsvProxy(referenceFeeDistributor));
+        vm.stopPrank();
+
+        deal(address(ssvToken), address(p2pSsvProxyInstance), 50 ether);
+        uint256 amount = 42 ether;
+
+        address ssvTokenAddress = address(ssvToken);
+        bytes memory contractCalldata = abi.encodeWithSelector(
+            IERC20.transfer.selector,
+            owner,
+            amount
+        );
+
+        vm.startPrank(nobody);
+        vm.expectRevert(abi.encodeWithSelector(
+            OwnableBase__CallerNotOwner.selector, nobody, owner
+        ));
+        p2pSsvProxyInstance.callAnyContract(ssvTokenAddress, contractCalldata);
+        vm.stopPrank();
+
+        uint256 ssvTokenBalanceBefore = ssvToken.balanceOf(owner);
+
+        vm.startPrank(owner);
+        p2pSsvProxyInstance.callAnyContract(ssvTokenAddress, contractCalldata);
+        vm.stopPrank();
+
+        uint256 ssvTokenBalanceAfter = ssvToken.balanceOf(owner);
+
+        assertEq(ssvTokenBalanceAfter - ssvTokenBalanceBefore, amount);
+
+        console.log("test_callAnyContract finished");
     }
 }

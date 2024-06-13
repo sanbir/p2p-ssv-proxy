@@ -1570,7 +1570,7 @@ contract MainnetIntegration is Test {
     function test_makeBeaconDepositsAndRegisterValidators_higherMEB() public {
         console.log("test_makeBeaconDepositsAndRegisterValidators_higherMEB started");
 
-        uint256 depositAmount = 42 ether;
+        uint96 depositAmount = 42 ether;
         uint256 nonDepositable = 13 ether;
         uint256 clientDeposit = 7 * depositAmount + nonDepositable;
 
@@ -1585,9 +1585,24 @@ contract MainnetIntegration is Test {
 
         vm.deal(client, 100000 ether);
         vm.startPrank(client);
+        vm.expectRevert(P2pOrgUnlimitedEthDepositor__Eip7251NotEnabledYet.selector);
         p2pSsvProxyFactory.addEth{value: clientDeposit}(
-            withdrawalCredentials,
-            MIN_ACTIVATION_BALANCE,
+            withdrawalCredentials_02,
+            depositAmount,
+            clientConfig1,
+            referrerConfig,
+            ""
+        );
+        vm.stopPrank();
+
+        vm.startPrank(owner);
+        p2pOrgUnlimitedEthDepositor.enableEip7251();
+        vm.stopPrank();
+
+        vm.startPrank(client);
+        p2pSsvProxyFactory.addEth{value: clientDeposit}(
+            withdrawalCredentials_02,
+            depositAmount,
             clientConfig1,
             referrerConfig,
             ""
@@ -1611,30 +1626,9 @@ contract MainnetIntegration is Test {
         }
 
         vm.startPrank(operator);
-        vm.expectRevert(P2pOrgUnlimitedEthDepositor__Eip7251NotEnabledYet.selector);
         p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
-            withdrawalCredentials,
-            MIN_ACTIVATION_BALANCE,
-            feeDistributorInstance,
-
-            depositData1,
-
-            operatorIds,
-            pubKeys1,
-            sharesData1,
-            getTokenAmount1(),
-            getCluster1()
-        );
-        vm.stopPrank();
-
-        vm.startPrank(owner);
-        p2pOrgUnlimitedEthDepositor.enableEip7251();
-        vm.stopPrank();
-
-        vm.startPrank(operator);
-        p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
-            withdrawalCredentials,
-            MIN_ACTIVATION_BALANCE,
+            withdrawalCredentials_02,
+            depositAmount,
             feeDistributorInstance,
 
             depositData1,
@@ -1646,8 +1640,8 @@ contract MainnetIntegration is Test {
             getCluster1()
         );
         p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
-            withdrawalCredentials,
-            MIN_ACTIVATION_BALANCE,
+            withdrawalCredentials_02,
+            depositAmount,
             feeDistributorInstance,
 
             depositData2,
@@ -1666,8 +1660,8 @@ contract MainnetIntegration is Test {
 
         vm.startPrank(withdrawalCredentialsAddress);
         p2pOrgUnlimitedEthDepositor.refund(
-            withdrawalCredentials,
-            MIN_ACTIVATION_BALANCE,
+            withdrawalCredentials_02,
+            depositAmount,
             feeDistributorInstance
         );
         vm.stopPrank();
