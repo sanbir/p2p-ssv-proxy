@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-pragma solidity 0.8.18;
+pragma solidity 0.8.24;
 
 /// @dev https://github.com/ssvlabs/ssv-network/blob/c140c3c0de0ee7a64f3016f25c7820af6b752fd6/contracts/interfaces/external/ISSVWhitelistingContract.sol
 interface ISSVWhitelistingContract {
