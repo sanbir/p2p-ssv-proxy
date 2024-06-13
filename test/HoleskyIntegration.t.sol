@@ -33,9 +33,9 @@ contract HoleskyIntegration is Test {
     address payable public constant client = payable(address(0x62a90760c7ce5CBaDbb64188ad075e9A52518D41));
     address public constant withdrawalCredentialsAddress = 0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
 
-    IP2pOrgUnlimitedEthDepositor public constant p2pOrgUnlimitedEthDepositor = IP2pOrgUnlimitedEthDepositor(0xaBdef4C2B980dd803FA5Ec050a1F3458B01D3BF2);
-    IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0x0eAD4849854A1fF8aE29b4bC90A4C8705828fC07);
-    address public constant referenceFeeDistributor = 0xff2d137F9E2a710AC48A2A3440701D4d9336dd1C;
+    IP2pOrgUnlimitedEthDepositor public constant p2pOrgUnlimitedEthDepositor = IP2pOrgUnlimitedEthDepositor(0x0666B89c174CFCDa8E303EdC710424C9a8733E7A);
+    IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0x86F4975b738185e65e94DEe60304f5a896b8EACc);
+    address public constant referenceFeeDistributor = 0xc025b3d334eBb325DB94503C24912363cDFDe157;
     address public referenceP2pSsvProxy;
     ISSVClusters.Cluster public clusterAfter1stRegistation;
 
@@ -70,7 +70,7 @@ contract HoleskyIntegration is Test {
     event ValidatorExited(address indexed owner, uint64[] operatorIds, bytes publicKey);
 
     function setUp() public {
-        vm.createSelectFork("holesky", 1675441);
+        vm.createSelectFork("holesky", 1726649);
 
         vm.startPrank(owner);
 
