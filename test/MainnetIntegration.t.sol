@@ -33,6 +33,7 @@ contract MainnetIntegration is Test {
     P2pSsvProxyFactory public p2pSsvProxyFactory;
     address payable public constant client = payable(address(0x62a90760c7ce5CBaDbb64188ad075e9A52518D41));
     address public constant withdrawalCredentialsAddress = 0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
+    bytes32 public constant withdrawalCredentials = 0x010000000000000000000000548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
 
     IP2pOrgUnlimitedEthDepositor public constant p2pOrgUnlimitedEthDepositor = IP2pOrgUnlimitedEthDepositor(0x109D1091Fa5fdc65720f7c623590A15B43265E43);
     IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0xf6B1a21282CA77a02160EC6A37f7A008B231E0dF);
@@ -54,6 +55,7 @@ contract MainnetIntegration is Test {
     uint112 public constant SsvPerEthExchangeRateDividedByWei = 7539000000000000;
     uint112 public constant MaxSsvTokenAmountPerValidator = 30 ether;
     uint40 constant TIMEOUT = 1 days;
+    uint96 constant MIN_ACTIVATION_BALANCE = 32 ether;
 
     event ValidatorAdded(address indexed owner, uint64[] operatorIds, bytes publicKey, bytes shares, ISSVClusters.Cluster cluster);
 
@@ -817,39 +819,6 @@ contract MainnetIntegration is Test {
         console.log("test_setFeeRecipientAddress finsihed");
     }
 
-    function test_setReferenceFeeDistributor() public {
-        console.log("test_setReferenceFeeDistributor started");
-
-        vm.startPrank(owner);
-        p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(SsvPerEthExchangeRateDividedByWei);
-        vm.stopPrank();
-
-        SsvPayload memory ssvPayload1 = getSsvPayload1();
-
-        uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
-
-        vm.deal(client, 1000 ether);
-        vm.startPrank(client);
-        address proxy1 = p2pSsvProxyFactory.registerValidators{value: neededEth}(
-            ssvPayload1,
-            clientConfig,
-            referrerConfig
-        );
-        vm.stopPrank();
-
-        address referenceFeeDistributor2 = 0x6091767Be457a5A7f7d368dD68Ebf2f416728d97;
-        vm.startPrank(owner);
-        p2pSsvProxyFactory.setReferenceFeeDistributor(referenceFeeDistributor2);
-        vm.stopPrank();
-
-        address feeDistributor2 = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor2, clientConfig, referrerConfig);
-        address proxy2 = p2pSsvProxyFactory.predictP2pSsvProxyAddress(feeDistributor2);
-
-        assertNotEq(proxy1, proxy2);
-
-        console.log("test_setReferenceFeeDistributor finsihed");
-    }
-
     function test_settersAndRemovers() public {
         console.log("test_settersAndRemovers started");
 
@@ -1526,10 +1495,15 @@ contract MainnetIntegration is Test {
 
         vm.deal(client, 100000 ether);
         vm.startPrank(client);
-        p2pSsvProxyFactory.addEth{value: clientDeposit}(clientConfig1, referrerConfig);
+        (,address feeDistributorInstance,) = p2pSsvProxyFactory.addEth{value: clientDeposit}(
+            withdrawalCredentials,
+            MIN_ACTIVATION_BALANCE,
+            clientConfig1,
+            referrerConfig,
+            ""
+        );
         vm.stopPrank();
 
-        address feeDistributorInstance = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, clientConfig1, referrerConfig);
         DepositData memory depositData1 = getDepositData1();
         bytes[] memory pubKeys1 = new bytes[](5);
         bytes[] memory sharesData1 = new bytes[](5);
@@ -1547,26 +1521,30 @@ contract MainnetIntegration is Test {
 
         vm.startPrank(operator);
         p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            withdrawalCredentials,
+            MIN_ACTIVATION_BALANCE,
+            feeDistributorInstance,
+
             depositData1,
 
             operatorIds,
             pubKeys1,
             sharesData1,
             getTokenAmount1(),
-            getCluster1(),
-
-            feeDistributorInstance
+            getCluster1()
         );
         p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            withdrawalCredentials,
+            MIN_ACTIVATION_BALANCE,
+            feeDistributorInstance,
+
             depositData2,
 
             operatorIds,
             pubKeys2,
             sharesData2,
             getTokenAmount1(),
-            clusterAfter1stRegistation,
-
-            feeDistributorInstance
+            clusterAfter1stRegistation
         );
         vm.stopPrank();
 
@@ -1575,7 +1553,11 @@ contract MainnetIntegration is Test {
         uint256 balanceBefore = withdrawalCredentialsAddress.balance;
 
         vm.startPrank(withdrawalCredentialsAddress);
-        p2pOrgUnlimitedEthDepositor.refund(feeDistributorInstance);
+        p2pOrgUnlimitedEthDepositor.refund(
+            withdrawalCredentials,
+            MIN_ACTIVATION_BALANCE,
+            feeDistributorInstance
+        );
         vm.stopPrank();
 
         uint256 balanceAfter = withdrawalCredentialsAddress.balance;
@@ -1603,7 +1585,13 @@ contract MainnetIntegration is Test {
 
         vm.deal(client, 100000 ether);
         vm.startPrank(client);
-        p2pSsvProxyFactory.addEth{value: clientDeposit}(clientConfig1, referrerConfig);
+        p2pSsvProxyFactory.addEth{value: clientDeposit}(
+            withdrawalCredentials,
+            MIN_ACTIVATION_BALANCE,
+            clientConfig1,
+            referrerConfig,
+            ""
+        );
         vm.stopPrank();
 
         address feeDistributorInstance = feeDistributorFactory.predictFeeDistributorAddress(referenceFeeDistributor, clientConfig1, referrerConfig);
@@ -1625,16 +1613,17 @@ contract MainnetIntegration is Test {
         vm.startPrank(operator);
         vm.expectRevert(P2pOrgUnlimitedEthDepositor__Eip7251NotEnabledYet.selector);
         p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            withdrawalCredentials,
+            MIN_ACTIVATION_BALANCE,
+            feeDistributorInstance,
+
             depositData1,
 
             operatorIds,
             pubKeys1,
             sharesData1,
             getTokenAmount1(),
-            getCluster1(),
-
-            feeDistributorInstance,
-            depositAmount
+            getCluster1()
         );
         vm.stopPrank();
 
@@ -1644,28 +1633,30 @@ contract MainnetIntegration is Test {
 
         vm.startPrank(operator);
         p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            withdrawalCredentials,
+            MIN_ACTIVATION_BALANCE,
+            feeDistributorInstance,
+
             depositData1,
 
             operatorIds,
             pubKeys1,
             sharesData1,
             getTokenAmount1(),
-            getCluster1(),
-
-            feeDistributorInstance,
-            depositAmount
+            getCluster1()
         );
         p2pSsvProxyFactory.makeBeaconDepositsAndRegisterValidators(
+            withdrawalCredentials,
+            MIN_ACTIVATION_BALANCE,
+            feeDistributorInstance,
+
             depositData2,
 
             operatorIds,
             pubKeys2,
             sharesData2,
             getTokenAmount1(),
-            clusterAfter1stRegistation,
-
-            feeDistributorInstance,
-            depositAmount
+            clusterAfter1stRegistation
         );
         vm.stopPrank();
 
@@ -1674,7 +1665,11 @@ contract MainnetIntegration is Test {
         uint256 balanceBefore = withdrawalCredentialsAddress.balance;
 
         vm.startPrank(withdrawalCredentialsAddress);
-        p2pOrgUnlimitedEthDepositor.refund(feeDistributorInstance);
+        p2pOrgUnlimitedEthDepositor.refund(
+            withdrawalCredentials,
+            MIN_ACTIVATION_BALANCE,
+            feeDistributorInstance
+        );
         vm.stopPrank();
 
         uint256 balanceAfter = withdrawalCredentialsAddress.balance;

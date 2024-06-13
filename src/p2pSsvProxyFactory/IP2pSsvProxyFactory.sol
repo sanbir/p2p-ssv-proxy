@@ -103,14 +103,16 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
     );
 
     /// @notice Emits when client deposited their ETH for SSV staking
+    /// @param _depositId ID of client deposit (derived from ETH2 WithdrawalCredentials, ETH amount per validator in wei, fee distributor instance address)
     /// @param _sender address who sent ETH
     /// @param _p2pSsvProxy address of the client instance of P2pSsvProxy
     /// @param _feeDistributorInstance address of the client instance of FeeDistributor
     /// @param _ethAmountInWei amount of deposited ETH in wei
     event P2pSsvProxyFactory__EthForSsvStakingDeposited(
+        bytes32 indexed _depositId,
         address indexed _sender,
         address indexed _p2pSsvProxy,
-        address indexed _feeDistributorInstance,
+        address _feeDistributorInstance,
         uint256 _ethAmountInWei
     );
 
@@ -276,13 +278,28 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
 
     /// @notice Deposit unlimited amount of ETH for SSV staking
     /// @dev Callable by clients
-    /// @param _clientConfig address and basis points (percent * 100) of the client (for FeeDistributor)
-    /// @param _referrerConfig address and basis points (percent * 100) of the referrer (for FeeDistributor)
+    /// @param _eth2WithdrawalCredentials ETH2 withdrawal credentials
+    /// @param _ethAmountPerValidatorInWei amount of ETH to deposit per 1 validator (should be >= 32 and <= 2048)
+    /// @param _clientConfig address and basis points (percent * 100) of the client
+    /// @param _referrerConfig address and basis points (percent * 100) of the referrer.
+    /// @param _extraData any other data to pass to the event listener
+    /// @return depositId ID of client deposit (derived from ETH2 WithdrawalCredentials, ETH amount per validator in wei, fee distributor instance address)
+    /// @return feeDistributorInstance client FeeDistributor instance
     /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
     function addEth(
+        bytes32 _eth2WithdrawalCredentials,
+        uint96 _ethAmountPerValidatorInWei,
         FeeRecipient calldata _clientConfig,
-        FeeRecipient calldata _referrerConfig
-    ) external payable returns (address p2pSsvProxy);
+        FeeRecipient calldata _referrerConfig,
+        bytes calldata _extraData
+    )
+    external
+    payable
+    returns (
+        bytes32 depositId,
+        address feeDistributorInstance,
+        address p2pSsvProxy
+    );
 
     /// @notice Register validators with SSV (up to 60, calldata size is the limit) without ETH deposits
     /// @param _ssvPayload a stuct with data necessary for SSV registration (see `SsvPayload` struct for details)
@@ -319,45 +336,26 @@ interface IP2pSsvProxyFactory is ISSVWhitelistingContract, IOwnableWithOperator,
 
     /// @notice Send ETH to ETH2 DepositContract on behalf of the client and register validators with SSV (up to 60, calldata size is the limit)
     /// @dev Callable by P2P only.
+    /// @param _eth2WithdrawalCredentials ETH2 withdrawal credentials
+    /// @param _ethAmountPerValidatorInWei amount of ETH to deposit per 1 validator (should be >= 32 and <= 2048)
+    /// @param _feeDistributorInstance user FeeDistributor instance that determines the terms of staking service
     /// @param _depositData signatures and depositDataRoots from Beacon deposit data
     /// @param _operatorIds SSV operator IDs
     /// @param _publicKeys validator public keys
     /// @param _sharesData encrypted shares related to the validator
     /// @param _amount amount of ERC-20 SSV tokens to deposit into the cluster
     /// @param _cluster SSV cluster
-    /// @param _feeDistributorInstance client FeeDistributor instance
     /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
     function makeBeaconDepositsAndRegisterValidators(
-        DepositData calldata _depositData,
-        uint64[] calldata _operatorIds,
-        bytes[] calldata _publicKeys,
-        bytes[] calldata _sharesData,
-        uint256 _amount,
-        ISSVNetwork.Cluster calldata _cluster,
-        address _feeDistributorInstance
-    ) external returns (address p2pSsvProxy);
-
-    /// @notice Send ETH to ETH2 DepositContract on behalf of the client and register validators with SSV (up to 60, calldata size is the limit)
-    /// @dev Callable by P2P only.
-    /// @dev Should be called after Pectra hardfork
-    /// @param _depositData signatures and depositDataRoots from Beacon deposit data
-    /// @param _operatorIds SSV operator IDs
-    /// @param _publicKeys validator public keys
-    /// @param _sharesData encrypted shares related to the validator
-    /// @param _amount amount of ERC-20 SSV tokens to deposit into the cluster
-    /// @param _cluster SSV cluster
-    /// @param _feeDistributorInstance client FeeDistributor instance
-    /// @param _ethAmountPerValidator amount of ETH to deposit per 1 validator (should be >= 32 and <= 2048)
-    /// @return p2pSsvProxy client P2pSsvProxy instance that became the SSV cluster owner
-    function makeBeaconDepositsAndRegisterValidators(
-        DepositData calldata _depositData,
-        uint64[] calldata _operatorIds,
-        bytes[] calldata _publicKeys,
-        bytes[] calldata _sharesData,
-        uint256 _amount,
-        ISSVNetwork.Cluster calldata _cluster,
+        bytes32 _eth2WithdrawalCredentials,
+        uint96 _ethAmountPerValidatorInWei,
         address _feeDistributorInstance,
-        uint256 _ethAmountPerValidator
+        DepositData calldata _depositData,
+        uint64[] calldata _operatorIds,
+        bytes[] calldata _publicKeys,
+        bytes[] calldata _sharesData,
+        uint256 _amount,
+        ISSVNetwork.Cluster calldata _cluster
     ) external returns (address p2pSsvProxy);
 
     /// @notice Deposit SSV tokens from P2pSsvProxyFactory to SSV cluster
