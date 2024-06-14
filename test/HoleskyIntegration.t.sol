@@ -1543,7 +1543,7 @@ contract HoleskyIntegration is Test {
             depositAmount,
             clientConfig1,
             referrerConfig,
-            ""
+            "ANY EXTRA DATA"
         );
         vm.stopPrank();
 

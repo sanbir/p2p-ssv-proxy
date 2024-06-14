@@ -34,6 +34,7 @@ contract MainnetIntegration is Test {
     address payable public constant client = payable(address(0x62a90760c7ce5CBaDbb64188ad075e9A52518D41));
     address public constant withdrawalCredentialsAddress = 0x548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
     bytes32 public constant withdrawalCredentials = 0x010000000000000000000000548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
+    bytes32 public constant withdrawalCredentials_02 = 0x020000000000000000000000548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
 
     IP2pOrgUnlimitedEthDepositor public constant p2pOrgUnlimitedEthDepositor = IP2pOrgUnlimitedEthDepositor(0x109D1091Fa5fdc65720f7c623590A15B43265E43);
     IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0xf6B1a21282CA77a02160EC6A37f7A008B231E0dF);
