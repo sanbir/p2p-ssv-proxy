@@ -1,15 +1,39 @@
-// SPDX-FileCopyrightText: 2023 P2P Validator <info@p2p.org>
+// SPDX-FileCopyrightText: 2024 P2P Validator <info@p2p.org>
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.24;
 
 import "../../@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../../access/IOwnable.sol";
 import "./IFeeDistributor.sol";
 import "../../structs/P2pStructs.sol";
 
-/// @dev External interface of FeeDistributorFactory
+/// @dev External interface of FeeDistributorFactory declared to support ERC165 detection.
 interface IFeeDistributorFactory is IOwnable, IERC165 {
+
+    /// @notice Emits when a new FeeDistributor instance has been created for a client
+    /// @param _newFeeDistributorAddress address of the newly created FeeDistributor contract instance
+    /// @param _clientAddress address of the client for whom the new instance was created
+    /// @param _referenceFeeDistributor The address of the reference implementation of FeeDistributor used as the basis for clones
+    /// @param _clientBasisPoints client basis points (percent * 100)
+    event FeeDistributorFactory__FeeDistributorCreated(
+        address indexed _newFeeDistributorAddress,
+        address indexed _clientAddress,
+        address indexed _referenceFeeDistributor,
+        uint96 _clientBasisPoints
+    );
+
+    /// @notice Emits when a new P2pEth2Depositor contract address has been set.
+    /// @param _p2pEth2Depositor the address of the new P2pEth2Depositor contract
+    event FeeDistributorFactory__P2pEth2DepositorSet(
+        address indexed _p2pEth2Depositor
+    );
+
+    /// @notice Emits when a new value of defaultClientBasisPoints has been set.
+    /// @param _defaultClientBasisPoints new value of defaultClientBasisPoints
+    event FeeDistributorFactory__DefaultClientBasisPointsSet(
+        uint96 _defaultClientBasisPoints
+    );
 
     /// @notice Creates a FeeDistributor instance for a client
     /// @dev _referrerConfig can be zero if there is no referrer.

@@ -1,7 +1,7 @@
-// SPDX-FileCopyrightText: 2023 P2P Validator <info@p2p.org>
+// SPDX-FileCopyrightText: 2024 P2P Validator <info@p2p.org>
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.18;
+pragma solidity 0.8.24;
 
 import "../@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../structs/P2pStructs.sol";
@@ -25,6 +25,14 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
         bytes4 indexed _selector
     );
 
+    /// @notice Emits when an arbitrary external contract has been called by owner via P2pSsvProxy
+    /// @param _contract external contract address
+    /// @param _selector selector of the called function
+    event P2pSsvProxy__SuccessfullyCalledExternalContract(
+        address indexed _contract,
+        bytes4 indexed _selector
+    );
+
     /// @notice Initialize the P2pSsvProxy instance
     /// @dev Should only be called by P2pSsvProxyFactory
     /// @param _feeDistributor FeeDistributor instance that determines the identity of this P2pSsvProxy instance
@@ -32,11 +40,36 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
         address _feeDistributor
     ) external;
 
+    /// @notice Call an arbitrary external contract with P2pSsvProxy as a msg.sender
+    /// @dev Should be called by owner only
+    /// @dev This function can help e.g. in claiming airdrops
+    /// @param _contract external contract address
+    /// @param _calldata calldata for the external contract
+    function callAnyContract(
+        address _contract,
+        bytes calldata _calldata
+    ) external;
+
     /// @notice Register a batch of validators with SSV
     /// @dev Should be called by P2pSsvProxyFactory only
     /// @param _ssvPayload struct with the SSV data required for registration
     function registerValidators(
         SsvPayload calldata _ssvPayload
+    ) external;
+
+    /// @notice Registers new validators on the SSV Network
+    /// @dev Should be called by P2pSsvProxyFactory only
+    /// @param publicKeys The public keys of the new validators
+    /// @param operatorIds Array of IDs of operators managing this validator
+    /// @param sharesData Encrypted shares related to the new validators
+    /// @param amount Amount of SSV tokens to be deposited
+    /// @param cluster Cluster to be used with the new validator
+    function bulkRegisterValidators(
+        bytes[] calldata publicKeys,
+        uint64[] calldata operatorIds,
+        bytes[] calldata sharesData,
+        uint256 amount,
+        ISSVNetwork.Cluster calldata cluster
     ) external;
 
     /// @notice Remove a batch of validators from SSV
@@ -105,6 +138,21 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
         uint256 _amount
     ) external;
 
+    /// @notice Withdraw all SSV tokens from this contract to P2pSsvProxyFactory
+    /// @dev Should be called by P2P only
+    function withdrawAllSSVTokensToFactory() external;
+
+    /// @notice Withdraw SSV tokens from SSV clusters to P2pSsvProxyFactory
+    /// @dev Should be called by P2P only
+    /// @param _tokenAmount SSV token amount to be withdrawn
+    /// @param _operatorIds SSV operator IDs
+    /// @param _clusters SSV clusters
+    function withdrawFromSSVToFactory(
+        uint256 _tokenAmount,
+        uint64[] calldata _operatorIds,
+        ISSVNetwork.Cluster[] calldata _clusters
+    ) external;
+
     /// @notice Set a new fee recipient address for this contract (cluster owner)
     /// @dev Should be called by P2P only.
     /// Another FeeDistributor instance can become the fee recipient (e.g. if service percentages change).
@@ -115,6 +163,11 @@ interface IP2pSsvProxy is IOwnableWithOperator, IERC165 {
     function setFeeRecipientAddress(
         address _feeRecipientAddress
     ) external;
+
+    /// @notice Fires the exit event for a set of validators
+    /// @param publicKeys The public keys of the validators to be exited
+    /// @param operatorIds Array of IDs of operators managing the validators
+    function bulkExitValidator(bytes[] calldata publicKeys, uint64[] calldata operatorIds) external;
 
     /// @notice Returns the client address
     /// @return address client address
