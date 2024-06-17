@@ -36,9 +36,9 @@ contract MainnetIntegration is Test {
     bytes32 public constant withdrawalCredentials = 0x010000000000000000000000548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
     bytes32 public constant withdrawalCredentials_02 = 0x020000000000000000000000548D1cA3470Cf9Daa1Ea6b4eF82A382cc3e24c4f;
 
-    IP2pOrgUnlimitedEthDepositor public constant p2pOrgUnlimitedEthDepositor = IP2pOrgUnlimitedEthDepositor(0x109D1091Fa5fdc65720f7c623590A15B43265E43);
-    IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0xf6B1a21282CA77a02160EC6A37f7A008B231E0dF);
-    address public constant referenceFeeDistributor = 0xCA2a3d2267Cf1309B21d08a16BE414AC5455796F;
+    IP2pOrgUnlimitedEthDepositor public constant p2pOrgUnlimitedEthDepositor = IP2pOrgUnlimitedEthDepositor(0xf6deA2834281d1a2e9E5ae6297F287475C907270);
+    IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0x825C85a124a8134D2f599AE65B7E8D0635E84247);
+    address public constant referenceFeeDistributor = 0x98b2eFF7e900d741d5c90dab4E708DaEb2a063e1;
     address public referenceP2pSsvProxy;
     ISSVClusters.Cluster public clusterAfter1stRegistation;
 
@@ -77,7 +77,7 @@ contract MainnetIntegration is Test {
     error P2pOrgUnlimitedEthDepositor__Eip7251NotEnabledYet();
 
     function setUp() public {
-        vm.createSelectFork("mainnet", 20009782);
+        vm.createSelectFork("mainnet", 20106698);
 
         vm.startPrank(owner);
 
@@ -130,8 +130,8 @@ contract MainnetIntegration is Test {
 
         clusterAfter1stRegistation = ISSVClusters.Cluster({
             validatorCount: 5,
-            networkFeeIndex: 72268258830,
-            index: 62010294024,
+            networkFeeIndex: 73961461734,
+            index: 80552263144,
             active: true,
             balance: 53460049500000000000
         });
@@ -831,7 +831,7 @@ contract MainnetIntegration is Test {
 
         uint256 neededEth = p2pSsvProxyFactory.getNeededAmountOfEtherToCoverSsvFees(ssvPayload1.tokenAmount);
 
-        address feeDistributor = 0x6bCBFF73A652B6cB1852c4d85cc34894F5120e28;
+        address feeDistributor = 0x98b2eFF7e900d741d5c90dab4E708DaEb2a063e1;
         address proxy1 = p2pSsvProxyFactory.predictP2pSsvProxyAddress(feeDistributor);
         assertEq(proxy1.code.length, 0);
 
