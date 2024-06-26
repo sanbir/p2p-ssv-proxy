@@ -1147,6 +1147,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
-        return interfaceId == type(IP2pSsvProxyFactory).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IP2pSsvProxyFactory).interfaceId ||
+               interfaceId == type(ISSVWhitelistingContract).interfaceId ||
+               super.supportsInterface(interfaceId);
     }
 }
