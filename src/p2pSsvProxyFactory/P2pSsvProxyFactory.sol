@@ -707,13 +707,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         uint256 validatorCount = _publicKeys.length;
         _checkTokenAmount(_amount, validatorCount);
 
-        if (_depositData.signatures.length != validatorCount || _depositData.depositDataRoots.length != validatorCount) {
-            revert P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength(
-                validatorCount,
-                _depositData.signatures.length,
-                _depositData.depositDataRoots.length
-            );
-        }
+        // Lengths matching check for public keys, signatures, and deposit data roots
+        // is done by P2pOrgUnlimitedEthDepositor
 
         i_p2pOrgUnlimitedEthDepositor.makeBeaconDeposit(
             _eth2WithdrawalCredentials,
