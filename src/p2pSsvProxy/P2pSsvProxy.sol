@@ -433,7 +433,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         uint64 _currentNetworkFeeIndex,
         uint256 _balance
     ) private {
-        ISSVClusters.Cluster memory cluster = ISSVClusters.Cluster({
+        ISSVNetworkCore.Cluster memory cluster = ISSVNetworkCore.Cluster({
             validatorCount: uint32(_cluster.validatorCount + i),
             networkFeeIndex: _currentNetworkFeeIndex,
             index: _clusterIndex,

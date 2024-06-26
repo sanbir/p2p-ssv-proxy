@@ -40,7 +40,7 @@ contract MainnetIntegration is Test {
     IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0x825C85a124a8134D2f599AE65B7E8D0635E84247);
     address public constant referenceFeeDistributor = 0x98b2eFF7e900d741d5c90dab4E708DaEb2a063e1;
     address public referenceP2pSsvProxy;
-    ISSVClusters.Cluster public clusterAfter1stRegistation;
+    ISSVNetworkCore.Cluster public clusterAfter1stRegistation;
 
     FeeRecipient public clientConfig;
     FeeRecipient public referrerConfig;
@@ -58,17 +58,17 @@ contract MainnetIntegration is Test {
     uint40 constant TIMEOUT = 1 days;
     uint96 constant MIN_ACTIVATION_BALANCE = 32 ether;
 
-    event ValidatorAdded(address indexed owner, uint64[] operatorIds, bytes publicKey, bytes shares, ISSVClusters.Cluster cluster);
+    event ValidatorAdded(address indexed owner, uint64[] operatorIds, bytes publicKey, bytes shares, ISSVNetworkCore.Cluster cluster);
 
-    event ValidatorRemoved(address indexed owner, uint64[] operatorIds, bytes publicKey, ISSVClusters.Cluster cluster);
+    event ValidatorRemoved(address indexed owner, uint64[] operatorIds, bytes publicKey, ISSVNetworkCore.Cluster cluster);
 
-    event ClusterLiquidated(address indexed owner, uint64[] operatorIds, ISSVClusters.Cluster cluster);
+    event ClusterLiquidated(address indexed owner, uint64[] operatorIds, ISSVNetworkCore.Cluster cluster);
 
-    event ClusterReactivated(address indexed owner, uint64[] operatorIds, ISSVClusters.Cluster cluster);
+    event ClusterReactivated(address indexed owner, uint64[] operatorIds, ISSVNetworkCore.Cluster cluster);
 
-    event ClusterWithdrawn(address indexed owner, uint64[] operatorIds, uint256 value, ISSVClusters.Cluster cluster);
+    event ClusterWithdrawn(address indexed owner, uint64[] operatorIds, uint256 value, ISSVNetworkCore.Cluster cluster);
 
-    event ClusterDeposited(address indexed owner, uint64[] operatorIds, uint256 value, ISSVClusters.Cluster cluster);
+    event ClusterDeposited(address indexed owner, uint64[] operatorIds, uint256 value, ISSVNetworkCore.Cluster cluster);
 
     event FeeRecipientAddressUpdated(address indexed owner, address recipientAddress);
 
@@ -128,7 +128,7 @@ contract MainnetIntegration is Test {
 
         proxyAddress = predictProxyAddress();
 
-        clusterAfter1stRegistation = ISSVClusters.Cluster({
+        clusterAfter1stRegistation = ISSVNetworkCore.Cluster({
             validatorCount: 5,
             networkFeeIndex: 73961461734,
             index: 80552263144,
@@ -211,8 +211,8 @@ contract MainnetIntegration is Test {
         ssvValidators[1].sharesData = validatorSharesData[6];
     }
 
-    function getCluster1() private pure returns(ISSVClusters.Cluster memory cluster) {
-        cluster = ISSVClusters.Cluster({
+    function getCluster1() private pure returns(ISSVNetworkCore.Cluster memory cluster) {
+        cluster = ISSVNetworkCore.Cluster({
             validatorCount: 0,
             networkFeeIndex: 0,
             index: 0,
@@ -228,7 +228,7 @@ contract MainnetIntegration is Test {
     function getSsvPayload1() private view returns(SsvPayload memory) {
         SsvOperator[] memory ssvOperators = getUpdatedSsvOperators();
         SsvValidator[] memory ssvValidators = getSsvValidators1();
-        ISSVClusters.Cluster memory cluster = getCluster1();
+        ISSVNetworkCore.Cluster memory cluster = getCluster1();
         uint256 tokenAmount = getTokenAmount1();
 
         return SsvPayload({
@@ -246,7 +246,7 @@ contract MainnetIntegration is Test {
         ssvOperators[3] = ssvOperators[2];
 
         SsvValidator[] memory ssvValidators = getSsvValidators1();
-        ISSVClusters.Cluster memory cluster = getCluster1();
+        ISSVNetworkCore.Cluster memory cluster = getCluster1();
         uint256 tokenAmount = getTokenAmount1();
 
         return SsvPayload({
@@ -962,7 +962,7 @@ contract MainnetIntegration is Test {
         ISSVNetwork.Cluster[] memory _clusters = new ISSVNetwork.Cluster[](1);
         _clusters[0] = clusterAfter1stRegistation;
 
-        ISSVClusters.Cluster memory clusterAfterLiquidation = ISSVClusters.Cluster({
+        ISSVNetworkCore.Cluster memory clusterAfterLiquidation = ISSVNetworkCore.Cluster({
             validatorCount: 5,
             networkFeeIndex: 0,
             index: 0,
@@ -1021,7 +1021,7 @@ contract MainnetIntegration is Test {
 
         ssvToken.transfer(proxy1, 42 ether);
 
-        ISSVClusters.Cluster memory clusterAfterDeposit = clusterAfter1stRegistation;
+        ISSVNetworkCore.Cluster memory clusterAfterDeposit = clusterAfter1stRegistation;
         clusterAfterDeposit.balance += 42 ether;
 
         vm.expectEmit();
@@ -1183,7 +1183,7 @@ contract MainnetIntegration is Test {
 
         registerValidators();
 
-        ISSVClusters.Cluster[] memory clusters = new ISSVClusters.Cluster[](1);
+        ISSVNetworkCore.Cluster[] memory clusters = new ISSVNetworkCore.Cluster[](1);
         clusters[0] = clusterAfter1stRegistation;
 
         uint256 proxyBalanceBefore = ssvToken.balanceOf(proxyAddress);
@@ -1220,7 +1220,7 @@ contract MainnetIntegration is Test {
 
         uint256 tokenAmount = 42;
 
-        ISSVClusters.Cluster memory clusterAfterDeposit = ISSVClusters.Cluster({
+        ISSVNetworkCore.Cluster memory clusterAfterDeposit = ISSVNetworkCore.Cluster({
             validatorCount: clusterAfter1stRegistation.validatorCount,
             networkFeeIndex: clusterAfter1stRegistation.networkFeeIndex,
             index: clusterAfter1stRegistation.index,
@@ -1351,7 +1351,7 @@ contract MainnetIntegration is Test {
 
         registerValidators();
 
-        ISSVClusters.Cluster[] memory clusters = new ISSVClusters.Cluster[](1);
+        ISSVNetworkCore.Cluster[] memory clusters = new ISSVNetworkCore.Cluster[](1);
         clusters[0] = clusterAfter1stRegistation;
 
         uint256 proxyBalanceBefore = ssvToken.balanceOf(proxyAddress);
@@ -1395,7 +1395,7 @@ contract MainnetIntegration is Test {
 
         registerValidators();
 
-        ISSVClusters.Cluster[] memory clusters = new ISSVClusters.Cluster[](1);
+        ISSVNetworkCore.Cluster[] memory clusters = new ISSVNetworkCore.Cluster[](1);
         clusters[0] = clusterAfter1stRegistation;
 
         uint256 tokenAmount = 42;

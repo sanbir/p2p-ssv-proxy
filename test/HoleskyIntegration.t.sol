@@ -19,6 +19,7 @@ import "../src/structs/P2pStructs.sol";
 import "../src/mocks/IChangeOperator.sol";
 import "../src/mocks/IMockSsvNetwork.sol";
 import "../src/mocks/IMockSsvNetworkViews.sol";
+import "../src/interfaces/ssv/ISSVOperatorsWhitelist.sol";
 
 contract HoleskyIntegration is Test {
     address public constant ssvNetworkAddress = 0x38A4794cCEd47d3baf7370CcC43B560D3a1beEFA;
@@ -39,7 +40,7 @@ contract HoleskyIntegration is Test {
     IFeeDistributorFactory public constant feeDistributorFactory = IFeeDistributorFactory(0x86F4975b738185e65e94DEe60304f5a896b8EACc);
     address public constant referenceFeeDistributor = 0xc025b3d334eBb325DB94503C24912363cDFDe157;
     address public referenceP2pSsvProxy;
-    ISSVClusters.Cluster public clusterAfter1stRegistation;
+    ISSVNetworkCore.Cluster public clusterAfter1stRegistation;
 
     FeeRecipient public clientConfig;
     FeeRecipient public referrerConfig;
@@ -57,17 +58,17 @@ contract HoleskyIntegration is Test {
     uint40 constant TIMEOUT = 1 days;
     uint96 constant MIN_ACTIVATION_BALANCE = 32 ether;
 
-    event ValidatorAdded(address indexed owner, uint64[] operatorIds, bytes publicKey, bytes shares, ISSVClusters.Cluster cluster);
+    event ValidatorAdded(address indexed owner, uint64[] operatorIds, bytes publicKey, bytes shares, ISSVNetworkCore.Cluster cluster);
 
-    event ValidatorRemoved(address indexed owner, uint64[] operatorIds, bytes publicKey, ISSVClusters.Cluster cluster);
+    event ValidatorRemoved(address indexed owner, uint64[] operatorIds, bytes publicKey, ISSVNetworkCore.Cluster cluster);
 
-    event ClusterLiquidated(address indexed owner, uint64[] operatorIds, ISSVClusters.Cluster cluster);
+    event ClusterLiquidated(address indexed owner, uint64[] operatorIds, ISSVNetworkCore.Cluster cluster);
 
-    event ClusterReactivated(address indexed owner, uint64[] operatorIds, ISSVClusters.Cluster cluster);
+    event ClusterReactivated(address indexed owner, uint64[] operatorIds, ISSVNetworkCore.Cluster cluster);
 
-    event ClusterWithdrawn(address indexed owner, uint64[] operatorIds, uint256 value, ISSVClusters.Cluster cluster);
+    event ClusterWithdrawn(address indexed owner, uint64[] operatorIds, uint256 value, ISSVNetworkCore.Cluster cluster);
 
-    event ClusterDeposited(address indexed owner, uint64[] operatorIds, uint256 value, ISSVClusters.Cluster cluster);
+    event ClusterDeposited(address indexed owner, uint64[] operatorIds, uint256 value, ISSVNetworkCore.Cluster cluster);
 
     event FeeRecipientAddressUpdated(address indexed owner, address recipientAddress);
 
@@ -76,7 +77,7 @@ contract HoleskyIntegration is Test {
     error P2pOrgUnlimitedEthDepositor__Eip7251NotEnabledYet();
 
     function setUp() public {
-        vm.createSelectFork("holesky", 1726649);
+        vm.createSelectFork("holesky", 1810830);
 
         vm.startPrank(owner);
 
@@ -127,10 +128,10 @@ contract HoleskyIntegration is Test {
 
         proxyAddress = predictProxyAddress();
 
-        clusterAfter1stRegistation = ISSVClusters.Cluster({
+        clusterAfter1stRegistation = ISSVNetworkCore.Cluster({
             validatorCount: 5,
-            networkFeeIndex: 58079433304,
-            index: 251903762194,
+            networkFeeIndex: 61300535088,
+            index: 262565454206,
             active: true,
             balance: 53460049500000000000
         });
@@ -246,8 +247,8 @@ contract HoleskyIntegration is Test {
         ssvValidators[1].sharesData = validatorSharesData[6];
     }
 
-    function getCluster1() private pure returns(ISSVClusters.Cluster memory cluster) {
-        cluster = ISSVClusters.Cluster({
+    function getCluster1() private pure returns(ISSVNetworkCore.Cluster memory cluster) {
+        cluster = ISSVNetworkCore.Cluster({
             validatorCount: 0,
             networkFeeIndex: 0,
             index: 0,
@@ -263,7 +264,7 @@ contract HoleskyIntegration is Test {
     function getSsvPayload1() private view returns(SsvPayload memory) {
         SsvOperator[] memory ssvOperators = getUpdatedSsvOperators();
         SsvValidator[] memory ssvValidators = getSsvValidators1();
-        ISSVClusters.Cluster memory cluster = getCluster1();
+        ISSVNetworkCore.Cluster memory cluster = getCluster1();
         uint256 tokenAmount = getTokenAmount1();
 
         return SsvPayload({
@@ -281,7 +282,7 @@ contract HoleskyIntegration is Test {
         ssvOperators[3] = ssvOperators[2];
 
         SsvValidator[] memory ssvValidators = getSsvValidators1();
-        ISSVClusters.Cluster memory cluster = getCluster1();
+        ISSVNetworkCore.Cluster memory cluster = getCluster1();
         uint256 tokenAmount = getTokenAmount1();
 
         return SsvPayload({
@@ -899,7 +900,7 @@ contract HoleskyIntegration is Test {
         ISSVNetwork.Cluster[] memory _clusters = new ISSVNetwork.Cluster[](1);
         _clusters[0] = clusterAfter1stRegistation;
 
-        ISSVClusters.Cluster memory clusterAfterLiquidation = ISSVClusters.Cluster({
+        ISSVNetworkCore.Cluster memory clusterAfterLiquidation = ISSVNetworkCore.Cluster({
             validatorCount: 5,
             networkFeeIndex: 0,
             index: 0,
@@ -958,7 +959,7 @@ contract HoleskyIntegration is Test {
 
         ssvToken.transfer(proxy1, 42 ether);
 
-        ISSVClusters.Cluster memory clusterAfterDeposit = clusterAfter1stRegistation;
+        ISSVNetworkCore.Cluster memory clusterAfterDeposit = clusterAfter1stRegistation;
         clusterAfterDeposit.balance += 42 ether;
 
         vm.expectEmit();
@@ -1120,7 +1121,7 @@ contract HoleskyIntegration is Test {
 
         registerValidators();
 
-        ISSVClusters.Cluster[] memory clusters = new ISSVClusters.Cluster[](1);
+        ISSVNetworkCore.Cluster[] memory clusters = new ISSVNetworkCore.Cluster[](1);
         clusters[0] = clusterAfter1stRegistation;
 
         uint256 proxyBalanceBefore = ssvToken.balanceOf(proxyAddress);
@@ -1157,7 +1158,7 @@ contract HoleskyIntegration is Test {
 
         uint256 tokenAmount = 42;
 
-        ISSVClusters.Cluster memory clusterAfterDeposit = ISSVClusters.Cluster({
+        ISSVNetworkCore.Cluster memory clusterAfterDeposit = ISSVNetworkCore.Cluster({
             validatorCount: clusterAfter1stRegistation.validatorCount,
             networkFeeIndex: clusterAfter1stRegistation.networkFeeIndex,
             index: clusterAfter1stRegistation.index,
@@ -1288,7 +1289,7 @@ contract HoleskyIntegration is Test {
 
         registerValidators();
 
-        ISSVClusters.Cluster[] memory clusters = new ISSVClusters.Cluster[](1);
+        ISSVNetworkCore.Cluster[] memory clusters = new ISSVNetworkCore.Cluster[](1);
         clusters[0] = clusterAfter1stRegistation;
 
         uint256 proxyBalanceBefore = ssvToken.balanceOf(proxyAddress);
@@ -1332,7 +1333,7 @@ contract HoleskyIntegration is Test {
 
         registerValidators();
 
-        ISSVClusters.Cluster[] memory clusters = new ISSVClusters.Cluster[](1);
+        ISSVNetworkCore.Cluster[] memory clusters = new ISSVNetworkCore.Cluster[](1);
         clusters[0] = clusterAfter1stRegistation;
 
         uint256 tokenAmount = 42;
@@ -1373,7 +1374,10 @@ contract HoleskyIntegration is Test {
             vm.startPrank(allowedSsvOperatorOwners[i]);
 
             ISSVOperators(ssvNetworkAddress).reduceOperatorFee(operatorIds[i], 0);
-            ISSVOperators(ssvNetworkAddress).setOperatorWhitelist(operatorIds[i], proxy_);
+            uint64[] memory ids = new uint64[](1);
+            ids[0] = operatorIds[i];
+            ISSVOperators(ssvNetworkAddress).setOperatorsPrivateUnchecked(ids);
+            ISSVOperatorsWhitelist(ssvNetworkAddress).setOperatorsWhitelistingContract(ids, p2pSsvProxyFactory);
 
             vm.stopPrank();
         }

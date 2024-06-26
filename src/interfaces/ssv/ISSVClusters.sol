@@ -1,23 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 pragma solidity 0.8.24;
 
-/// @dev https://github.com/bloxapp/ssv-network/blob/8c945e82cc063eb8e40c467d314a470121821157/contracts/interfaces/ISSVNetworkCore.sol
-interface ISSVClusters {
-    /// @notice Represents a cluster of validators
-    struct Cluster {
-        /// @dev The number of validators in the cluster
-        uint32 validatorCount;
-        /// @dev The index of network fees related to this cluster
-        uint64 networkFeeIndex;
-        /// @dev The last index calculated for the cluster
-        uint64 index;
-        /// @dev Flag indicating whether the cluster is active
-        bool active;
-        /// @dev The balance of the cluster
-        uint256 balance;
-    }
+import {ISSVNetworkCore} from "./ISSVNetworkCore.sol";
 
-
+/// @dev https://github.com/ssvlabs/ssv-network/blob/2e90a0cc44ae2645ea06ef9c0fcd2369bbf3c277/contracts/interfaces/ISSVClusters.sol
+interface ISSVClusters is ISSVNetworkCore {
     /// @notice Registers a new validator on the SSV Network
     /// @param publicKey The public key of the new validator
     /// @param operatorIds Array of IDs of operators managing this validator
@@ -123,12 +110,38 @@ interface ISSVClusters {
      */
     event ValidatorRemoved(address indexed owner, uint64[] operatorIds, bytes publicKey, Cluster cluster);
 
+    /**
+     * @dev Emitted when a cluster is liquidated.
+     * @param owner The owner of the liquidated cluster.
+     * @param operatorIds The operator IDs managing the cluster.
+     * @param cluster The liquidated cluster data.
+     */
     event ClusterLiquidated(address indexed owner, uint64[] operatorIds, Cluster cluster);
 
+    /**
+     * @dev Emitted when a cluster is reactivated.
+     * @param owner The owner of the reactivated cluster.
+     * @param operatorIds The operator IDs managing the cluster.
+     * @param cluster The reactivated cluster data.
+     */
     event ClusterReactivated(address indexed owner, uint64[] operatorIds, Cluster cluster);
 
+    /**
+     * @dev Emitted when tokens are withdrawn from a cluster.
+     * @param owner The owner of the cluster.
+     * @param operatorIds The operator IDs managing the cluster.
+     * @param value The amount of tokens withdrawn.
+     * @param cluster The cluster from which tokens were withdrawn.
+     */
     event ClusterWithdrawn(address indexed owner, uint64[] operatorIds, uint256 value, Cluster cluster);
 
+    /**
+     * @dev Emitted when tokens are deposited into a cluster.
+     * @param owner The owner of the cluster.
+     * @param operatorIds The operator IDs managing the cluster.
+     * @param value The amount of SSV tokens deposited.
+     * @param cluster The cluster into which SSV tokens were deposited.
+     */
     event ClusterDeposited(address indexed owner, uint64[] operatorIds, uint256 value, Cluster cluster);
 
     /**

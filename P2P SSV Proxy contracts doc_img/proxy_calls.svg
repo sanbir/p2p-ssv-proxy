@@ -418,14 +418,14 @@
 <ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="586.99" cy="-877" rx="81.08" ry="18" style=""/>
 <text text-anchor="middle" x="586.99" y="-872.8" font-family="Times,serif" font-size="14.00" style="">_registerValidator</text>
 </g>
-<!-- ISSVClusters.Cluster -->
-<g id="node47" class="node" pointer-events="visible" data-name="ISSVClusters.Cluster">
+<!-- ISSVNetworkCore.Cluster -->
+<g id="node47" class="node" pointer-events="visible" data-name="ISSVNetworkCore.Cluster">
 
 <ellipse fill="#edad56" stroke="#edad56" stroke-width="3" cx="979.23" cy="-1329" rx="38.86" ry="18" style=""/>
 <text text-anchor="middle" x="979.23" y="-1324.8" font-family="Times,serif" font-size="14.00" style="">Cluster</text>
 </g>
-<!-- P2pSsvProxy._registerValidator&#45;&gt;ISSVClusters.Cluster -->
-<g id="edge31" class="edge" data-name="P2pSsvProxy._registerValidator-&gt;ISSVClusters.Cluster">
+<!-- P2pSsvProxy._registerValidator&#45;&gt;ISSVNetworkCore.Cluster -->
+<g id="edge31" class="edge" data-name="P2pSsvProxy._registerValidator-&gt;ISSVNetworkCore.Cluster">
 
 <path fill="none" stroke="white" stroke-width="2" d="M648.47,-864.04C705.14,-855.82 787.93,-854.59 834.53,-904 864.68,-935.97 826.5,-1265.16 854.53,-1299 871.76,-1319.8 900.72,-1327.57 926.29,-1330.02" style=""/>
 <polygon fill="white" stroke="white" stroke-width="2" points="926.05,-1333.52 936.26,-1330.67 926.5,-1326.53 926.05,-1333.52" style=""/>

@@ -47,7 +47,7 @@ struct SsvOperator {
 struct SsvPayload {
     SsvOperator[] ssvOperators;
     SsvValidator[] ssvValidators;
-    ISSVClusters.Cluster cluster;
+    ISSVNetworkCore.Cluster cluster;
     uint256 tokenAmount;
     bytes32 ssvSlot0;
 }
