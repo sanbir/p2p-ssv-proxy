@@ -172,7 +172,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     EnumerableSet.AddressSet private s_allowedSsvOperatorOwners;
 
     /// @notice a mapping of (operator owner address → SSV operator IDs list).
-    /// @dev The list of allowed SSV operator IDs for each address is limited to 16 IDs.
+    /// @dev The list of allowed SSV operator IDs for each address is limited to 24 IDs.
     /// The operator owner can update only their list. P2P can update lists of any owners.
     mapping(address => uint64[MAX_ALLOWED_SSV_OPERATOR_IDS]) private s_allowedSsvOperatorIds;
 
