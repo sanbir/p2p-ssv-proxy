@@ -214,7 +214,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
             _ssvPayload.cluster
         );
 
-        for (uint256 i = 1; i < _ssvPayload.ssvValidators.length;) {
+        for (uint256 i = 1; i < _ssvPayload.ssvValidators.length; ++i) {
             _registerValidator(
                 i,
                 operatorIds,
@@ -225,8 +225,6 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
                 currentNetworkFeeIndex,
                 balance
             );
-
-            unchecked {++i;}
         }
 
         i_ssvNetwork.setFeeRecipientAddress(address(s_feeDistributor));
@@ -258,10 +256,8 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
             revert P2pSsvProxy__AmountOfParametersError();
         }
 
-        for (uint256 i = 0; i < validatorCount;) {
+        for (uint256 i = 0; i < validatorCount; ++i) {
             i_ssvNetwork.removeValidator(_pubkeys[i], _operatorIds, _clusters[i]);
-
-            unchecked {++i;}
         }
     }
 
@@ -273,10 +269,8 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         address clusterOwner = address(this);
         uint256 validatorCount = _clusters.length;
 
-        for (uint256 i = 0; i < validatorCount;) {
+        for (uint256 i = 0; i < validatorCount; ++i) {
             i_ssvNetwork.liquidate(clusterOwner, _operatorIds, _clusters[i]);
-
-            unchecked {++i;}
         }
     }
 
@@ -289,10 +283,8 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         uint256 tokenPerValidator = _tokenAmount / _clusters.length;
         uint256 validatorCount = _clusters.length;
 
-        for (uint256 i = 0; i < validatorCount;) {
+        for (uint256 i = 0; i < validatorCount; ++i) {
             i_ssvNetwork.reactivate(_operatorIds, tokenPerValidator, _clusters[i]);
-
-            unchecked {++i;}
         }
     }
 
@@ -306,10 +298,8 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         uint256 validatorCount = _clusters.length;
         uint256 tokenPerValidator = _tokenAmount / validatorCount;
 
-        for (uint256 i = 0; i < validatorCount;) {
+        for (uint256 i = 0; i < validatorCount; ++i) {
             i_ssvNetwork.deposit(clusterOwner, _operatorIds, tokenPerValidator, _clusters[i]);
-
-            unchecked {++i;}
         }
     }
 
@@ -322,10 +312,8 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         uint256 tokenPerValidator = _tokenAmount / _clusters.length;
         uint256 validatorCount = _clusters.length;
 
-        for (uint256 i = 0; i < validatorCount;) {
+        for (uint256 i = 0; i < validatorCount; ++i) {
             i_ssvNetwork.withdraw(_operatorIds, tokenPerValidator, _clusters[i]);
-
-            unchecked {++i;}
         }
     }
 
@@ -381,15 +369,13 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         clusterIndex = 0;
         uint256 operatorCount = _ssvOperators.length;
         operatorIds = new uint64[](operatorCount);
-        for (uint256 i = 0; i < operatorCount;) {
+        for (uint256 i = 0; i < operatorCount; ++i) {
             operatorIds[i] = _ssvOperators[i].id;
 
             uint256 snapshot = uint256(_ssvOperators[i].snapshot);
 
             // see https://github.com/bloxapp/ssv-network/blob/6ae5903a5c99c8d75b59fc0d35574d87f82e5861/contracts/libraries/OperatorLib.sol#L13
             clusterIndex += uint64(snapshot >> 32) + (uint32(block.number) - uint32(snapshot)) * uint64(_ssvOperators[i].fee / 10_000_000);
-
-            unchecked {++i;}
         }
     }
 
@@ -433,7 +419,7 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         uint64 _currentNetworkFeeIndex,
         uint256 _balance
     ) private {
-        ISSVClusters.Cluster memory cluster = ISSVClusters.Cluster({
+        ISSVNetworkCore.Cluster memory cluster = ISSVNetworkCore.Cluster({
             validatorCount: uint32(_cluster.validatorCount + i),
             networkFeeIndex: _currentNetworkFeeIndex,
             index: _clusterIndex,

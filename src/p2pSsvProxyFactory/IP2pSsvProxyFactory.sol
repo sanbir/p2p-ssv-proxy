@@ -7,7 +7,7 @@ import "../@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import "../structs/P2pStructs.sol";
 import "../constants/P2pConstants.sol";
 import "../interfaces/ssv/ISSVNetwork.sol";
-import "../interfaces/ssv/ISSVWhitelistingContract.sol";
+import "../interfaces/ssv/external/ISSVWhitelistingContract.sol";
 import "../access/IOwnableWithOperator.sol";
 
 /// @dev External interface of P2pSsvProxyFactory

@@ -172,7 +172,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     EnumerableSet.AddressSet private s_allowedSsvOperatorOwners;
 
     /// @notice a mapping of (operator owner address → SSV operator IDs list).
-    /// @dev The list of allowed SSV operator IDs for each address is limited to 16 IDs.
+    /// @dev The list of allowed SSV operator IDs for each address is limited to 24 IDs.
     /// The operator owner can update only their list. P2P can update lists of any owners.
     mapping(address => uint64[MAX_ALLOWED_SSV_OPERATOR_IDS]) private s_allowedSsvOperatorIds;
 
@@ -226,25 +226,21 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
     /// @notice Revert if either 1) one of the operator IDs is not allowed 2) at least 2 operator IDs belong to the same owner
     modifier onlyAllowedOperators(SsvOperator[] calldata _operators) {
         uint256 operatorCount = _operators.length;
-        for (uint256 i = 0; i < operatorCount;) {
+        for (uint256 i = 0; i < operatorCount; ++i) {
             address currentOperatorOwner = _operators[i].owner;
 
-            uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory allowedIds = s_allowedSsvOperatorIds[currentOperatorOwner];
-
             bool isAllowed;
-            for (uint256 j = 0; j < MAX_ALLOWED_SSV_OPERATOR_IDS;) {
-                if (allowedIds[j] == _operators[i].id) {
+            for (uint256 j = 0; j < MAX_ALLOWED_SSV_OPERATOR_IDS; ++j) {
+                if (s_allowedSsvOperatorIds[currentOperatorOwner][j] == _operators[i].id) {
                     isAllowed = true;
                     break;
                 }
-
-                unchecked {++j;}
             }
             if (!isAllowed) {
                 revert P2pSsvProxyFactory__SsvOperatorNotAllowed(currentOperatorOwner, _operators[i].id);
             }
 
-            for (uint256 k = 0; k < operatorCount;) {
+            for (uint256 k = 0; k < operatorCount; ++k) {
                 if (i != k && currentOperatorOwner == _operators[k].owner) {
                     revert P2pSsvProxyFactory__DuplicateOperatorOwnersNotAllowed(
                         currentOperatorOwner,
@@ -252,11 +248,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                         _operators[k].id
                     );
                 }
-
-                unchecked {++k;}
             }
-
-            unchecked {++i;}
         }
 
         _;
@@ -270,25 +262,21 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             revert P2pSsvProxyFactory__SsvOperatorOwnersAndIdsMustHaveTheSameLength(ownersCount, idsCount);
         }
 
-        for (uint256 i = 0; i < ownersCount;) {
+        for (uint256 i = 0; i < ownersCount; ++i) {
             address currentOperatorOwner = _operatorOwners[i];
 
-            uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory allowedIds = s_allowedSsvOperatorIds[currentOperatorOwner];
-
             bool isAllowed;
-            for (uint256 j = 0; j < MAX_ALLOWED_SSV_OPERATOR_IDS;) {
-                if (allowedIds[j] == _operatorIds[i]) {
+            for (uint256 j = 0; j < MAX_ALLOWED_SSV_OPERATOR_IDS; ++j) {
+                if (s_allowedSsvOperatorIds[currentOperatorOwner][j] == _operatorIds[i]) {
                     isAllowed = true;
                     break;
                 }
-
-                unchecked {++j;}
             }
             if (!isAllowed) {
                 revert P2pSsvProxyFactory__SsvOperatorNotAllowed(currentOperatorOwner, _operatorIds[i]);
             }
 
-            for (uint256 k = 0; k < ownersCount;) {
+            for (uint256 k = 0; k < ownersCount; ++k) {
                 if (i != k && currentOperatorOwner == _operatorOwners[k]) {
                     revert P2pSsvProxyFactory__DuplicateOperatorOwnersNotAllowed(
                         currentOperatorOwner,
@@ -296,11 +284,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                         _operatorIds[k]
                     );
                 }
-
-                unchecked {++k;}
             }
-
-            unchecked {++i;}
         }
 
         _;
@@ -389,12 +373,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             revert P2pSsvProxyFactory__CannotSetZeroSelectors();
         }
 
-        for (uint256 i = 0; i < count;) {
+        for (uint256 i = 0; i < count; ++i) {
             s_clientSelectors[_selectors[i]] = true;
-
-            unchecked {
-                ++i;
-            }
         }
 
         emit P2pSsvProxyFactory__AllowedSelectorsForClientSet(_selectors);
@@ -408,12 +388,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             revert P2pSsvProxyFactory__CannotRemoveZeroSelectors();
         }
 
-        for (uint256 i = 0; i < count;) {
+        for (uint256 i = 0; i < count; ++i) {
             s_clientSelectors[_selectors[i]] = false;
-
-            unchecked {
-                ++i;
-            }
         }
 
         emit P2pSsvProxyFactory__AllowedSelectorsForClientRemoved(_selectors);
@@ -427,12 +403,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             revert P2pSsvProxyFactory__CannotSetZeroSelectors();
         }
 
-        for (uint256 i = 0; i < count;) {
+        for (uint256 i = 0; i < count; ++i) {
             s_operatorSelectors[_selectors[i]] = true;
-
-            unchecked {
-                ++i;
-            }
         }
 
         emit P2pSsvProxyFactory__AllowedSelectorsForOperatorSet(_selectors);
@@ -446,12 +418,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             revert P2pSsvProxyFactory__CannotRemoveZeroSelectors();
         }
 
-        for (uint256 i = 0; i < count;) {
+        for (uint256 i = 0; i < count; ++i) {
             s_operatorSelectors[_selectors[i]] = false;
-
-            unchecked {
-                ++i;
-            }
         }
 
         emit P2pSsvProxyFactory__AllowedSelectorsForOperatorRemoved(_selectors);
@@ -479,15 +447,11 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             revert P2pSsvProxyFactory__CannotSetZeroAllowedSsvOperatorOwners();
         }
 
-        for (uint256 i = 0; i < count;) {
+        for (uint256 i = 0; i < count; ++i) {
             address allowedSsvOperatorOwner = _allowedSsvOperatorOwners[i];
 
             if (!s_allowedSsvOperatorOwners.add(allowedSsvOperatorOwner)) {
                 revert P2pSsvProxyFactory__SsvOperatorOwnerAlreadyExists(allowedSsvOperatorOwner);
-            }
-
-            unchecked {
-                ++i;
             }
         }
 
@@ -504,15 +468,11 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             revert P2pSsvProxyFactory__CannotRemoveZeroAllowedSsvOperatorOwners();
         }
 
-        for (uint256 i = 0; i < count;) {
+        for (uint256 i = 0; i < count; ++i) {
             address allowedSsvOperatorOwnersToRemove = _allowedSsvOperatorOwnersToRemove[i];
 
             if (!s_allowedSsvOperatorOwners.remove(allowedSsvOperatorOwnersToRemove)) {
                 revert P2pSsvProxyFactory__SsvOperatorOwnerDoesNotExist(allowedSsvOperatorOwnersToRemove);
-            }
-
-            unchecked {
-                ++i;
             }
         }
 
@@ -743,13 +703,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         uint256 validatorCount = _publicKeys.length;
         _checkTokenAmount(_amount, validatorCount);
 
-        if (_depositData.signatures.length != validatorCount || _depositData.depositDataRoots.length != validatorCount) {
-            revert P2pSsvProxyFactory__DepositDataArraysShouldHaveTheSameLength(
-                validatorCount,
-                _depositData.signatures.length,
-                _depositData.depositDataRoots.length
-            );
-        }
+        // Lengths matching check for public keys, signatures, and deposit data roots
+        // is done by P2pOrgUnlimitedEthDepositor
 
         i_p2pOrgUnlimitedEthDepositor.makeBeaconDeposit(
             _eth2WithdrawalCredentials,
@@ -954,15 +909,12 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] calldata _operatorIds,
         address _ssvOperatorOwner
     ) private {
-        for (uint i = 0; i < _operatorIds.length;) {
+        for (uint i = 0; i < _operatorIds.length; ++i) {
             uint64 id = _operatorIds[i];
 
-            for (uint j = i + 1; j < _operatorIds.length;) {
+            for (uint j = i + 1; j < _operatorIds.length; ++j) {
                 if (id == _operatorIds[j] && id != 0) {
                     revert P2pSsvProxyFactory__DuplicateIdsNotAllowed(id);
-                }
-                unchecked {
-                    ++j;
                 }
             }
 
@@ -971,10 +923,6 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 if (actualOwner != _ssvOperatorOwner) {
                     revert P2pSsvProxyFactory__SsvOperatorIdDoesNotBelongToOwner(id, _ssvOperatorOwner, actualOwner);
                 }
-            }
-
-            unchecked {
-                ++i;
             }
         }
 
@@ -1019,7 +967,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             _withdrawalCredentialsAddress
         );
 
-        for (uint256 i = 0; i < validatorCount;) {
+        for (uint256 i = 0; i < validatorCount; ++i) {
             // ETH deposit
             i_depositContract.deposit{value: COLLATERAL}(
                 _ssvValidators[i].pubkey,
@@ -1027,8 +975,6 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 _depositData.signatures[i],
                 _depositData.depositDataRoots[i]
             );
-
-            unchecked {++i;}
         }
     }
 
@@ -1060,7 +1006,7 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
             _withdrawalCredentialsAddress
         );
 
-        for (uint256 i = 0; i < validatorCount;) {
+        for (uint256 i = 0; i < validatorCount; ++i) {
             // ETH deposit
             i_depositContract.deposit{value: COLLATERAL}(
                 _pubkeys[i],
@@ -1068,8 +1014,6 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
                 _depositData.signatures[i],
                 _depositData.depositDataRoots[i]
             );
-
-            unchecked {++i;}
         }
     }
 
@@ -1147,6 +1091,8 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
 
     /// @inheritdoc ERC165
     function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
-        return interfaceId == type(IP2pSsvProxyFactory).interfaceId || super.supportsInterface(interfaceId);
+        return interfaceId == type(IP2pSsvProxyFactory).interfaceId ||
+               interfaceId == type(ISSVWhitelistingContract).interfaceId ||
+               super.supportsInterface(interfaceId);
     }
 }
