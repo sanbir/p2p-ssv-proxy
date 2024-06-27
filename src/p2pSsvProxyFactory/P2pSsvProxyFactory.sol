@@ -229,11 +229,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         for (uint256 i = 0; i < operatorCount; ++i) {
             address currentOperatorOwner = _operators[i].owner;
 
-            uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory allowedIds = s_allowedSsvOperatorIds[currentOperatorOwner];
-
             bool isAllowed;
             for (uint256 j = 0; j < MAX_ALLOWED_SSV_OPERATOR_IDS; ++j) {
-                if (allowedIds[j] == _operators[i].id) {
+                if (s_allowedSsvOperatorIds[currentOperatorOwner][j] == _operators[i].id) {
                     isAllowed = true;
                     break;
                 }
@@ -267,11 +265,9 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         for (uint256 i = 0; i < ownersCount; ++i) {
             address currentOperatorOwner = _operatorOwners[i];
 
-            uint64[MAX_ALLOWED_SSV_OPERATOR_IDS] memory allowedIds = s_allowedSsvOperatorIds[currentOperatorOwner];
-
             bool isAllowed;
             for (uint256 j = 0; j < MAX_ALLOWED_SSV_OPERATOR_IDS; ++j) {
-                if (allowedIds[j] == _operatorIds[i]) {
+                if (s_allowedSsvOperatorIds[currentOperatorOwner][j] == _operatorIds[i]) {
                     isAllowed = true;
                     break;
                 }
