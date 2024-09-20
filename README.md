@@ -18,7 +18,30 @@ forge test
 
 ## SSV validator registration use cases
 
-### 1. With ETH deposit
+### 1. Without data generation on the client side
+> Client has 100500 ETH and wants to stake it with DVT (SSV) in 1 transaction, preserving custody over withdrawal credentials but delegating validator key management and all the low-level data generation to P2P.
+
+1. Client calls `P2pSsvProxyFactory`'s `addEth` function once. The ETH value should be 100500 ETH.
+
+    The arguments are:
+    - **_eth2WithdrawalCredentials** - client's [withdrawal credentials](https://eth2book.info/capella/part2/deposits-withdrawals/withdrawal-processing/#withdrawal-credentials)
+    - **_ethAmountPerValidatorInWei** - amount of ETH per validator (exactly 32000000000000000000 (32 ETH in wei) before Pectra)
+    - **_clientConfig** - should be in the format {recipient:"0x6Bb8b45a1C6eA816B70d76f83f7dC4f0f87365Ff",basisPoints:9000} for Etherscan if client address is 0x6Bb8b45a1C6eA816B70d76f83f7dC4f0f87365Ff and client should get 90% of total ETH rewards
+    - **_referrerConfig** - should be in the format {recipient:"0x81CE71EEB7531AA26073eD0d1110F6F0563C6C7c",basisPoints:600} for Etherscan if referrer address is 0x81CE71EEB7531AA26073eD0d1110F6F0563C6C7c and referrer should get 6% of total ETH rewards. P2P will receive 4% in this case.
+    - **_extraData** - any data. Can be empty (""). Intended to be used for MEV relay information, client-specific encrypted data, etc.
+
+    > **Note:** addresses and percentages (basis points) here are for example only. Please double check the actual values before sending any mainnet ETH!!!
+
+Client does not need to do anything else for staking. All the following steps are done by P2P:
+
+2. P2P generates ETH2 deposit data and corresponding SSV shares data for each validator.
+3. P2P calls `P2pSsvProxyFactory`'s `makeBeaconDepositsAndRegisterValidators` function for batches up to 50 validators using 
+   - the client data from Step 1 (retrived from  `P2pSsvProxyFactory`'s `P2pSsvProxyFactory__EthForSsvStakingDeposited` events and `P2pOrgUnlimitedEthDepositor`'s `P2pOrgUnlimitedEthDepositor__ClientEthAdded` events).
+   - the ETH2 deposit data and corresponding SSV shares data generated in Step 2.
+
+4. If P2P did not do the actual staking deposits within 1 day, client can call `P2pOrgUnlimitedEthDepositor`'s `refund` function to get their ETH back.
+
+### 2. [Deprecated] With ETH deposit (with data generation on the client side)
 
 > Client has 3200 ETH and wants to stake it with DVT (SSV), preserving custody over withdrawal credentials and private keys of the validators.
 > 
@@ -151,7 +174,7 @@ Steps 1 - 3 can be done using the native tools (like [staking-deposit-cli](https
         ```
         
 
-### 2. Without ETH deposit
+### 3. [Deprecated] Without ETH deposit (with data generation on the client side)
 
 > Client has 100 already deposited validators and wants to distribute the keys with DVT (SSV), preserving custody over withdrawal credentials and private keys of the validators.
 > 
@@ -269,6 +292,7 @@ All the steps below can happen client-side without any interaction with P2P serv
         }
         ```
         
+
 
 ## Asset recovery
 
