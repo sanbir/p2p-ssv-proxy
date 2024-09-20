@@ -370,8 +370,8 @@ P2pSsvProxyFactory’s functions:
         ```
         
 
-- Mainnet: TBD
-- Goerli: [0x687Cc3F02e1C9B2b87989f76eB3Bd215b1cBfd38](https://goerli.etherscan.io/address/0x687Cc3F02e1C9B2b87989f76eB3Bd215b1cBfd38)
+- Mainnet: [0xcb924D4BE3Ff04B2d2116fE116138950373111d9](https://etherscan.io/address/0xcb924D4BE3Ff04B2d2116fE116138950373111d9)
+- Holesky: [0xE9DfC1850110DadF68402Ec6AD2B9bDfB7980733](https://holesky.etherscan.io/address/0xE9DfC1850110DadF68402Ec6AD2B9bDfB7980733)
 
 ### **P2pSsvProxy**
 
@@ -398,15 +398,15 @@ P2pSsvProxy allows to call all `SSVNetwork` functions having P2pSsvProxy instanc
 
 For the client, only `removeValidator` function is available out of the box. It’s still possible for P2P to allow any other functions for clients to call. It’s done via P2pSsvProxyFactory’s `setAllowedSelectorsForClient` function.
 
-- Mainnet: TBD
-- Goerli: [0xb00C3a8D951b0C4bac8Db2f006c614F05D29E666](https://goerli.etherscan.io/address/0xb00C3a8D951b0C4bac8Db2f006c614F05D29E666)
+- Mainnet: [0xec17A02B2A8b0C291C0DddE2a00Ca24477c17ED5](https://etherscan.io/address/0xec17A02B2A8b0C291C0DddE2a00Ca24477c17ED5)
+- Holesky: [0x1e534b1B344fDA49F2778b9b956f7EeB2280e258](https://holesky.etherscan.io/address/0x1e534b1B344fDA49F2778b9b956f7EeB2280e258)
 
 ### **DepositContract**
 
 Native ETH2 (Beacon) deposit contract, 1 for all.
 
 - Mainnet: [0x00000000219ab540356cBB839Cbe05303d7705Fa](https://etherscan.io/address/0x00000000219ab540356cBB839Cbe05303d7705Fa)
-- Goerli: [0xff50ed3d0ec03aC01D4C79aAd74928BFF48a7b2b](https://goerli.etherscan.io/address/0xff50ed3d0ec03ac01d4c79aad74928bff48a7b2b)
+- Holesky: [0x4242424242424242424242424242424242424242](https://holesky.etherscan.io/address/0x4242424242424242424242424242424242424242)
 
 ### FeeDistributorFactory
 
@@ -429,7 +429,7 @@ function createFeeDistributor(
 ```
 
 - Mainnet: [0x86a9f3e908b4658A1327952Eb1eC297a4212E1bb](https://etherscan.io/address/0x86a9f3e908b4658A1327952Eb1eC297a4212E1bb)
-- Goerli: [0xe17cA83F84295aA66EC1d199bc569B0dbCddFb05](https://goerli.etherscan.io/address/0xe17cA83F84295aA66EC1d199bc569B0dbCddFb05)
+- Holesky: [0x5cdF046Bd49629E5130a4A82400733523Ba5820C](https://holesky.etherscan.io/address/0x5cdF046Bd49629E5130a4A82400733523Ba5820C)
 
 ### **FeeDistributor**
 
@@ -446,13 +446,9 @@ Also, for each type of `FeeDistributor` contract, there is a **reference instanc
 **Reference (template) FeeDistributor instances:**
 
 - Mainnet:
-    - [ElOnlyFeeDistributor](https://etherscan.io/address/0x6091767be457a5a7f7d368dd68ebf2f416728d97) 0x6091767Be457a5A7f7d368dD68Ebf2f416728d97
     - [OracleFeeDistributor](https://etherscan.io/address/0x7109deeb07aa9eed1e2613f88b2f3e1e6c05163f) 0x7109DeEb07aa9Eed1e2613F88b2f3E1e6C05163f
-    - [ContractWcFeeDistributor](https://etherscan.io/address/0xf6aa125a49c7b371f27dea01e7407daa85ab91ed) 0xf6aa125a49c7B371f27dEA01E7407DAa85AB91ed
-- Goerli:
-    - [ElOnlyFeeDistributor](https://goerli.etherscan.io/address/0x6cc87e83c677f32c45e70cf64b1fbca7560d217f) 0x6cC87e83c677F32C45e70Cf64B1fbCa7560d217f
-    - [OracleFeeDistributor](https://goerli.etherscan.io/address/0x98c275395677cabc5ec21f4d669eb66a3a25fda4) 0x98C275395677cAbc5EC21f4D669eB66a3A25fdA4
-    - [ContractWcFeeDistributor](https://goerli.etherscan.io/address/0x1a18808b53492db3c6de7fab83c728b430f5a105) 0x1A18808B53492dB3C6De7fAB83c728b430f5A105
+- Holesky:
+    - [OracleFeeDistributor](https://holesky.etherscan.io/address/0x26766611723B654DeE5F041C8E20FDBC4EB37b31) 0x26766611723B654DeE5F041C8E20FDBC4EB37b31
 
 For each set of 
 
@@ -471,7 +467,7 @@ The actual deployment is done using FeeDistributorFactory’s `createFeeDistribu
 ERC-20 token used for paying fees in SSV.
 
 - Mainnet: [0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54](https://etherscan.io/address/0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
-- Goerli: [0x3a9f01091C446bdE031E39ea8354647AFef091E7](https://goerli.etherscan.io/address/0x3a9f01091C446bdE031E39ea8354647AFef091E7)
+- Holesky: [0xad45A78180961079BFaeEe349704F411dfF947C6](https://holesky.etherscan.io/address/0xad45A78180961079BFaeEe349704F411dfF947C6)
 
 ### **SSVNetwork**
 
@@ -480,7 +476,7 @@ ERC-20 token used for paying fees in SSV.
 [Read in SSV doc](https://docs.ssv.network/developers/smart-contracts/ssvnetwork)
 
 - Mainnet: [0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1](https://etherscan.io/address/0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1)
-- Goerli: [0xC3CD9A0aE89Fff83b71b58b6512D43F8a41f363D](https://goerli.etherscan.io/address/0xc3cd9a0ae89fff83b71b58b6512d43f8a41f363d)
+- Holesky: [0x38A4794cCEd47d3baf7370CcC43B560D3a1beEFA](https://holesky.etherscan.io/address/0x38A4794cCEd47d3baf7370CcC43B560D3a1beEFA)
 
 ### **SSVNetworkViews**
 
@@ -489,7 +485,7 @@ ERC-20 token used for paying fees in SSV.
 [Read in SSV doc](https://docs.ssv.network/developers/smart-contracts/ssvnetworkviews)
 
 - Mainnet: [0xafE830B6Ee262ba11cce5F32fDCd760FFE6a66e4](https://etherscan.io/address/0xafE830B6Ee262ba11cce5F32fDCd760FFE6a66e4)
-- Goerli: [0xAE2C84c48272F5a1746150ef333D5E5B51F68763](https://goerli.etherscan.io/address/0xAE2C84c48272F5a1746150ef333D5E5B51F68763)
+- Holesky: [0x352A18AEe90cdcd825d1E37d9939dCA86C00e281](https://holesky.etherscan.io/address/0x352A18AEe90cdcd825d1E37d9939dCA86C00e281)
 
 ## Links
 
