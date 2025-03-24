@@ -316,21 +316,19 @@ contract P2pSsvProxyFactory is OwnableAssetRecoverer, OwnableWithOperator, ERC16
         s_referenceFeeDistributor = _referenceFeeDistributor;
         emit P2pSsvProxyFactory__ReferenceFeeDistributorSet(_referenceFeeDistributor);
 
-        i_depositContract = (block.chainid == 1)
-            ? IDepositContract(0x00000000219ab540356cBB839Cbe05303d7705Fa)
-            : IDepositContract(0x4242424242424242424242424242424242424242);
+        i_depositContract = IDepositContract(0x00000000219ab540356cBB839Cbe05303d7705Fa);
 
         i_ssvToken = (block.chainid == 1)
             ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
-            : IERC20(0xad45A78180961079BFaeEe349704F411dfF947C6);
+            : IERC20(0x9F5d4Ec84fC4785788aB44F9de973cF34F7A038e);
 
         i_ssvViews = (block.chainid == 1)
             ? ISSVViews(0xafE830B6Ee262ba11cce5F32fDCd760FFE6a66e4)
-            : ISSVViews(0x352A18AEe90cdcd825d1E37d9939dCA86C00e281);
+            : ISSVViews(0x5AdDb3f1529C5ec70D77400499eE4bbF328368fe);
 
         i_ssvNetwork = (block.chainid == 1)
             ? ISSVNetwork(0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1)
-            : ISSVNetwork(0x38A4794cCEd47d3baf7370CcC43B560D3a1beEFA);
+            : ISSVNetwork(0x58410Bef803ECd7E63B23664C586A6DB72DAf59c);
 
         i_ssvToken.approve(address(i_ssvNetwork), type(uint256).max);
     }
