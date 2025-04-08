@@ -125,13 +125,9 @@ contract P2pSsvProxy is OwnableAssetRecoverer, ERC165, IP2pSsvProxy {
         }
         i_p2pSsvProxyFactory = IP2pSsvProxyFactory(_p2pSsvProxyFactory);
 
-        i_ssvNetwork = (block.chainid == 1)
-            ? ISSVNetwork(0xDD9BC35aE942eF0cFa76930954a156B3fF30a4E1)
-            : ISSVNetwork(0x58410Bef803ECd7E63B23664C586A6DB72DAf59c);
+        i_ssvNetwork = ISSVNetwork(0x58410Bef803ECd7E63B23664C586A6DB72DAf59c);
 
-        i_ssvToken = (block.chainid == 1)
-            ? IERC20(0x9D65fF81a3c488d585bBfb0Bfe3c7707c7917f54)
-            : IERC20(0x9F5d4Ec84fC4785788aB44F9de973cF34F7A038e);
+        i_ssvToken = IERC20(0x9F5d4Ec84fC4785788aB44F9de973cF34F7A038e);
     }
 
     /// @inheritdoc IP2pSsvProxy

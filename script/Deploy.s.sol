@@ -28,7 +28,7 @@ contract Deploy is Script {
         P2pSsvProxy referenceP2pSsvProxy = new P2pSsvProxy(address(p2pSsvProxyFactory));
         p2pSsvProxyFactory.setReferenceP2pSsvProxy(address(referenceP2pSsvProxy));
 
-        IChangeOperator(address(feeDistributorFactory)).changeOperator(address(p2pSsvProxyFactory));
+        // IChangeOperator(address(feeDistributorFactory)).changeOperator(address(p2pSsvProxyFactory));
 
         p2pSsvProxyFactory.setSsvPerEthExchangeRateDividedByWei(uint112(vm.envUint("EXCHANGE_RATE")));
         p2pSsvProxyFactory.setMaxSsvTokenAmountPerValidator(uint112(vm.envUint("MAX_SSV_TOKEN_AMOUNT_PER_VALIDATOR")));
